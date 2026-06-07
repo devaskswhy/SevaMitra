@@ -1,7 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -81,12 +82,13 @@ export default function Dashboard() {
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
   const [recommendations, setRecommendations] = useState<VolunteerRecommendation[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
-    initSocket();
+    const cleanup = initSocket();
+    return cleanup;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
@@ -129,7 +131,6 @@ export default function Dashboard() {
 
   const initSocket = () => {
     const socketInstance = io('http://localhost:4000');
-    setSocket(socketInstance);
 
     socketInstance.on('connect', () => {
       console.log('Connected to socket');
@@ -137,12 +138,12 @@ export default function Dashboard() {
 
     socketInstance.on('activity', (data: Activity) => {
       setActivities((prev) => [
-        { id: Date.now().toString(), ...data },
+        { ...data, id: data.id || Date.now().toString() },
         ...prev.slice(0, 49),
       ]);
     });
 
-    socketInstance.on('assignment:updated', (data: any) => {
+    socketInstance.on('assignment:updated', (data: string) => {
       setActivities((prev) => [
         { id: Date.now().toString(), message: `Assignment updated: ${data}`, timestamp: new Date(), type: 'info' },
         ...prev.slice(0, 49),
@@ -150,7 +151,7 @@ export default function Dashboard() {
       fetchData();
     });
 
-    socketInstance.on('incident:reported', (data: any) => {
+    socketInstance.on('incident:reported', (data: string) => {
       setActivities((prev) => [
         { id: Date.now().toString(), message: `Incident reported: ${data}`, timestamp: new Date(), type: 'warning' },
         ...prev.slice(0, 49),

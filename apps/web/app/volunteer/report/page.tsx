@@ -21,7 +21,6 @@ export default function IncidentReport() {
   const [zoneId, setZoneId] = useState('');
   const [type, setType] = useState('');
   const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -41,8 +40,6 @@ export default function IncidentReport() {
       setZones(response.data);
     } catch (error) {
       console.error('Failed to fetch zones:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -70,7 +67,7 @@ export default function IncidentReport() {
       setTimeout(() => {
         router.push('/volunteer/home');
       }, 2000);
-    } catch (error) {
+    } catch {
       setError('Failed to submit report. Please try again.');
     } finally {
       setSubmitting(false);
