@@ -1,0 +1,114 @@
+// Prisma schema for SevaMitra
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Volunteer {
+  id                Int       @id @default(autoincrement())
+  name              String
+  phone             String    @unique
+  email             String    @unique
+  aadhaarHash       String
+  age               Int
+  gender            String
+  languages         String[]
+  skills            Skill[]   @relation("VolunteerSkills")
+  certifications    String[]
+  homeState         String
+  registeredAt      DateTime  @default(now())
+  status            Status    @default(ACTIVE)
+  reliabilityScore  Int       @default(0)
+  completedShifts   Int       @default(0)
+
+  @@index([phone])
+}
+
+model Zone {
+  id             Int       @id @default(autoincrement())
+  name           String
+  type           ZoneType
+  coordinates    Json
+  maxCapacity    Int
+  currentLoad    Int       @default(0)
+  priority       Priority   @default(LOW)
+
+  @@index([type])
+}
+
+model Task {
+  id                Int       @id @default(autoincrement())
+  title             String
+  skillsRequired    Skill[]
+  zone              Zone      @relation(fields: [zoneId], references: [id])
+  zoneId            Int
+  estimatedDuration Int
+  difficulty        Int
+  minVolunteers     Int
+  maxVolunteers     Int
+
+  @@index([zoneId])
+}
+
+model Assignment {
+  id            Int       @id @default(autoincrement())
+  volunteer     Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId   Int
+  task          Task      @relation(fields: [taskId], references: [id])
+  taskId        Int
+  shift         Shift     @relation(fields: [shiftId], references: [id])
+  shiftId       Int
+  checkInTime   DateTime?
+  checkOutTime  DateTime?
+  performanceRating Int?
+
+  @@unique([volunteerId, taskId, shiftId])
+}
+
+model Incident {
+  id              Int       @id @default(autoincrement())
+  zone            Zone      @relation(fields: [zoneId], references: [id])
+  zoneId          Int
+  reportedBy      String
+  severity        Int
+  type            String
+  description     String
+  resolvedAt      DateTime?
+  volunteersDeployed Volunteer[] @relation("IncidentVolunteers")
+
+  @@index([zoneId])
+}
+
+model Shift {
+  id            Int       @id @default(autoincrement())
+  startTime     DateTime
+  endTime       DateTime
+  assignments   Assignment[]
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+}
+
+enum ZoneType {
+  GHAT
+  CAMP
+  MEDICAL
+  TRAFFIC
+  ENTRY_EXIT
+  CROWD_CONTROL
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}

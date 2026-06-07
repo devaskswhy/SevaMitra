@@ -1,0 +1,11 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@prisma/client": "^3.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^3.0.0"
+  }
+}

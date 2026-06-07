@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Volunteer {
+  id               Int          @id @default(autoincrement())
+  name             String
+  phone            String       @unique
+  email            String       @unique
+  aadhaarHash      String
+  age              Int
+  gender           String
+  languages        String       @default("")
+  skills           String       @default("")
+  certifications   String       @default("")
+  homeState        String
+  registeredAt     DateTime     @default(now())
+  status           String       @default("ACTIVE")
+  reliabilityScore Int          @default(0)
+  completedShifts  Int          @default(0)
+  assignments      Assignment[]
+  incidents        Incident[]   @relation("IncidentVolunteers")
+
+  @@index([phone])
+}
+
+model Zone {
+  id           Int        @id @default(autoincrement())
+  name         String
+  type         String
+  coordinates  String     @default("")
+  maxCapacity  Int
+  currentLoad  Int        @default(0)
+  priority     String     @default("LOW")
+  tasks        Task[]
+  incidents    Incident[]
+
+  @@index([type])
+}
+
+model Task {
+  id                Int          @id @default(autoincrement())
+  title             String
+  skillsRequired    String       @default("")
+  zoneId            Int
+  zone              Zone         @relation(fields: [zoneId], references: [id])
+  estimatedDuration Int
+  difficulty        Int
+  minVolunteers     Int
+  maxVolunteers     Int
+  assignments       Assignment[]
+
+  @@index([zoneId])
+}
+
+model Assignment {
+  id                Int       @id @default(autoincrement())
+  volunteerId       Int
+  volunteer         Volunteer @relation(fields: [volunteerId], references: [id])
+  taskId            Int
+  task              Task      @relation(fields: [taskId], references: [id])
+  shiftId           Int
+  shift             Shift     @relation(fields: [shiftId], references: [id])
+  checkInTime       DateTime?
+  checkOutTime      DateTime?
+  performanceRating Int?
+
+  @@unique([volunteerId, taskId, shiftId])
+}
+
+model Incident {
+  id                 Int         @id @default(autoincrement())
+  zoneId             Int
+  zone               Zone        @relation(fields: [zoneId], references: [id])
+  reportedBy         String
+  severity           Int
+  type               String
+  description        String
+  resolvedAt         DateTime?
+  volunteersDeployed Volunteer[] @relation("IncidentVolunteers")
+
+  @@index([zoneId])
+}
+
+model Shift {
+  id          Int          @id @default(autoincrement())
+  startTime   DateTime
+  endTime     DateTime
+  assignments Assignment[]
+}
