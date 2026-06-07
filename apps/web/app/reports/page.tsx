@@ -86,7 +86,7 @@ export default function ReportsPage() {
     ? Math.round(volunteers.reduce((sum, v) => sum + v.reliabilityScore, 0) / volunteers.length)
     : 0;
 
-  // Zone performance: compute incidents per zone and simulated avg response time
+  // Zone performance
   const zonePerformance = zones.map(zone => {
     const zoneIncidents = incidents.filter(i => i.zoneId === zone.id);
     const resolvedIncidents = zoneIncidents.filter(i => i.resolvedAt);
@@ -94,7 +94,7 @@ export default function ReportsPage() {
       ? Math.round(resolvedIncidents.reduce((sum, i) => {
           const created = new Date(i.createdAt).getTime();
           const resolved = new Date(i.resolvedAt!).getTime();
-          return sum + (resolved - created) / 60000; // minutes
+          return sum + (resolved - created) / 60000;
         }, 0) / resolvedIncidents.length)
       : 0;
 
@@ -113,10 +113,10 @@ export default function ReportsPage() {
     .slice(0, 10);
 
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return { emoji: '🥇', color: '#FFD700', bg: 'rgba(255, 215, 0, 0.15)' };
-    if (rank === 2) return { emoji: '🥈', color: '#C0C0C0', bg: 'rgba(192, 192, 192, 0.15)' };
-    if (rank === 3) return { emoji: '🥉', color: '#CD7F32', bg: 'rgba(205, 127, 50, 0.15)' };
-    return { emoji: `#${rank}`, color: '#C4B49A', bg: 'rgba(196, 180, 154, 0.08)' };
+    if (rank === 1) return { emoji: '🥇', color: '#D4A017', bg: 'rgba(212, 160, 23, 0.1)' };
+    if (rank === 2) return { emoji: '🥈', color: '#78909C', bg: 'rgba(120, 144, 156, 0.1)' };
+    if (rank === 3) return { emoji: '🥉', color: '#8B5E3C', bg: 'rgba(139, 94, 60, 0.1)' };
+    return { emoji: `#${rank}`, color: 'var(--text-muted)', bg: 'rgba(160, 120, 90, 0.05)' };
   };
 
   const handleExport = () => {
@@ -125,7 +125,7 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center lotus-pattern" style={{ background: '#0D0A1A' }}>
+      <div className="min-h-screen flex items-center justify-center lotus-pattern" style={{ background: 'var(--bg-primary)' }}>
         <div className="saffron-spinner"></div>
         <div className="loading-bar"></div>
       </div>
@@ -133,7 +133,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
       <Sidebar />
       <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
@@ -141,10 +141,10 @@ export default function ReportsPage() {
           {/* Page Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+              <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
                 Reports & Analytics
               </h1>
-              <p className="text-lg" style={{ color: '#C4B49A', fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
                 Event performance overview and volunteer insights
               </p>
             </div>
@@ -152,9 +152,9 @@ export default function ReportsPage() {
               onClick={handleExport}
               className="px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg flex items-center gap-2"
               style={{
-                background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
-                color: '#0D0A1A',
-                fontFamily: 'Poppins, sans-serif'
+                background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
+                color: '#fff',
+                border: 'none'
               }}
             >
               📥 Export Report
@@ -163,80 +163,59 @@ export default function ReportsPage() {
 
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <SummaryCard
-              title="Total Volunteers"
-              value={totalVolunteers}
-              icon="👥"
-              color="#FF6B00"
-            />
-            <SummaryCard
-              title="Shifts Completed"
-              value={totalShiftsCompleted}
-              icon="✅"
-              color="#4CAF50"
-            />
-            <SummaryCard
-              title="Incidents Resolved"
-              value={totalIncidentsResolved}
-              icon="🛡️"
-              color="#FFD700"
-            />
-            <SummaryCard
-              title="Avg Reliability Score"
-              value={`${avgReliability}%`}
-              icon="⭐"
-              color="#E8A045"
-            />
+            <SummaryCard title="Total Volunteers" value={totalVolunteers} icon="👥" color="var(--accent-saffron)" />
+            <SummaryCard title="Shifts Completed" value={totalShiftsCompleted} icon="✅" color="var(--success)" />
+            <SummaryCard title="Incidents Resolved" value={totalIncidentsResolved} icon="🛡️" color="var(--accent-gold)" />
+            <SummaryCard title="Avg Reliability Score" value={`${avgReliability}%`} icon="⭐" color="var(--accent-deep)" />
           </div>
 
           <hr className="rangoli-divider" />
 
           {/* Zone Performance Table */}
           <div className="card p-6 mb-8">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
-              <span style={{ color: '#FFD700' }}>●</span> Zone Performance
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <span style={{ color: 'var(--accent-gold)' }}>●</span> Zone Performance
             </h2>
-            <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255, 165, 0, 0.2)' }}>
+            <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
               <table className="w-full">
-                <thead style={{ background: '#2A1F3D' }}>
+                <thead style={{ background: 'var(--bg-secondary)' }}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Zone Name</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Assigned Volunteers</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Incidents</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Avg Response Time</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Zone Name</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Assigned Volunteers</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Incidents</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Avg Response Time</th>
                   </tr>
                 </thead>
                 <tbody>
                   {zonePerformance.map((zone, index) => (
                     <tr key={zone.id} style={{
-                      background: index % 2 === 0 ? '#211835' : '#1A1228',
-                      borderBottom: '1px solid rgba(255, 165, 0, 0.1)'
+                      background: index % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-secondary)',
+                      borderBottom: '1px solid var(--border)'
                     }}>
-                      <td className="px-6 py-4 text-sm font-medium" style={{ color: '#F5F0E8' }}>{zone.name}</td>
-                      <td className="px-6 py-4 text-sm" style={{ color: '#C4B49A' }}>{zone.assignedVolunteers}</td>
+                      <td className="px-6 py-4 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{zone.name}</td>
+                      <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{zone.assignedVolunteers}</td>
                       <td className="px-6 py-4 text-sm">
-                        <span className="px-2 py-1 rounded text-xs font-semibold" style={{
-                          background: zone.incidents > 3 ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)',
-                          color: zone.incidents > 3 ? '#F44336' : '#4CAF50'
+                        <span className="px-2 py-1 rounded text-xs font-semibold text-white" style={{
+                          background: zone.incidents > 3 ? '#B71C1C' : '#2E7D32'
                         }}>
                           {zone.incidents}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: '#E8A045' }}>{zone.avgResponseTime}</td>
+                      <td className="px-6 py-4 text-sm" style={{ color: 'var(--accent-saffron)' }}>{zone.avgResponseTime}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             {zonePerformance.length === 0 && (
-              <div className="text-center py-12" style={{ color: '#C4B49A' }}>No zone data available.</div>
+              <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No zone data available.</div>
             )}
           </div>
 
           {/* Volunteer Leaderboard */}
           <div className="card p-6">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
-              <span style={{ color: '#FF6B00' }}>●</span> Volunteer Leaderboard — Top 10
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <span style={{ color: 'var(--accent-saffron)' }}>●</span> Volunteer Leaderboard — Top 10
             </h2>
             <div className="space-y-3">
               {leaderboard.map((volunteer, index) => {
@@ -245,10 +224,10 @@ export default function ReportsPage() {
                 return (
                   <div
                     key={volunteer.id}
-                    className="flex items-center gap-4 p-4 rounded-lg transition-all hover:border-orange-400"
+                    className="flex items-center gap-4 p-4 rounded-lg transition-all"
                     style={{
                       background: badge.bg,
-                      border: `1px solid ${rank <= 3 ? badge.color + '40' : 'rgba(255, 165, 0, 0.15)'}`,
+                      border: `1px solid ${rank <= 3 ? badge.color + '40' : 'var(--border)'}`,
                     }}
                   >
                     {/* Rank Badge */}
@@ -257,10 +236,9 @@ export default function ReportsPage() {
                       style={{
                         width: '44px',
                         height: '44px',
-                        background: rank <= 3 ? `${badge.color}20` : '#1A1228',
+                        background: rank <= 3 ? `${badge.color}15` : 'var(--bg-secondary)',
                         border: `2px solid ${badge.color}`,
                         color: badge.color,
-                        fontFamily: 'Poppins, sans-serif',
                         fontSize: rank <= 3 ? '20px' : '14px'
                       }}
                     >
@@ -269,34 +247,34 @@ export default function ReportsPage() {
 
                     {/* Volunteer Info */}
                     <div className="flex-1">
-                      <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+                      <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                         {volunteer.name}
                       </p>
-                      <p className="text-sm" style={{ color: '#C4B49A' }}>
+                      <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                         {volunteer.skills.split(',').slice(0, 3).join(', ')}
                       </p>
                     </div>
 
                     {/* Status */}
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                      volunteer.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                    }`}>
+                    <span className="px-2 py-1 rounded text-xs font-semibold text-white" style={{
+                      background: volunteer.status === 'ACTIVE' ? '#2E7D32' : '#B71C1C'
+                    }}>
                       {volunteer.status}
                     </span>
 
                     {/* Score */}
                     <div className="text-right">
-                      <p className="text-2xl font-bold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--accent-gold)' }}>
                         {volunteer.reliabilityScore}%
                       </p>
-                      <p className="text-xs" style={{ color: '#C4B49A' }}>reliability</p>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>reliability</p>
                     </div>
                   </div>
                 );
               })}
             </div>
             {leaderboard.length === 0 && (
-              <div className="text-center py-12" style={{ color: '#C4B49A' }}>No volunteer data available.</div>
+              <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No volunteer data available.</div>
             )}
           </div>
         </div>
@@ -310,11 +288,11 @@ function SummaryCard({ title, value, icon, color }: { title: string; value: stri
     <div className="card p-6 hover:shadow-xl transition-all">
       <div className="flex items-center justify-between mb-4">
         <span className="text-4xl">{icon}</span>
-        <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
-          <span className="text-3xl font-bold" style={{ color, fontFamily: 'Poppins, sans-serif' }}>{value}</span>
+        <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
+          <span className="text-3xl font-bold" style={{ color }}>{value}</span>
         </div>
       </div>
-      <h3 className="font-medium" style={{ color: '#C4B49A', fontSize: '18px', fontFamily: 'Inter, sans-serif' }}>{title}</h3>
+      <h3 className="font-medium" style={{ color: 'var(--text-secondary)', fontSize: '18px' }}>{title}</h3>
     </div>
   );
 }

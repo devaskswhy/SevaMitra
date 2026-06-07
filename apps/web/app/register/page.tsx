@@ -79,19 +79,19 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
       <Sidebar />
       <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
         <div className="p-8 max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Volunteer Registration</h1>
-          <p className="mb-8" style={{ color: '#C4B49A' }}>Join us in serving at the Mahakumbh 2025</p>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Volunteer Registration</h1>
+          <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Join us in serving at the Mahakumbh 2025</p>
 
-          <div className="rounded-lg p-8" style={{ background: '#211835', border: '1px solid rgba(255, 165, 0, 0.25)' }}>
+          <div className="card rounded-lg p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
-                <label className="block mb-2" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Full Name</label>
+                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Full Name</label>
                 <input
                   type="text"
                   name="name"
@@ -99,14 +99,14 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 rounded-lg focus:outline-none"
-                  style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.4)', color: '#F5F0E8' }}
+                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                   placeholder="Enter your full name"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block mb-2" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Email</label>
+                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Email</label>
                 <input
                   type="email"
                   name="email"
@@ -114,14 +114,14 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 rounded-lg focus:outline-none"
-                  style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.4)', color: '#F5F0E8' }}
+                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                   placeholder="your.email@example.com"
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block mb-2" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Phone Number</label>
+                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Phone Number</label>
                 <input
                   type="tel"
                   name="phone"
@@ -129,14 +129,14 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 rounded-lg focus:outline-none"
-                  style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.4)', color: '#F5F0E8' }}
+                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                   placeholder="+91 XXXXXXXXXX"
                 />
               </div>
 
               {/* Skills */}
               <div>
-                <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Skills</label>
+                <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Skills</label>
                 <div className="grid grid-cols-2 gap-3">
                   {SKILLS.map((skill) => (
                     <label key={skill} className="flex items-center space-x-2">
@@ -145,9 +145,9 @@ export default function RegisterPage() {
                         checked={formData.skills.includes(skill)}
                         onChange={() => handleSkillToggle(skill)}
                         className="w-4 h-4 rounded"
-                        style={{ accentColor: '#FF6B00' }}
+                        style={{ accentColor: 'var(--accent-saffron)' }}
                       />
-                      <span className="text-sm capitalize" style={{ color: '#C4B49A' }}>{skill.replace(/_/g, ' ')}</span>
+                      <span className="text-sm capitalize" style={{ color: 'var(--text-secondary)' }}>{skill.replace(/_/g, ' ')}</span>
                     </label>
                   ))}
                 </div>
@@ -155,9 +155,11 @@ export default function RegisterPage() {
 
               {/* Message */}
               {message && (
-                <div className={`p-4 rounded-lg ${
-                  message.includes('✅') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                }`}>
+                <div className="p-4 rounded-lg" style={{
+                  background: message.includes('✅') ? 'rgba(46, 125, 50, 0.1)' : 'rgba(183, 28, 28, 0.1)',
+                  color: message.includes('✅') ? '#2E7D32' : '#B71C1C',
+                  border: `1px solid ${message.includes('✅') ? '#2E7D32' : '#B71C1C'}`
+                }}>
                   {message}
                 </div>
               )}
@@ -167,7 +169,7 @@ export default function RegisterPage() {
                 type="submit"
                 disabled={loading}
                 className="w-full px-6 py-3 font-semibold rounded-lg transition-all hover:shadow-lg disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #FF6B00, #FFD700)', color: '#0D0A1A', fontFamily: 'Poppins, sans-serif' }}
+                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
               >
                 {loading ? 'Registering...' : 'Register as Volunteer'}
               </button>

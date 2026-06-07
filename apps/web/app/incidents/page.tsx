@@ -34,59 +34,62 @@ export default function IncidentsPage() {
     fetchIncidents();
   }, []);
 
-  const getSeverityColor = (severity: number) => {
-    if (severity >= 4) return 'bg-red-500/20 text-red-400';
-    if (severity >= 3) return 'bg-orange-500/20 text-orange-400';
-    return 'bg-yellow-500/20 text-yellow-400';
+  const getSeverityStyle = (severity: number) => {
+    if (severity >= 4) return { background: '#B71C1C', color: '#fff' };
+    if (severity >= 3) return { background: '#E65100', color: '#fff' };
+    return { background: '#D4A017', color: '#fff' };
   };
 
   const unresolved = incidents.filter((i) => !i.resolvedAt);
   const resolved = incidents.filter((i) => i.resolvedAt);
 
   return (
-    <div className="min-h-screen" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
       <Sidebar />
       <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
         <div className="p-8">
-          <h1 className="text-3xl font-bold mb-6" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Incident Management</h1>
+          <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Incident Management</h1>
 
           {/* Unresolved Incidents */}
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Active Incidents ({unresolved.length})
             </h2>
             <div className="space-y-4">
-              {unresolved.map((incident) => (
-                <div key={incident.id} className="rounded-lg p-6" style={{ background: '#211835', border: '1px solid rgba(255, 165, 0, 0.25)', borderLeft: '4px solid #F44336' }}>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>{incident.type}</h3>
-                    <span className={`px-3 py-1 rounded text-xs font-semibold ${getSeverityColor(incident.severity)}`}>
-                      Severity {incident.severity}
-                    </span>
+              {unresolved.map((incident) => {
+                const sevStyle = getSeverityStyle(incident.severity);
+                return (
+                  <div key={incident.id} className="card rounded-lg p-6" style={{ borderLeft: '4px solid #B71C1C' }}>
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{incident.type}</h3>
+                      <span className="px-3 py-1 rounded text-xs font-semibold" style={sevStyle}>
+                        Severity {incident.severity}
+                      </span>
+                    </div>
+                    <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>{incident.description}</p>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Reported by: {incident.reportedBy}</p>
                   </div>
-                  <p className="mb-3" style={{ color: '#C4B49A' }}>{incident.description}</p>
-                  <p className="text-sm" style={{ color: '#C4B49A' }}>Reported by: {incident.reportedBy}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Resolved Incidents */}
           <div>
-            <h2 className="text-xl font-semibold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Resolved Incidents ({resolved.length})
             </h2>
             <div className="space-y-4">
               {resolved.map((incident) => (
-                <div key={incident.id} className="rounded-lg p-6 opacity-75" style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.25)', borderLeft: '4px solid #4CAF50' }}>
+                <div key={incident.id} className="card rounded-lg p-6 opacity-75" style={{ borderLeft: '4px solid #2E7D32' }}>
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-semibold" style={{ color: '#C4B49A', fontFamily: 'Poppins, sans-serif' }}>{incident.type}</h3>
-                    <span className="px-3 py-1 rounded text-xs font-semibold bg-green-500/20 text-green-400">
+                    <h3 className="text-lg font-semibold" style={{ color: 'var(--text-secondary)' }}>{incident.type}</h3>
+                    <span className="px-3 py-1 rounded text-xs font-semibold text-white" style={{ background: '#2E7D32' }}>
                       Resolved
                     </span>
                   </div>
-                  <p className="mb-3" style={{ color: '#C4B49A' }}>{incident.description}</p>
+                  <p className="mb-3" style={{ color: 'var(--text-muted)' }}>{incident.description}</p>
                 </div>
               ))}
             </div>

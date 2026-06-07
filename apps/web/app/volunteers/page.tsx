@@ -43,12 +43,12 @@ export default function VolunteersPage() {
   );
 
   return (
-    <div className="min-h-screen" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
       <Sidebar />
       <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
         <div className="p-8">
-          <h1 className="text-3xl font-bold mb-6" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Volunteers</h1>
+          <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Volunteers</h1>
 
           {/* Search */}
           <div className="mb-6">
@@ -59,42 +59,42 @@ export default function VolunteersPage() {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full px-4 py-2 rounded-lg focus:outline-none"
               style={{
-                background: '#1A1228',
-                border: '1px solid rgba(255, 165, 0, 0.4)',
-                color: '#F5F0E8'
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-primary)'
               }}
             />
           </div>
 
           {/* Volunteers Table */}
-          <div className="rounded-lg overflow-hidden" style={{ background: '#211835', border: '1px solid rgba(255, 165, 0, 0.25)' }}>
+          <div className="card rounded-lg overflow-hidden">
             <table className="w-full">
-              <thead style={{ background: '#2A1F3D' }}>
+              <thead style={{ background: 'var(--bg-secondary)' }}>
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Name</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Email</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Phone</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Skills</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Reliability</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>Status</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Name</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Email</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Phone</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Skills</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Reliability</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold" style={{ color: 'var(--accent-deep)' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((v, index) => (
-                  <tr key={v.id} style={{ background: index % 2 === 0 ? '#211835' : '#1A1228', borderBottom: '1px solid rgba(255, 165, 0, 0.1)' }}>
-                    <td className="px-6 py-4 text-sm" style={{ color: '#F5F0E8' }}>{v.name}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: '#C4B49A' }}>{v.email}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: '#C4B49A' }}>{v.phone}</td>
+                  <tr key={v.id} style={{ background: index % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
+                    <td className="px-6 py-4 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{v.name}</td>
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{v.email}</td>
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{v.phone}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="px-2 py-1 rounded text-xs font-medium" style={{ background: 'rgba(255, 107, 0, 0.2)', color: '#FF6B00' }}>
+                      <span className="px-2 py-1 rounded text-xs font-medium" style={{ background: 'rgba(255, 107, 0, 0.12)', color: 'var(--accent-saffron)' }}>
                         {v.skills.substring(0, 20)}...
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>{v.reliabilityScore}%</td>
+                    <td className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--accent-gold)' }}>{v.reliabilityScore}%</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                        v.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                      }`}>
+                      <span className="px-2 py-1 rounded text-xs font-semibold text-white" style={{
+                        background: v.status === 'ACTIVE' ? '#2E7D32' : '#B71C1C'
+                      }}>
                         {v.status}
                       </span>
                     </td>
@@ -105,7 +105,7 @@ export default function VolunteersPage() {
           </div>
 
           {filtered.length === 0 && (
-            <div className="text-center py-12" style={{ color: '#C4B49A' }}>No volunteers found.</div>
+            <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No volunteers found.</div>
           )}
         </div>
       </div>

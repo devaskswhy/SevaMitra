@@ -58,19 +58,19 @@ export default function VolunteerLogin() {
   };
 
   return (
-    <div className="min-h-screen lotus-pattern flex items-center justify-center p-4" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen lotus-pattern flex items-center justify-center p-4" style={{ background: 'var(--bg-primary)' }}>
       <div className="loading-bar"></div>
       <div className="om-watermark">ॐ</div>
       
       <div className="card p-8 w-full max-w-md" style={{ maxWidth: '480px' }}>
         <div className="text-center mb-8">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #FF6B00, #FFD700)' }}>
+          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)' }}>
             <span className="text-5xl">🙏</span>
           </div>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             SevaMitra Volunteer
           </h1>
-          <p className="text-lg" style={{ color: '#C4B49A', fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
             Login to access your dashboard
           </p>
         </div>
@@ -78,11 +78,11 @@ export default function VolunteerLogin() {
         {!showOtp ? (
           <form onSubmit={handleSendOtp} className="space-y-6">
             <div>
-              <label className="block mb-2" style={{ color: '#C4B49A', fontSize: '16px', fontFamily: 'Inter, sans-serif' }}>
+              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
                 Phone Number
               </label>
               <div className="flex">
-                <span className="inline-flex items-center px-4 rounded-l-lg" style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.3)', color: '#FFD700' }}>
+                <span className="inline-flex items-center px-4 rounded-l-lg" style={{ background: 'var(--bg-sidebar)', border: '1px solid var(--border)', color: 'var(--accent-gold)' }}>
                   +91
                 </span>
                 <input
@@ -94,16 +94,16 @@ export default function VolunteerLogin() {
                   maxLength={10}
                   inputMode="numeric"
                   style={{
-                    background: '#1A1228',
-                    border: '1px solid rgba(255, 165, 0, 0.3)',
-                    color: '#F5F0E8'
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
             </div>
 
             {error && (
-              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(244, 67, 54, 0.1)', border: '1px solid #F44336', color: '#F44336' }}>
+              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(183, 28, 28, 0.08)', border: '1px solid #B71C1C', color: '#B71C1C' }}>
                 ❌ {error}
               </div>
             )}
@@ -113,9 +113,9 @@ export default function VolunteerLogin() {
               disabled={loading}
               className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
-                color: '#0D0A1A',
-                fontFamily: 'Poppins, sans-serif',
+                background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
+                color: '#fff',
+                border: 'none',
                 fontSize: '18px'
               }}
             >
@@ -125,7 +125,7 @@ export default function VolunteerLogin() {
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-6">
             <div>
-              <label className="block mb-2" style={{ color: '#C4B49A', fontSize: '16px', fontFamily: 'Inter, sans-serif' }}>
+              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
                 Enter OTP
               </label>
               <input
@@ -137,19 +137,19 @@ export default function VolunteerLogin() {
                 maxLength={6}
                 inputMode="numeric"
                 style={{
-                  background: '#1A1228',
-                  border: '1px solid rgba(255, 165, 0, 0.3)',
-                  color: '#F5F0E8',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
                   letterSpacing: '0.5em'
                 }}
               />
-              <p className="text-sm mt-2 text-center" style={{ color: '#C4B49A' }}>
+              <p className="text-sm mt-2 text-center" style={{ color: 'var(--text-muted)' }}>
                 Demo: Any 6-digit number works
               </p>
             </div>
 
             {error && (
-              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(244, 67, 54, 0.1)', border: '1px solid #F44336', color: '#F44336' }}>
+              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(183, 28, 28, 0.08)', border: '1px solid #B71C1C', color: '#B71C1C' }}>
                 ❌ {error}
               </div>
             )}
@@ -159,9 +159,9 @@ export default function VolunteerLogin() {
               disabled={loading}
               className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
-                color: '#0D0A1A',
-                fontFamily: 'Poppins, sans-serif',
+                background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
+                color: '#fff',
+                border: 'none',
                 fontSize: '18px'
               }}
             >
@@ -177,10 +177,9 @@ export default function VolunteerLogin() {
               }}
               className="w-full px-6 py-4 rounded-lg font-medium transition-all"
               style={{
-                background: '#1A1228',
-                border: '1px solid rgba(255, 165, 0, 0.3)',
-                color: '#F5F0E8',
-                fontFamily: 'Inter, sans-serif'
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-primary)'
               }}
             >
               Change Phone Number
@@ -189,9 +188,9 @@ export default function VolunteerLogin() {
         )}
 
         <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#C4B49A' }}>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             New volunteer?{' '}
-            <a href="/register" className="font-bold hover:underline" style={{ color: '#FFD700' }}>
+            <a href="/register" className="font-bold hover:underline" style={{ color: 'var(--accent-saffron)' }}>
               Register here
             </a>
           </p>

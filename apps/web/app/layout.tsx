@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Poppins, Inter } from "next/font/google";
+import { Poppins, Tiro_Devanagari_Sanskrit } from "next/font/google";
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-poppins',
 });
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-inter',
+const tiroDevanagari = Tiro_Devanagari_Sanskrit({
+  subsets: ['devanagari'],
+  weight: ['400'],
+  variable: '--font-tiro',
 });
 
 const geistSans = localFont({
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     maximumScale: 1,
     userScalable: false,
   },
-  themeColor: "#FF6B35",
+  themeColor: "#FF6B00",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -52,8 +52,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${inter.variable} antialiased`}
-        style={{ backgroundColor: '#0D0A1A', color: '#F5F0E8' }}
+        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${tiroDevanagari.variable} antialiased`}
+        style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
       >
         {children}
       </body>
