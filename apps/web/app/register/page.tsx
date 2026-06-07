@@ -82,7 +82,7 @@ export default function RegisterPage() {
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
       <Sidebar />
-      <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
+      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
         <div className="p-8 max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Volunteer Registration</h1>
           <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Join us in serving at the Mahakumbh 2025</p>

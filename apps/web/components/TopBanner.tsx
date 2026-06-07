@@ -36,14 +36,14 @@ export default function TopBanner() {
       </div>
 
       {/* Center Title */}
-      <h1 className="font-bold" style={{ fontSize: '20px', color: 'var(--accent-gold)', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>
-        SevaMitra — Mahakumbh 2025
+      <h1 className="font-bold text-sm md:text-xl truncate flex-1 text-center px-2" style={{ color: 'var(--accent-gold)', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>
+        SevaMitra <span className="hidden md:inline">— Mahakumbh 2025</span>
       </h1>
 
       {/* Live Clock */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-shrink-0">
         <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#4CAF50' }} />
-        <span className="font-semibold" style={{ fontSize: '16px', color: 'var(--text-light)', fontFamily: 'Poppins, sans-serif' }}>
+        <span className="font-semibold text-xs md:text-base hidden sm:inline-block" style={{ color: 'var(--text-light)', fontFamily: 'Poppins, sans-serif' }}>
           {formatTime(time)}
         </span>
       </div>

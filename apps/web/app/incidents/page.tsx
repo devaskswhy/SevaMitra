@@ -47,7 +47,7 @@ export default function IncidentsPage() {
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
       <Sidebar />
-      <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
+      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
         <div className="p-8">
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Incident Management</h1>
 

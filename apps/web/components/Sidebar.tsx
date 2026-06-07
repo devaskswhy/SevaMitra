@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface NavItem {
@@ -20,18 +21,32 @@ const navItems: NavItem[] = [
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex flex-col z-40" style={{
-      position: 'fixed',
-      left: 0,
-      top: '56px',
-      width: '280px',
-      height: 'calc(100vh - 56px)',
-      background: 'var(--bg-sidebar)',
-      borderRight: '2px solid var(--accent-gold)',
-      overflowY: 'auto'
-    }}>
+    <>
+      {/* Mobile Toggle Button */}
+      <button 
+        className="md:hidden fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
+        style={{ background: 'var(--accent-saffron)', color: '#fff', width: '60px', height: '60px' }}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="text-2xl">{isOpen ? '✕' : '☰'}</span>
+      </button>
+
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div 
+          className="md:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-sm transition-opacity" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      <div className={`flex flex-col z-40 fixed top-[56px] h-[calc(100vh-56px)] w-[280px] transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`} style={{
+        background: 'var(--bg-sidebar)',
+        borderRight: '2px solid var(--accent-gold)',
+        overflowY: 'auto'
+      }}>
       <nav className="flex-1 py-6">
         <ul className="space-y-2 px-4">
           {navItems.map((item) => {
@@ -85,6 +100,6 @@ export default function Sidebar() {
           </span>
         </button>
       </div>
-    </div>
+    </>
   );
 }

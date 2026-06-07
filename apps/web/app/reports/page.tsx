@@ -136,7 +136,7 @@ export default function ReportsPage() {
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
       <Sidebar />
-      <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
+      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
         <div className="p-8">
           {/* Page Header */}
           <div className="flex items-center justify-between mb-8">
@@ -296,3 +296,4 @@ function SummaryCard({ title, value, icon, color }: { title: string; value: stri
     </div>
   );
 }
+
