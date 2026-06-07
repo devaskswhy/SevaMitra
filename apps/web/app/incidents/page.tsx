@@ -5,7 +5,9 @@ import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_API_URL
+  ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
+  : 'http://localhost:4000/api';
 
 interface Incident {
   id: number;
@@ -22,7 +24,7 @@ export default function IncidentsPage() {
   useEffect(() => {
     const fetchIncidents = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/incidents`);
+        const res = await axios.get(`${API}/incidents`);
         setIncidents(res.data);
       } catch (error) {
         console.error('Failed to fetch incidents:', error);

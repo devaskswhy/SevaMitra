@@ -5,7 +5,9 @@ import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_API_URL
+  ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
+  : 'http://localhost:4000/api';
 
 const SKILLS = [
   'first_aid',
@@ -55,7 +57,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await axios.post(`${API_BASE}/volunteers`, {
+      await axios.post(`${API}/volunteers`, {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,

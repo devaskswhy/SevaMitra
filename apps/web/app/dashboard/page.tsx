@@ -8,7 +8,9 @@ import Image from 'next/image';
 import TopBanner from '@/components/TopBanner';
 import Sidebar from '@/components/Sidebar';
 
-const API_BASE = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_API_URL
+  ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
+  : 'http://localhost:4000/api';
 
 interface Volunteer {
   id: number;
@@ -90,11 +92,11 @@ export default function Dashboard() {
   const fetchData = async () => {
     try {
       const [volunteersRes, zonesRes, incidentsRes, tasksRes, assignmentsRes] = await Promise.all([
-        axios.get(`${API_BASE}/volunteers`),
-        axios.get(`${API_BASE}/zones`),
-        axios.get(`${API_BASE}/incidents`),
-        axios.get(`${API_BASE}/tasks`),
-        axios.get(`${API_BASE}/assignments`),
+        axios.get(`${API}/volunteers`),
+        axios.get(`${API}/zones`),
+        axios.get(`${API}/incidents`),
+        axios.get(`${API}/tasks`),
+        axios.get(`${API}/assignments`),
       ]);
 
       const volunteers = volunteersRes.data;
@@ -163,7 +165,7 @@ export default function Dashboard() {
 
   const handleDeployVolunteers = async (incidentId: number) => {
     try {
-      await axios.post(`${API_BASE}/incidents/${incidentId}/deploy`);
+      await axios.post(`${API}/incidents/${incidentId}/deploy`);
       setActivities((prev) => [
         { id: Date.now().toString(), message: `Volunteers deployed for incident #${incidentId}`, timestamp: new Date(), type: 'success' },
         ...prev.slice(0, 49),
@@ -177,7 +179,7 @@ export default function Dashboard() {
   const handleFindBestVolunteers = async () => {
     if (!selectedTask) return;
     try {
-      const response = await axios.get(`${API_BASE}/allocate/recommend`, {
+      const response = await axios.get(`${API}/allocate/recommend`, {
         params: { taskId: selectedTask },
       });
       setRecommendations(response.data.slice(0, 5));

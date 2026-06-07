@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_API_URL
+  ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
+  : 'http://localhost:4000/api';
 
 interface Zone {
   id: number;
@@ -35,7 +37,7 @@ export default function IncidentReport() {
 
   const fetchZones = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/zones`);
+      const response = await axios.get(`${API}/zones`);
       setZones(response.data);
     } catch (error) {
       console.error('Failed to fetch zones:', error);
@@ -56,7 +58,7 @@ export default function IncidentReport() {
 
     try {
       const volunteerId = localStorage.getItem('volunteerId');
-      await axios.post(`${API_BASE}/incidents`, {
+      await axios.post(`${API}/incidents`, {
         zoneId: parseInt(zoneId),
         reportedBy: volunteerId,
         severity,

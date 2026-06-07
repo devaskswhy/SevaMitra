@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_API_URL
+  ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
+  : 'http://localhost:4000/api';
 
 interface Assignment {
   id: number;
@@ -52,8 +54,8 @@ export default function VolunteerHome() {
     try {
       const volunteerId = localStorage.getItem('volunteerId');
       const [assignmentsRes, shiftsRes] = await Promise.all([
-        axios.get(`${API_BASE}/assignments`),
-        axios.get(`${API_BASE}/shifts`),
+        axios.get(`${API}/assignments`),
+        axios.get(`${API}/shifts`),
       ]);
 
       const assignments = assignmentsRes.data;
@@ -84,7 +86,7 @@ export default function VolunteerHome() {
     try {
       const volunteerId = localStorage.getItem('volunteerId');
       // Mock check-in - in real app, this would call the API
-      await axios.post(`${API_BASE}/assignments/check-in`, {
+      await axios.post(`${API}/assignments/check-in`, {
         volunteerId: parseInt(volunteerId!),
         timestamp: new Date().toISOString(),
       });
@@ -101,7 +103,7 @@ export default function VolunteerHome() {
     try {
       const volunteerId = localStorage.getItem('volunteerId');
       // Mock check-out - in real app, this would call the API
-      await axios.post(`${API_BASE}/assignments/check-out`, {
+      await axios.post(`${API}/assignments/check-out`, {
         volunteerId: parseInt(volunteerId!),
         timestamp: new Date().toISOString(),
       });

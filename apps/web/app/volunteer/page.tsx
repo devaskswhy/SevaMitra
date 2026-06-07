@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_API_URL
+  ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
+  : 'http://localhost:4000/api';
 
 export default function VolunteerLogin() {
   const router = useRouter();
@@ -38,7 +40,7 @@ export default function VolunteerLogin() {
     setError('');
 
     try {
-      const response = await axios.get(`${API_BASE}/volunteers`);
+      const response = await axios.get(`${API}/volunteers`);
       const volunteer = response.data.find((v: any) => v.phone === `+91${phone}`);
       
       if (volunteer) {
