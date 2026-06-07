@@ -23,10 +23,15 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed left-0 top-14 bottom-0 w-70 flex flex-col z-40" style={{
+    <div className="flex flex-col z-40" style={{
+      position: 'fixed',
+      left: 0,
+      top: '56px',
       width: '280px',
+      height: 'calc(100vh - 56px)',
       background: '#1A1228',
-      borderRight: '2px solid #FFD700'
+      borderRight: '2px solid #FFD700',
+      overflowY: 'auto'
     }}>
       <nav className="flex-1 py-6">
         <ul className="space-y-2 px-4">

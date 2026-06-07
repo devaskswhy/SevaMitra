@@ -44,11 +44,11 @@ export default function IncidentsPage() {
   const resolved = incidents.filter((i) => i.resolvedAt);
 
   return (
-    <div className="flex h-screen" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen" style={{ background: '#0D0A1A' }}>
+      <TopBanner />
       <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <TopBanner />
-        <div className="p-8" style={{ marginTop: '56px' }}>
+      <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
+        <div className="p-8">
           <h1 className="text-3xl font-bold mb-6" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Incident Management</h1>
 
           {/* Unresolved Incidents */}

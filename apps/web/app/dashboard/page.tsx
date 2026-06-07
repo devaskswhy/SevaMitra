@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import Image from 'next/image';
+
 import TopBanner from '@/components/TopBanner';
 import Sidebar from '@/components/Sidebar';
 
@@ -228,7 +228,7 @@ export default function Dashboard() {
       <div className="om-watermark">ॐ</div>
 
       {/* Main Content */}
-      <div className="ml-70 pt-14 p-8" style={{ marginLeft: '280px', paddingTop: '56px' }}>
+      <div className="p-8" style={{ marginLeft: '280px', paddingTop: '56px' }}>
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
@@ -275,13 +275,7 @@ export default function Dashboard() {
           <div className="flex gap-4 overflow-x-auto pb-4">
             <div className="flex-shrink-0 w-80">
               <div className="rounded-xl overflow-hidden relative" style={{ height: '160px', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-                <Image
-                  src="/im1.webp"
-                  alt="Triveni Sangam Aerial View"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+                <img src="/im1.webp" alt="Triveni Sangam Aerial View" style={{width:'100%', height:'160px', objectFit:'cover', borderRadius:'12px'}} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <p className="text-white text-sm font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Triveni Sangam Aerial View</p>
@@ -291,13 +285,7 @@ export default function Dashboard() {
             </div>
             <div className="flex-shrink-0 w-80">
               <div className="rounded-xl overflow-hidden relative" style={{ height: '160px', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-                <Image
-                  src="/im2.webp"
-                  alt="Evening Aarti"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+                <img src="/im2.webp" alt="Evening Aarti" style={{width:'100%', height:'160px', objectFit:'cover', borderRadius:'12px'}} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <p className="text-white text-sm font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Evening Aarti</p>
@@ -307,13 +295,7 @@ export default function Dashboard() {
             </div>
             <div className="flex-shrink-0 w-80">
               <div className="rounded-xl overflow-hidden relative" style={{ height: '160px', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-                <Image
-                  src="/im3.webp"
-                  alt="Sunrise Bathing"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+                <img src="/im3.webp" alt="Sunrise Bathing" style={{width:'100%', height:'160px', objectFit:'cover', borderRadius:'12px'}} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <p className="text-white text-sm font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Sunrise Bathing</p>

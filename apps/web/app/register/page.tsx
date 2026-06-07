@@ -79,11 +79,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex h-screen" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen" style={{ background: '#0D0A1A' }}>
+      <TopBanner />
       <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <TopBanner />
-        <div className="p-8 max-w-2xl mx-auto" style={{ marginTop: '56px' }}>
+      <div style={{ marginLeft: '280px', paddingTop: '56px' }}>
+        <div className="p-8 max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Volunteer Registration</h1>
           <p className="mb-8" style={{ color: '#C4B49A' }}>Join us in serving at the Mahakumbh 2025</p>
 

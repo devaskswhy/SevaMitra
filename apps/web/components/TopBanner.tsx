@@ -20,7 +20,12 @@ export default function TopBanner() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 flex items-center justify-between px-6 z-50" style={{
+    <div className="flex items-center justify-between px-6" style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
       background: '#1A1228',
       color: '#FFD700',
       borderBottom: '1px solid rgba(255, 165, 0, 0.4)',
