@@ -20,24 +20,26 @@ export default function TopBanner() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-6 z-50" style={{
-      background: 'linear-gradient(90deg, #FF6B00, #FFD700)',
-      color: '#0D0A1A'
+    <div className="fixed top-0 left-0 right-0 flex items-center justify-between px-6 z-50" style={{
+      background: '#1A1228',
+      color: '#FFD700',
+      borderBottom: '1px solid rgba(255, 165, 0, 0.4)',
+      height: '56px'
     }}>
       {/* OM Symbol */}
       <div className="flex items-center gap-3">
-        <span className="text-3xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>ॐ</span>
+        <span className="font-bold" style={{ fontSize: '28px', color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>ॐ</span>
       </div>
 
       {/* Center Title */}
-      <h1 className="text-xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <h1 className="font-bold" style={{ fontSize: '20px', color: '#FFD700', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>
         SevaMitra — Mahakumbh 2025
       </h1>
 
       {/* Live Clock */}
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
-        <span className="text-lg font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <span className="font-semibold" style={{ fontSize: '16px', color: '#FF6B00', fontFamily: 'Inter, sans-serif' }}>
           {formatTime(time)}
         </span>
       </div>

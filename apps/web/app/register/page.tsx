@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Navbar from '@/components/Navbar';
+import Sidebar from '@/components/Sidebar';
+import TopBanner from '@/components/TopBanner';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:4000/api';
@@ -76,60 +77,64 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Navbar />
+    <div className="flex h-screen" style={{ background: '#0D0A1A' }}>
+      <Sidebar />
       <div className="flex-1 overflow-auto">
-        <div className="p-8 max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Volunteer Registration</h1>
-          <p className="text-gray-600 mb-8">Join us in serving at the Mahakumbh 2025</p>
+        <TopBanner />
+        <div className="p-8 max-w-2xl mx-auto" style={{ marginTop: '56px' }}>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Volunteer Registration</h1>
+          <p className="mb-8" style={{ color: '#C4B49A' }}>Join us in serving at the Mahakumbh 2025</p>
 
-          <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="rounded-lg p-8" style={{ background: '#211835', border: '1px solid rgba(255, 165, 0, 0.25)' }}>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Full Name</label>
+                <label className="block mb-2" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Full Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none"
+                  style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.4)', color: '#F5F0E8' }}
                   placeholder="Enter your full name"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Email</label>
+                <label className="block mb-2" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Email</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none"
+                  style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.4)', color: '#F5F0E8' }}
                   placeholder="your.email@example.com"
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Phone Number</label>
+                <label className="block mb-2" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Phone Number</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none"
+                  style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.4)', color: '#F5F0E8' }}
                   placeholder="+91 XXXXXXXXXX"
                 />
               </div>
 
               {/* Skills */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">Skills</label>
+                <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Skills</label>
                 <div className="grid grid-cols-2 gap-3">
                   {SKILLS.map((skill) => (
                     <label key={skill} className="flex items-center space-x-2">
@@ -137,9 +142,10 @@ export default function RegisterPage() {
                         type="checkbox"
                         checked={formData.skills.includes(skill)}
                         onChange={() => handleSkillToggle(skill)}
-                        className="w-4 h-4 text-orange-500 rounded"
+                        className="w-4 h-4 rounded"
+                        style={{ accentColor: '#FF6B00' }}
                       />
-                      <span className="text-sm text-gray-700 capitalize">{skill.replace(/_/g, ' ')}</span>
+                      <span className="text-sm capitalize" style={{ color: '#C4B49A' }}>{skill.replace(/_/g, ' ')}</span>
                     </label>
                   ))}
                 </div>
@@ -148,7 +154,7 @@ export default function RegisterPage() {
               {/* Message */}
               {message && (
                 <div className={`p-4 rounded-lg ${
-                  message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  message.includes('✅') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                 }`}>
                   {message}
                 </div>
@@ -158,7 +164,8 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
+                className="w-full px-6 py-3 font-semibold rounded-lg transition-all hover:shadow-lg disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #FF6B00, #FFD700)', color: '#0D0A1A', fontFamily: 'Poppins, sans-serif' }}
               >
                 {loading ? 'Registering...' : 'Register as Volunteer'}
               </button>

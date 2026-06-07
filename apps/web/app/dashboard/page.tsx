@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import Image from 'next/image';
 import TopBanner from '@/components/TopBanner';
 import Sidebar from '@/components/Sidebar';
 
@@ -271,29 +272,50 @@ export default function Dashboard() {
           </h2>
           <div className="flex gap-4 overflow-x-auto pb-4">
             <div className="flex-shrink-0 w-80">
-              <div className="h-30 rounded-xl overflow-hidden relative" style={{ height: '120px' }}>
-                <div className="w-full h-full bg-gradient-to-br from-orange-600 to-yellow-500 flex items-center justify-center">
-                  <span className="text-white text-lg font-semibold">Triveni Sangam Aerial View</span>
+              <div className="rounded-xl overflow-hidden relative" style={{ height: '160px', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+                <Image
+                  src="/im1.webp"
+                  alt="Triveni Sangam Aerial View"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-white text-sm font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Triveni Sangam Aerial View</p>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               </div>
               <p className="mt-2 text-sm" style={{ color: '#C4B49A' }}>Crowds at the sacred confluence</p>
             </div>
             <div className="flex-shrink-0 w-80">
-              <div className="h-30 rounded-xl overflow-hidden relative" style={{ height: '120px' }}>
-                <div className="w-full h-full bg-gradient-to-br from-purple-600 to-orange-500 flex items-center justify-center">
-                  <span className="text-white text-lg font-semibold">Evening Aarti</span>
+              <div className="rounded-xl overflow-hidden relative" style={{ height: '160px', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+                <Image
+                  src="/im2.webp"
+                  alt="Evening Aarti"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-white text-sm font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Evening Aarti</p>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               </div>
               <p className="mt-2 text-sm" style={{ color: '#C4B49A' }}>Devotional ceremonies at ghats</p>
             </div>
             <div className="flex-shrink-0 w-80">
-              <div className="h-30 rounded-xl overflow-hidden relative" style={{ height: '120px' }}>
-                <div className="w-full h-full bg-gradient-to-br from-yellow-500 to-orange-400 flex items-center justify-center">
-                  <span className="text-white text-lg font-semibold">Sunrise Bathing</span>
+              <div className="rounded-xl overflow-hidden relative" style={{ height: '160px', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+                <Image
+                  src="/im3.webp"
+                  alt="Sunrise Bathing"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-white text-sm font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Sunrise Bathing</p>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               </div>
               <p className="mt-2 text-sm" style={{ color: '#C4B49A' }}>Holy dip at dawn</p>
             </div>
