@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from "express";
 import { Server } from "socket.io";
 import cors from "cors";
 import helmet from "helmet";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "./lib/prisma";
 import volunteerRoutes from "./routes/volunteers";
 import zoneRoutes from "./routes/zones";
 import taskRoutes from "./routes/tasks";
@@ -11,8 +11,7 @@ import incidentRoutes from "./routes/incidents";
 import allocationRoutes from "./routes/allocation";
 
 const app: Express = express();
-const PORT = process.env.PORT || 3000;
-const prisma = new PrismaClient();
+const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(helmet());

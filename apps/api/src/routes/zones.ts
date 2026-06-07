@@ -1,8 +1,7 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET all zones
 router.get("/", async (_req: Request, res: Response) => {
@@ -23,7 +22,7 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const zone = await prisma.zone.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       include: {
         tasks: {
           include: {
@@ -67,7 +66,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   try {
     const zone = await prisma.zone.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: req.body,
     });
     res.json(zone);
@@ -80,7 +79,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await prisma.zone.delete({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
     });
     res.json({ message: "Zone deleted successfully" });
   } catch (error) {
@@ -93,7 +92,7 @@ router.patch("/:id/load", async (req: Request, res: Response) => {
   try {
     const { currentLoad } = req.body;
     const zone = await prisma.zone.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: { currentLoad },
     });
     res.json(zone);
@@ -106,7 +105,7 @@ router.patch("/:id/load", async (req: Request, res: Response) => {
 router.get("/type/:type", async (req: Request, res: Response) => {
   try {
     const zones = await prisma.zone.findMany({
-      where: { type: req.params.type },
+      where: { type: req.params.type as string },
     });
     res.json(zones);
   } catch (error) {
@@ -118,7 +117,7 @@ router.get("/type/:type", async (req: Request, res: Response) => {
 router.get("/priority/:priority", async (req: Request, res: Response) => {
   try {
     const zones = await prisma.zone.findMany({
-      where: { priority: req.params.priority },
+      where: { priority: req.params.priority as string },
     });
     res.json(zones);
   } catch (error) {

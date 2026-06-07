@@ -1,8 +1,7 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET all incidents
 router.get("/", async (_req: Request, res: Response) => {
@@ -23,7 +22,7 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const incident = await prisma.incident.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       include: {
         zone: true,
         volunteersDeployed: true,
@@ -75,7 +74,7 @@ router.put("/:id", async (req: Request, res: Response) => {
     const { volunteersDeployed, ...otherData } = req.body;
 
     const incident = await prisma.incident.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: {
         ...otherData,
         volunteersDeployed: volunteersDeployed
@@ -100,7 +99,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await prisma.incident.delete({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
     });
     res.json({ message: "Incident deleted successfully" });
   } catch (error) {
@@ -112,7 +111,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 router.patch("/:id/resolve", async (req: Request, res: Response) => {
   try {
     const incident = await prisma.incident.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: {
         resolvedAt: new Date(),
       },
@@ -136,7 +135,7 @@ router.post("/:id/deploy-volunteers", async (req: Request, res: Response) => {
     const { volunteerIds } = req.body;
 
     const incident = await prisma.incident.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: {
         volunteersDeployed: {
           connect: volunteerIds.map((id: number) => ({ id })),
@@ -161,7 +160,7 @@ router.post("/:id/deploy-volunteers", async (req: Request, res: Response) => {
 router.get("/severity/:level", async (req: Request, res: Response) => {
   try {
     const incidents = await prisma.incident.findMany({
-      where: { severity: parseInt(req.params.level) },
+      where: { severity: parseInt(req.params.level as string) },
       include: {
         zone: true,
         volunteersDeployed: true,
@@ -177,7 +176,7 @@ router.get("/severity/:level", async (req: Request, res: Response) => {
 router.get("/zone/:zoneId", async (req: Request, res: Response) => {
   try {
     const incidents = await prisma.incident.findMany({
-      where: { zoneId: parseInt(req.params.zoneId) },
+      where: { zoneId: parseInt(req.params.zoneId as string) },
       include: {
         zone: true,
         volunteersDeployed: true,

@@ -9,7 +9,6 @@
     "prod": "npm run build && npm start"
   },
   "dependencies": {
-    "@prisma/client": "^3.15.2",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^10.0.0",

@@ -45,13 +45,13 @@ router.post("/auto-allocate/:taskId/:shiftId", async (req: Request, res: Respons
     }
 
     const result = await AllocationEngine.autoAllocateTask(
-      parseInt(taskId),
-      parseInt(shiftId)
+      parseInt(taskId as string),
+      parseInt(shiftId as string)
     );
 
     res.json({
-      taskId: parseInt(taskId),
-      shiftId: parseInt(shiftId),
+      taskId: parseInt(taskId as string),
+      shiftId: parseInt(shiftId as string),
       created: result.created,
       failed: result.failed,
       timestamp: new Date().toISOString(),

@@ -1,8 +1,7 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET all volunteers
 router.get("/", async (_req: Request, res: Response) => {
@@ -27,7 +26,7 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const volunteer = await prisma.volunteer.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       include: {
         assignments: {
           include: {
@@ -92,7 +91,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   try {
     const volunteer = await prisma.volunteer.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: req.body,
     });
     res.json(volunteer);
@@ -105,7 +104,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await prisma.volunteer.delete({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
     });
     res.json({ message: "Volunteer deleted successfully" });
   } catch (error) {
@@ -119,7 +118,7 @@ router.get("/search/skills/:skill", async (req: Request, res: Response) => {
     const volunteers = await prisma.volunteer.findMany({
       where: {
         skills: {
-          contains: req.params.skill,
+          contains: req.params.skill as string,
         },
       },
     });
@@ -145,9 +144,9 @@ router.get("/available/list", async (_req: Request, res: Response) => {
       },
     });
 
-    const available = volunteers.filter((v) => {
+    const available = volunteers.filter((v: any) => {
       const now = new Date();
-      return !v.assignments.some((a) => {
+      return !v.assignments.some((a: any) => {
         const shiftStart = new Date(a.shift.startTime);
         const shiftEnd = new Date(a.shift.endTime);
         return now >= shiftStart && now <= shiftEnd;

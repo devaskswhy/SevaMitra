@@ -1,8 +1,7 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET all tasks
 router.get("/", async (_req: Request, res: Response) => {
@@ -28,7 +27,7 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const task = await prisma.task.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       include: {
         zone: true,
         assignments: {
@@ -86,7 +85,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   try {
     const task = await prisma.task.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: req.body,
       include: {
         zone: true,
@@ -102,7 +101,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await prisma.task.delete({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
     });
     res.json({ message: "Task deleted successfully" });
   } catch (error) {
@@ -114,7 +113,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 router.get("/zone/:zoneId", async (req: Request, res: Response) => {
   try {
     const tasks = await prisma.task.findMany({
-      where: { zoneId: parseInt(req.params.zoneId) },
+      where: { zoneId: parseInt(req.params.zoneId as string) },
       include: {
         zone: true,
         assignments: {
@@ -134,7 +133,7 @@ router.get("/zone/:zoneId", async (req: Request, res: Response) => {
 router.get("/difficulty/:level", async (req: Request, res: Response) => {
   try {
     const tasks = await prisma.task.findMany({
-      where: { difficulty: parseInt(req.params.level) },
+      where: { difficulty: parseInt(req.params.level as string) },
       include: {
         zone: true,
       },
@@ -152,7 +151,7 @@ router.patch(
     try {
       const { minVolunteers, maxVolunteers } = req.body;
       const task = await prisma.task.update({
-        where: { id: parseInt(req.params.id) },
+        where: { id: parseInt(req.params.id as string) },
         data: { minVolunteers, maxVolunteers },
       });
       res.json(task);

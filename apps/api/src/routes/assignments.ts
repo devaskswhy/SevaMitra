@@ -1,8 +1,7 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET all assignments
 router.get("/", async (_req: Request, res: Response) => {
@@ -28,7 +27,7 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const assignment = await prisma.assignment.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       include: {
         volunteer: true,
         task: {
@@ -96,7 +95,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   try {
     const assignment = await prisma.assignment.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: req.body,
       include: {
         volunteer: true,
@@ -118,7 +117,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await prisma.assignment.delete({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
     });
     res.json({ message: "Assignment deleted successfully" });
   } catch (error) {
@@ -130,7 +129,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 router.post("/:id/check-in", async (req: Request, res: Response) => {
   try {
     const assignment = await prisma.assignment.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: {
         checkInTime: new Date(),
       },
@@ -155,7 +154,7 @@ router.post("/:id/check-out", async (req: Request, res: Response) => {
     const { performanceRating } = req.body;
 
     const assignment = await prisma.assignment.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: {
         checkOutTime: new Date(),
         performanceRating: performanceRating || undefined,
@@ -198,7 +197,7 @@ router.post("/:id/check-out", async (req: Request, res: Response) => {
 router.get("/volunteer/:volunteerId", async (req: Request, res: Response) => {
   try {
     const assignments = await prisma.assignment.findMany({
-      where: { volunteerId: parseInt(req.params.volunteerId) },
+      where: { volunteerId: parseInt(req.params.volunteerId as string) },
       include: {
         task: {
           include: {
@@ -218,7 +217,7 @@ router.get("/volunteer/:volunteerId", async (req: Request, res: Response) => {
 router.get("/task/:taskId", async (req: Request, res: Response) => {
   try {
     const assignments = await prisma.assignment.findMany({
-      where: { taskId: parseInt(req.params.taskId) },
+      where: { taskId: parseInt(req.params.taskId as string) },
       include: {
         volunteer: true,
         shift: true,
@@ -234,7 +233,7 @@ router.get("/task/:taskId", async (req: Request, res: Response) => {
 router.get("/shift/:shiftId", async (req: Request, res: Response) => {
   try {
     const assignments = await prisma.assignment.findMany({
-      where: { shiftId: parseInt(req.params.shiftId) },
+      where: { shiftId: parseInt(req.params.shiftId as string) },
       include: {
         volunteer: true,
         task: {
