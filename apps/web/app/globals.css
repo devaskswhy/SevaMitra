@@ -2,22 +2,186 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Mahakumbh Sacred Tech Color Palette */
+  --background-primary: #0D0A1A;
+  --background-secondary: #1A1228;
+  --background-card: #211835;
+  --accent-primary: #FF6B00;
+  --accent-secondary: #FFD700;
+  --accent-highlight: #E8A045;
+  --text-primary: #F5F0E8;
+  --text-secondary: #C4B49A;
+  --border-glow: rgba(255, 165, 0, 0.3);
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --danger: #F44336;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  background: var(--background-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 24px; }
+h3 { font-size: 22px; }
+h4 { font-size: 20px; }
+h5 { font-size: 18px; }
+h6 { font-size: 16px; }
+
+/* Accessibility - minimum text sizes */
+p, span, div, label {
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+small {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Button accessibility */
+button {
+  min-height: 48px;
+  min-width: 120px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+button:focus {
+  outline: 2px solid var(--accent-secondary);
+  outline-offset: 2px;
+}
+
+/* Input accessibility */
+input, select, textarea {
+  min-height: 52px;
+  font-size: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-glow);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--accent-secondary);
+  outline-offset: 2px;
+  border-color: var(--accent-secondary);
+}
+
+/* Card styling */
+.card {
+  background: var(--background-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(255, 107, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(255, 165, 0, 0.6);
+  box-shadow: 0 8px 32px rgba(255, 107, 0, 0.12);
+}
+
+/* Rangoli divider */
+.rangoli-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), var(--accent-secondary), var(--accent-primary), transparent);
+  border: none;
+  margin: 24px 0;
+  opacity: 0.6;
+}
+
+/* Lotus pattern background */
+.lotus-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF6B00' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Loading bar */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-primary));
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+  z-index: 9999;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Saffron spinner */
+.saffron-spinner {
+  border: 4px solid var(--background-secondary);
+  border-top: 4px solid var(--accent-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* OM watermark */
+.om-watermark {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 120px;
+  color: var(--accent-primary);
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
 }
 
 @layer utilities {

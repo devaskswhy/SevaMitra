@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import TopBanner from '@/components/TopBanner';
+import Sidebar from '@/components/Sidebar';
 
 const API_BASE = 'http://localhost:4000/api';
 
@@ -206,89 +208,143 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-2xl">Loading Operations Dashboard...</div>
+      <div className="min-h-screen flex items-center justify-center lotus-pattern" style={{ background: '#0D0A1A' }}>
+        <div className="saffron-spinner"></div>
+        <div className="loading-bar"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Header */}
-      <div className="bg-[#1a1a2e] border-b border-gray-700 px-8 py-4">
-        <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-          <span className="w-3 h-3 bg-[#FF6B35] rounded-full animate-pulse"></span>
-          SevaMitra Operations Center
-        </h1>
-        <p className="text-gray-400 mt-1">Real-time Volunteer Management System</p>
-      </div>
+    <div className="min-h-screen lotus-pattern" style={{ background: '#0D0A1A' }}>
+      <div className="loading-bar"></div>
+      <TopBanner />
+      <Sidebar />
+      
+      {/* OM Watermark */}
+      <div className="om-watermark">ॐ</div>
 
-      <div className="p-8">
+      {/* Main Content */}
+      <div className="ml-70 pt-14 p-8" style={{ marginLeft: '280px', paddingTop: '56px' }}>
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+            Operations Center
+          </h1>
+          <p className="text-lg" style={{ color: '#C4B49A', fontFamily: 'Inter, sans-serif' }}>
+            Real-time Volunteer Management System
+          </p>
+        </div>
+
         {/* Top Metrics Bar */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <MetricCard
             title="Total Active Volunteers"
             value={stats.totalActiveVolunteers}
-            color="#FF6B35"
+            color="#FF6B00"
             icon="👥"
           />
           <MetricCard
             title="Zones >80% Capacity"
             value={stats.zonesOverCapacity}
-            color="#FFA500"
+            color="#FFD700"
             icon="📍"
           />
           <MetricCard
             title="Open Incidents"
             value={stats.openIncidents}
-            color="#FF6B35"
+            color="#FF6B00"
             icon="⚠️"
           />
           <MetricCard
             title="Pending Assignments"
             value={stats.pendingAssignments}
-            color="#FFA500"
+            color="#FFD700"
             icon="📋"
           />
         </div>
+
+        {/* Sacred Moments Image Strip */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+            Sacred Moments
+          </h2>
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            <div className="flex-shrink-0 w-80">
+              <div className="h-30 rounded-xl overflow-hidden relative" style={{ height: '120px' }}>
+                <div className="w-full h-full bg-gradient-to-br from-orange-600 to-yellow-500 flex items-center justify-center">
+                  <span className="text-white text-lg font-semibold">Triveni Sangam Aerial View</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              </div>
+              <p className="mt-2 text-sm" style={{ color: '#C4B49A' }}>Crowds at the sacred confluence</p>
+            </div>
+            <div className="flex-shrink-0 w-80">
+              <div className="h-30 rounded-xl overflow-hidden relative" style={{ height: '120px' }}>
+                <div className="w-full h-full bg-gradient-to-br from-purple-600 to-orange-500 flex items-center justify-center">
+                  <span className="text-white text-lg font-semibold">Evening Aarti</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              </div>
+              <p className="mt-2 text-sm" style={{ color: '#C4B49A' }}>Devotional ceremonies at ghats</p>
+            </div>
+            <div className="flex-shrink-0 w-80">
+              <div className="h-30 rounded-xl overflow-hidden relative" style={{ height: '120px' }}>
+                <div className="w-full h-full bg-gradient-to-br from-yellow-500 to-orange-400 flex items-center justify-center">
+                  <span className="text-white text-lg font-semibold">Sunrise Bathing</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              </div>
+              <p className="mt-2 text-sm" style={{ color: '#C4B49A' }}>Holy dip at dawn</p>
+            </div>
+          </div>
+        </div>
+
+        <hr className="rangoli-divider" />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Zone Status and Incidents */}
           <div className="lg:col-span-2 space-y-6">
             {/* Zone Status Grid */}
-            <div className="bg-[#1a1a2e] rounded-xl p-6 border border-gray-700">
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span className="text-[#FFA500]">●</span> Zone Status Overview
+            <div className="card p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+                <span style={{ color: '#FFD700' }}>●</span> Zone Status Overview
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {zones.map((zone) => (
                   <div
                     key={zone.id}
-                    className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-[#FF6B35] transition-colors"
+                    className="card p-4 hover:border-orange-400 transition-all"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="text-white font-semibold">{zone.name}</h3>
-                        <p className="text-gray-400 text-sm">{zone.type}</p>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xl">{getZoneIcon(zone.type)}</span>
+                          <h3 className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>{zone.name}</h3>
+                        </div>
+                        <p className="text-sm" style={{ color: '#C4B49A' }}>{zone.type}</p>
                       </div>
                       <div className={`w-3 h-3 rounded-full ${getCapacityColor(zone)}`} />
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Capacity</span>
-                        <span className="text-white">
+                        <span style={{ color: '#C4B49A' }}>Capacity</span>
+                        <span style={{ color: '#F5F0E8' }}>
                           {zone.currentLoad} / {zone.maxCapacity}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div className="w-full rounded-full h-2" style={{ background: '#1A1228' }}>
                         <div
-                          className={`h-2 rounded-full ${getCapacityColor(zone)}`}
-                          style={{ width: `${(zone.currentLoad / zone.maxCapacity) * 100}%` }}
+                          className="h-2 rounded-full"
+                          style={{
+                            width: `${(zone.currentLoad / zone.maxCapacity) * 100}%`,
+                            background: 'linear-gradient(90deg, #FF6B00, #FFD700)'
+                          }}
                         />
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Priority</span>
+                        <span style={{ color: '#C4B49A' }}>Priority</span>
                         <span className={`font-medium ${
                           zone.priority === 'HIGH' ? 'text-red-400' :
                           zone.priority === 'MEDIUM' ? 'text-amber-400' : 'text-green-400'
@@ -303,33 +359,38 @@ export default function Dashboard() {
             </div>
 
             {/* Incident List */}
-            <div className="bg-[#1a1a2e] rounded-xl p-6 border border-gray-700">
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span className="text-[#FF6B35]">●</span> Active Incidents
+            <div className="card p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+                <span style={{ color: '#FF6B00' }}>●</span> Active Incidents
               </h2>
               <div className="space-y-3">
                 {incidents.filter(i => !i.resolvedAt).length === 0 ? (
-                  <p className="text-gray-400 text-center py-8">No active incidents</p>
+                  <p className="text-center py-8" style={{ color: '#C4B49A' }}>No active incidents</p>
                 ) : (
                   incidents.filter(i => !i.resolvedAt).map((incident) => (
                     <div
                       key={incident.id}
-                      className="bg-gray-800 rounded-lg p-4 border border-gray-700 flex items-center justify-between"
+                      className="card p-4 flex items-center justify-between"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadge(incident.severity)}`}>
+                          <span className={`px-3 py-1 rounded text-sm font-bold ${getSeverityBadge(incident.severity)}`}>
                             {getSeverityLabel(incident.severity)}
                           </span>
-                          <span className="text-white font-medium">{incident.type}</span>
+                          <span className="font-medium" style={{ color: '#F5F0E8' }}>{incident.type}</span>
                         </div>
-                        <p className="text-gray-400 text-sm">{incident.description}</p>
+                        <p className="text-sm" style={{ color: '#C4B49A' }}>{incident.description}</p>
                       </div>
                       <button
                         onClick={() => handleDeployVolunteers(incident.id)}
-                        className="ml-4 px-4 py-2 bg-[#FF6B35] hover:bg-[#e55a2b] text-white rounded-lg font-medium transition-colors"
+                        className="ml-4 px-6 py-3 rounded-lg font-medium transition-all hover:shadow-lg flex items-center gap-2"
+                        style={{
+                          background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
+                          color: '#0D0A1A',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
                       >
-                        Deploy Volunteers
+                        🔥 Deploy Volunteers
                       </button>
                     </div>
                   ))
@@ -338,17 +399,23 @@ export default function Dashboard() {
             </div>
 
             {/* Quick Allocation Panel */}
-            <div className="bg-[#1a1a2e] rounded-xl p-6 border border-gray-700">
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span className="text-[#FFA500]">●</span> Quick Volunteer Allocation
+            <div className="card p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+                <span style={{ color: '#FFD700' }}>●</span> Quick Volunteer Allocation
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">Select Task</label>
+                  <label className="block mb-2" style={{ color: '#C4B49A', fontSize: '16px' }}>Select Task</label>
                   <select
                     value={selectedTask || ''}
                     onChange={(e) => setSelectedTask(Number(e.target.value))}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-[#FF6B35] focus:outline-none"
+                    style={{
+                      width: '100%',
+                      background: '#1A1228',
+                      border: '1px solid rgba(255, 165, 0, 0.3)',
+                      borderRadius: '8px',
+                      color: '#F5F0E8'
+                    }}
                   >
                     <option value="">Choose a task...</option>
                     {tasks.map((task) => (
@@ -361,34 +428,39 @@ export default function Dashboard() {
                 <button
                   onClick={handleFindBestVolunteers}
                   disabled={!selectedTask}
-                  className="w-full px-4 py-3 bg-[#FFA500] hover:bg-[#e69500] text-black rounded-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFD700, #FF6B00)',
+                    color: '#0D0A1A',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
                 >
                   Find Best Volunteers
                 </button>
                 {recommendations.length > 0 && (
                   <div className="space-y-2 mt-4">
-                    <h3 className="text-white font-semibold">Top 5 Recommendations</h3>
+                    <h3 className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Top 5 Recommendations</h3>
                     {recommendations.map((rec) => (
                       <div
                         key={rec.volunteerId}
-                        className="bg-gray-800 rounded-lg p-4 border border-gray-700"
+                        className="card p-4"
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-white font-medium">{rec.name}</span>
-                          <span className="text-[#FF6B35] font-bold">{rec.score}%</span>
+                          <span className="font-medium" style={{ color: '#F5F0E8' }}>{rec.name}</span>
+                          <span className="font-bold" style={{ color: '#FFD700' }}>{rec.score}%</span>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-sm">
                           <div>
-                            <span className="text-gray-400">Skill:</span>
-                            <span className="text-white ml-1">{rec.skillMatch}%</span>
+                            <span style={{ color: '#C4B49A' }}>Skill:</span>
+                            <span className="ml-1" style={{ color: '#F5F0E8' }}>{rec.skillMatch}%</span>
                           </div>
                           <div>
-                            <span className="text-gray-400">Available:</span>
-                            <span className="text-white ml-1">{rec.availability}%</span>
+                            <span style={{ color: '#C4B49A' }}>Available:</span>
+                            <span className="ml-1" style={{ color: '#F5F0E8' }}>{rec.availability}%</span>
                           </div>
                           <div>
-                            <span className="text-gray-400">Distance:</span>
-                            <span className="text-white ml-1">{rec.distance}km</span>
+                            <span style={{ color: '#C4B49A' }}>Distance:</span>
+                            <span className="ml-1" style={{ color: '#F5F0E8' }}>{rec.distance}km</span>
                           </div>
                         </div>
                       </div>
@@ -400,14 +472,17 @@ export default function Dashboard() {
           </div>
 
           {/* Right Column - Activity Feed */}
-          <div className="bg-[#1a1a2e] rounded-xl p-6 border border-gray-700 h-fit">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              Live Activity Feed
+          <div className="card p-6 h-fit">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm font-bold" style={{ color: '#FF6B00' }}>LIVE</span>
+              </div>
+              Activity Feed
             </h2>
             <div className="space-y-3 h-[600px] overflow-y-auto pr-2">
               {activities.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12" style={{ color: '#C4B49A' }}>
                   <p className="text-4xl mb-4">📡</p>
                   <p>Waiting for live updates...</p>
                   <p className="text-sm mt-2">Connected to Socket.io</p>
@@ -416,7 +491,7 @@ export default function Dashboard() {
                 activities.map((activity) => (
                   <div
                     key={activity.id}
-                    className={`border-l-4 pl-4 py-2 rounded-r ${
+                    className={`border-l-4 pl-4 py-2 rounded-r transition-all ${
                       activity.type === 'warning' ? 'border-orange-500 bg-orange-500/10' :
                       activity.type === 'success' ? 'border-green-500 bg-green-500/10' :
                       'border-blue-500 bg-blue-500/10'
@@ -429,8 +504,8 @@ export default function Dashboard() {
                     }`}>
                       {activity.message}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {new Date(activity.timestamp).toLocaleTimeString()}
+                    <p className="text-xs mt-1" style={{ color: '#C4B49A' }}>
+                      {new Date(activity.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                     </p>
                   </div>
                 ))
@@ -439,10 +514,12 @@ export default function Dashboard() {
           </div>
         </div>
 
+        <hr className="rangoli-divider" />
+
         {/* Zone Capacity Chart */}
-        <div className="mt-6 bg-[#1a1a2e] rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <span className="text-[#FFA500]">●</span> Zone Capacity Overview
+        <div className="card p-6">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+            <span style={{ color: '#FFD700' }}>●</span> Zone Capacity Overview
           </h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -452,15 +529,15 @@ export default function Dashboard() {
                 max: z.maxCapacity,
                 percentage: Math.round((z.currentLoad / z.maxCapacity) * 100)
               }))}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9CA3AF" />
-                <YAxis stroke="#9CA3AF" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1A1228" />
+                <XAxis dataKey="name" stroke="#C4B49A" />
+                <YAxis stroke="#C4B49A" />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #374151' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#211835', border: '1px solid rgba(255, 165, 0, 0.3)', color: '#F5F0E8' }}
+                  itemStyle={{ color: '#F5F0E8' }}
                 />
-                <Bar dataKey="current" fill="#FF6B35" name="Current Load" />
-                <Bar dataKey="max" fill="#FFA500" name="Max Capacity" />
+                <Bar dataKey="current" fill="#FF6B00" name="Current Load" />
+                <Bar dataKey="max" fill="#FFD700" name="Max Capacity" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -472,14 +549,26 @@ export default function Dashboard() {
 
 function MetricCard({ title, value, color, icon }: { title: string; value: number; color: string; icon: string }) {
   return (
-    <div className="bg-[#1a1a2e] rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors">
+    <div className="card p-6 hover:shadow-xl transition-all">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-3xl">{icon}</span>
-        <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
-          <span className="text-2xl font-bold" style={{ color }}>{value}</span>
+        <span className="text-4xl">{icon}</span>
+        <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
+          <span className="text-4xl font-bold" style={{ color, fontFamily: 'Poppins, sans-serif' }}>{value}</span>
         </div>
       </div>
-      <h3 className="text-gray-400 text-sm font-medium">{title}</h3>
+      <h3 className="font-medium" style={{ color: '#C4B49A', fontSize: '18px', fontFamily: 'Inter, sans-serif' }}>{title}</h3>
     </div>
   );
+}
+
+function getZoneIcon(type: string): string {
+  const icons: { [key: string]: string } = {
+    'GHAT': '🏊',
+    'CAMP': '🏕',
+    'MEDICAL': '🏥',
+    'TRAFFIC': '🚦',
+    'ENTRY_EXIT': '🚪',
+    'CROWD_CONTROL': '👥',
+  };
+  return icons[type] || '📍';
 }

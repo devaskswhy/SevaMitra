@@ -22,7 +22,6 @@ export default function VolunteerLogin() {
     }
     setLoading(true);
     setError('');
-    // Mock OTP sending - in real app, this would send SMS
     setTimeout(() => {
       setShowOtp(true);
       setLoading(false);
@@ -39,8 +38,6 @@ export default function VolunteerLogin() {
     setError('');
 
     try {
-      // Mock verification - any 6-digit OTP works
-      // In real app, verify with backend
       const response = await axios.get(`${API_BASE}/volunteers`);
       const volunteer = response.data.find((v: any) => v.phone === `+91${phone}`);
       
@@ -59,22 +56,31 @@ export default function VolunteerLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <div className="min-h-screen lotus-pattern flex items-center justify-center p-4" style={{ background: '#0D0A1A' }}>
+      <div className="loading-bar"></div>
+      <div className="om-watermark">ॐ</div>
+      
+      <div className="card p-8 w-full max-w-md" style={{ maxWidth: '480px' }}>
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl">🙏</span>
+          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #FF6B00, #FFD700)' }}>
+            <span className="text-5xl">🙏</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">SevaMitra Volunteer</h1>
-          <p className="text-gray-600">Login to access your dashboard</p>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+            SevaMitra Volunteer
+          </h1>
+          <p className="text-lg" style={{ color: '#C4B49A', fontFamily: 'Inter, sans-serif' }}>
+            Login to access your dashboard
+          </p>
         </div>
 
         {!showOtp ? (
           <form onSubmit={handleSendOtp} className="space-y-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">Phone Number</label>
+              <label className="block mb-2" style={{ color: '#C4B49A', fontSize: '16px', fontFamily: 'Inter, sans-serif' }}>
+                Phone Number
+              </label>
               <div className="flex">
-                <span className="inline-flex items-center px-4 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-600">
+                <span className="inline-flex items-center px-4 rounded-l-lg" style={{ background: '#1A1228', border: '1px solid rgba(255, 165, 0, 0.3)', color: '#FFD700' }}>
                   +91
                 </span>
                 <input
@@ -82,23 +88,34 @@ export default function VolunteerLogin() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   placeholder="Enter 10-digit number"
-                  className="flex-1 px-4 py-4 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg"
+                  className="flex-1 rounded-r-lg text-lg"
                   maxLength={10}
                   inputMode="numeric"
+                  style={{
+                    background: '#1A1228',
+                    border: '1px solid rgba(255, 165, 0, 0.3)',
+                    color: '#F5F0E8'
+                  }}
                 />
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-                {error}
+              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(244, 67, 54, 0.1)', border: '1px solid #F44336', color: '#F44336' }}>
+                ❌ {error}
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
+                color: '#0D0A1A',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '18px'
+              }}
             >
               {loading ? 'Sending OTP...' : 'Send OTP'}
             </button>
@@ -106,31 +123,45 @@ export default function VolunteerLogin() {
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">Enter OTP</label>
+              <label className="block mb-2" style={{ color: '#C4B49A', fontSize: '16px', fontFamily: 'Inter, sans-serif' }}>
+                Enter OTP
+              </label>
               <input
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="Enter 6-digit OTP"
-                className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg text-center tracking-widest"
+                className="w-full text-lg text-center tracking-widest"
                 maxLength={6}
                 inputMode="numeric"
+                style={{
+                  background: '#1A1228',
+                  border: '1px solid rgba(255, 165, 0, 0.3)',
+                  color: '#F5F0E8',
+                  letterSpacing: '0.5em'
+                }}
               />
-              <p className="text-sm text-gray-500 mt-2 text-center">
+              <p className="text-sm mt-2 text-center" style={{ color: '#C4B49A' }}>
                 Demo: Any 6-digit number works
               </p>
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-                {error}
+              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(244, 67, 54, 0.1)', border: '1px solid #F44336', color: '#F44336' }}>
+                ❌ {error}
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
+                color: '#0D0A1A',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '18px'
+              }}
             >
               {loading ? 'Verifying...' : 'Verify & Login'}
             </button>
@@ -142,7 +173,13 @@ export default function VolunteerLogin() {
                 setOtp('');
                 setError('');
               }}
-              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors"
+              className="w-full px-6 py-4 rounded-lg font-medium transition-all"
+              style={{
+                background: '#1A1228',
+                border: '1px solid rgba(255, 165, 0, 0.3)',
+                color: '#F5F0E8',
+                fontFamily: 'Inter, sans-serif'
+              }}
             >
               Change Phone Number
             </button>
@@ -150,9 +187,9 @@ export default function VolunteerLogin() {
         )}
 
         <div className="mt-8 text-center">
-          <p className="text-gray-600 text-sm">
+          <p className="text-sm" style={{ color: '#C4B49A' }}>
             New volunteer?{' '}
-            <a href="/register" className="text-orange-500 hover:text-orange-600 font-medium">
+            <a href="/register" className="font-bold hover:underline" style={{ color: '#FFD700' }}>
               Register here
             </a>
           </p>

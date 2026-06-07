@@ -88,37 +88,41 @@ export default function IncidentReport() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen lotus-pattern" style={{ background: '#0D0A1A' }}>
+      <div className="loading-bar"></div>
+      <div className="om-watermark">ॐ</div>
+      
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-6">
+      <div className="p-6" style={{ background: 'linear-gradient(135deg, #FF6B00, #FFD700)', color: '#0D0A1A' }}>
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition-colors"
+            className="p-3 rounded-lg transition-colors"
+            style={{ background: 'rgba(13, 10, 26, 0.2)' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-xl font-bold">Report Incident</h1>
+          <h1 className="text-xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>Report Incident</h1>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="p-4 pb-24">
         {success ? (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="card p-8 text-center">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(76, 175, 80, 0.1)' }}>
               <span className="text-4xl">✓</span>
             </div>
-            <h2 className="text-2xl font-bold text-green-800 mb-2">Report Submitted</h2>
-            <p className="text-green-600">Thank you for reporting. Redirecting to home...</p>
+            <h2 className="text-2xl font-bold mb-2" style={{ color: '#4CAF50', fontFamily: 'Poppins, sans-serif' }}>Report Submitted</h2>
+            <p style={{ color: '#C4B49A' }}>Thank you for reporting. Redirecting to home...</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Severity Selector */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <label className="block text-gray-800 font-bold mb-4">Severity Level</label>
+            <div className="card p-6">
+              <label className="block mb-4" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Severity Level</label>
               <div className="grid grid-cols-5 gap-2">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <button
@@ -128,12 +132,23 @@ export default function IncidentReport() {
                     className={`aspect-square rounded-xl font-bold text-2xl transition-all ${
                       severity === level
                         ? level <= 2
-                          ? 'bg-green-500 text-white scale-110'
+                          ? 'scale-110'
                           : level === 3
-                          ? 'bg-amber-500 text-white scale-110'
-                          : 'bg-red-500 text-white scale-110'
-                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                          ? 'scale-110'
+                          : 'scale-110'
+                        : 'hover:scale-105'
                     }`}
+                    style={{
+                      background: severity === level
+                        ? level <= 2
+                          ? '#4CAF50'
+                          : level === 3
+                          ? '#FF9800'
+                          : '#F44336'
+                        : '#1A1228',
+                      color: severity === level ? '#F5F0E8' : '#C4B49A',
+                      border: '1px solid rgba(255, 165, 0, 0.3)'
+                    }}
                   >
                     {level}
                   </button>
@@ -141,20 +156,26 @@ export default function IncidentReport() {
               </div>
               <div className="mt-3 text-center">
                 <span className={`font-bold ${
-                  severity <= 2 ? 'text-green-600' : severity === 3 ? 'text-amber-600' : 'text-red-600'
-                }`}>
+                  severity <= 2 ? 'text-green-400' : severity === 3 ? 'text-amber-400' : 'text-red-400'
+                }`} style={{ fontFamily: 'Poppins, sans-serif' }}>
                   {severity <= 2 ? 'LOW' : severity === 3 ? 'MEDIUM' : severity === 4 ? 'HIGH' : 'CRITICAL'}
                 </span>
               </div>
             </div>
 
             {/* Zone Selector */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <label className="block text-gray-800 font-bold mb-3">Location / Zone</label>
+            <div className="card p-6">
+              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Location / Zone</label>
               <select
                 value={zoneId}
                 onChange={(e) => setZoneId(e.target.value)}
-                className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg bg-white"
+                style={{
+                  width: '100%',
+                  background: '#1A1228',
+                  border: '1px solid rgba(255, 165, 0, 0.3)',
+                  borderRadius: '8px',
+                  color: '#F5F0E8'
+                }}
                 required
               >
                 <option value="">Select Zone</option>
@@ -167,12 +188,18 @@ export default function IncidentReport() {
             </div>
 
             {/* Incident Type */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <label className="block text-gray-800 font-bold mb-3">Incident Type</label>
+            <div className="card p-6">
+              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Incident Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg bg-white"
+                style={{
+                  width: '100%',
+                  background: '#1A1228',
+                  border: '1px solid rgba(255, 165, 0, 0.3)',
+                  borderRadius: '8px',
+                  color: '#F5F0E8'
+                }}
                 required
               >
                 <option value="">Select Type</option>
@@ -185,27 +212,39 @@ export default function IncidentReport() {
             </div>
 
             {/* Description */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <label className="block text-gray-800 font-bold mb-3">Description</label>
+            <div className="card p-6">
+              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe what happened..."
-                className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg min-h-32 resize-none"
+                className="w-full min-h-32 resize-none"
+                style={{
+                  background: '#1A1228',
+                  border: '1px solid rgba(255, 165, 0, 0.3)',
+                  borderRadius: '8px',
+                  color: '#F5F0E8'
+                }}
                 required
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">
-                {error}
+              <div className="px-4 py-3 rounded-xl flex items-center gap-2" style={{ background: 'rgba(244, 67, 54, 0.1)', border: '1px solid #F44336', color: '#F44336' }}>
+                ❌ {error}
               </div>
             )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-xl text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-4 rounded-xl font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
+                color: '#0D0A1A',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '18px'
+              }}
             >
               {submitting ? 'Submitting...' : 'Submit Report'}
             </button>
@@ -214,31 +253,33 @@ export default function IncidentReport() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 px-6 py-4" style={{ background: '#211835', borderTop: '1px solid rgba(255, 165, 0, 0.3)' }}>
         <div className="flex justify-around">
           <button
             onClick={() => router.push('/volunteer/home')}
-            className="flex flex-col items-center text-gray-400 hover:text-orange-500 transition-colors"
+            className="flex flex-col items-center transition-colors"
+            style={{ color: '#C4B49A' }}
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
-            <span className="text-xs mt-1">Home</span>
+            <span className="text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Home</span>
           </button>
-          <button className="flex flex-col items-center text-orange-500">
+          <button className="flex flex-col items-center" style={{ color: '#FFD700' }}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span className="text-xs mt-1 font-medium">Report</span>
+            <span className="text-xs mt-1 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>Report</span>
           </button>
           <button
             onClick={() => router.push('/volunteer/profile')}
-            className="flex flex-col items-center text-gray-400 hover:text-orange-500 transition-colors"
+            className="flex flex-col items-center transition-colors"
+            style={{ color: '#C4B49A' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span className="text-xs mt-1">Profile</span>
+            <span className="text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Profile</span>
           </button>
         </div>
       </div>
