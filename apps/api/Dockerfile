@@ -1,21 +1,9 @@
-# Dockerfile for API
-
-FROM node:14
-
-# Set the working directory
+FROM node:18
 WORKDIR /usr/src/app
-
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy the rest of the application code
 COPY . .
-
-# Expose the API port
-EXPOSE 5000
-
-# Start the application
-CMD ["npm", "run", "dev"]
+RUN npx prisma generate
+RUN npm run build
+EXPOSE 4000
+CMD ["npm", "start"]
