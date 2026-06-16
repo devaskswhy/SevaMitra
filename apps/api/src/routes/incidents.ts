@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 
 const router = Router();
 
@@ -11,10 +12,11 @@ router.get("/", async (_req: Request, res: Response) => {
         zone: true,
         volunteersDeployed: true,
       },
+      orderBy: { createdAt: "desc" },
     });
-    res.json(incidents);
+    sendSuccess(res, incidents);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch incidents" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -29,12 +31,12 @@ router.get("/:id", async (req: Request, res: Response) => {
       },
     });
     if (!incident) {
-      res.status(404).json({ error: "Incident not found" });
+      sendError(res, "Incident not found", 404);
       return;
     }
-    res.json(incident);
+    sendSuccess(res, incident);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch incident" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -62,9 +64,9 @@ router.post("/", async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json(incident);
+    sendSuccess(res, incident, 201);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create incident" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -89,9 +91,9 @@ router.put("/:id", async (req: Request, res: Response) => {
       },
     });
 
-    res.json(incident);
+    sendSuccess(res, incident);
   } catch (error) {
-    res.status(500).json({ error: "Failed to update incident" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -101,9 +103,9 @@ router.delete("/:id", async (req: Request, res: Response) => {
     await prisma.incident.delete({
       where: { id: parseInt(req.params.id as string) },
     });
-    res.json({ message: "Incident deleted successfully" });
+    sendSuccess(res, { message: "Incident deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete incident" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -120,12 +122,9 @@ router.patch("/:id/resolve", async (req: Request, res: Response) => {
         volunteersDeployed: true,
       },
     });
-    res.json({
-      message: "Incident resolved",
-      incident,
-    });
+    sendSuccess(res, { message: "Incident resolved", incident });
   } catch (error) {
-    res.status(500).json({ error: "Failed to resolve incident" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -133,6 +132,11 @@ router.patch("/:id/resolve", async (req: Request, res: Response) => {
 router.post("/:id/deploy-volunteers", async (req: Request, res: Response) => {
   try {
     const { volunteerIds } = req.body;
+
+    if (!Array.isArray(volunteerIds) || volunteerIds.length === 0) {
+      sendError(res, "volunteerIds must be a non-empty array", 400);
+      return;
+    }
 
     const incident = await prisma.incident.update({
       where: { id: parseInt(req.params.id as string) },
@@ -147,12 +151,9 @@ router.post("/:id/deploy-volunteers", async (req: Request, res: Response) => {
       },
     });
 
-    res.json({
-      message: "Volunteers deployed to incident",
-      incident,
-    });
+    sendSuccess(res, { message: "Volunteers deployed to incident", incident });
   } catch (error) {
-    res.status(500).json({ error: "Failed to deploy volunteers" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -166,9 +167,9 @@ router.get("/severity/:level", async (req: Request, res: Response) => {
         volunteersDeployed: true,
       },
     });
-    res.json(incidents);
+    sendSuccess(res, incidents);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch incidents by severity" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -182,9 +183,9 @@ router.get("/zone/:zoneId", async (req: Request, res: Response) => {
         volunteersDeployed: true,
       },
     });
-    res.json(incidents);
+    sendSuccess(res, incidents);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch incidents for zone" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -197,10 +198,11 @@ router.get("/status/unresolved", async (_req: Request, res: Response) => {
         zone: true,
         volunteersDeployed: true,
       },
+      orderBy: { severity: "desc" },
     });
-    res.json(incidents);
+    sendSuccess(res, incidents);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch unresolved incidents" });
+    sendPrismaError(res, error);
   }
 });
 

@@ -3,44 +3,48 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Volunteer {
-  id               Int          @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   name             String
-  phone            String       @unique
-  email            String       @unique
+  phone            String             @unique
+  email            String             @unique
   aadhaarHash      String
   age              Int
   gender           String
-  languages        String       @default("")
-  skills           String       @default("")
-  certifications   String       @default("")
+  languages        String             @default("")
+  skills           String             @default("")
+  certifications   String             @default("")
   homeState        String
-  registeredAt     DateTime     @default(now())
-  status           String       @default("ACTIVE")
-  reliabilityScore Int          @default(0)
-  completedShifts  Int          @default(0)
+  registeredAt     DateTime           @default(now())
+  status           String             @default("ACTIVE")
+  reliabilityScore Int                @default(0)
+  completedShifts  Int                @default(0)
   assignments      Assignment[]
-  incidents        Incident[]   @relation("IncidentVolunteers")
+  incidents        Incident[]         @relation("IncidentVolunteers")
+  sessions         VolunteerSession[]
 
   @@index([phone])
+  @@index([status])
+  @@index([registeredAt])
 }
 
 model Zone {
-  id           Int        @id @default(autoincrement())
-  name         String
-  type         String
-  coordinates  String     @default("")
-  maxCapacity  Int
-  currentLoad  Int        @default(0)
-  priority     String     @default("LOW")
-  tasks        Task[]
-  incidents    Incident[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  type        String
+  coordinates String     @default("")
+  maxCapacity Int
+  currentLoad Int        @default(0)
+  priority    String     @default("LOW")
+  tasks       Task[]
+  incidents   Incident[]
 
   @@index([type])
+  @@index([priority])
 }
 
 model Task {
@@ -56,6 +60,7 @@ model Task {
   assignments       Assignment[]
 
   @@index([zoneId])
+  @@index([difficulty])
 }
 
 model Assignment {
@@ -69,8 +74,13 @@ model Assignment {
   checkInTime       DateTime?
   checkOutTime      DateTime?
   performanceRating Int?
+  createdAt         DateTime  @default(now())
 
   @@unique([volunteerId, taskId, shiftId])
+  @@index([volunteerId])
+  @@index([taskId])
+  @@index([shiftId])
+  @@index([createdAt])
 }
 
 model Incident {
@@ -82,9 +92,14 @@ model Incident {
   type               String
   description        String
   resolvedAt         DateTime?
+  createdAt          DateTime    @default(now())
   volunteersDeployed Volunteer[] @relation("IncidentVolunteers")
 
   @@index([zoneId])
+  @@index([severity])
+  @@index([type])
+  @@index([resolvedAt])
+  @@index([createdAt])
 }
 
 model Shift {
@@ -92,4 +107,25 @@ model Shift {
   startTime   DateTime
   endTime     DateTime
   assignments Assignment[]
+
+  @@index([startTime])
+  @@index([endTime])
+}
+
+model VolunteerSession {
+  id          Int       @id @default(autoincrement())
+  volunteerId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  otp         String
+  otpExpiresAt DateTime
+  token       String?   @unique
+  isVerified  Boolean   @default(false)
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+
+  @@index([volunteerId])
+  @@index([token])
+  @@index([createdAt])
 }

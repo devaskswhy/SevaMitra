@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 
 const router = Router();
 
@@ -17,9 +18,9 @@ router.get("/", async (_req: Request, res: Response) => {
         },
       },
     });
-    res.json(tasks);
+    sendSuccess(res, tasks);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch tasks" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -39,12 +40,12 @@ router.get("/:id", async (req: Request, res: Response) => {
       },
     });
     if (!task) {
-      res.status(404).json({ error: "Task not found" });
+      sendError(res, "Task not found", 404);
       return;
     }
-    res.json(task);
+    sendSuccess(res, task);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch task" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -75,9 +76,9 @@ router.post("/", async (req: Request, res: Response) => {
         zone: true,
       },
     });
-    res.status(201).json(task);
+    sendSuccess(res, task, 201);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create task" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -91,9 +92,9 @@ router.put("/:id", async (req: Request, res: Response) => {
         zone: true,
       },
     });
-    res.json(task);
+    sendSuccess(res, task);
   } catch (error) {
-    res.status(500).json({ error: "Failed to update task" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -103,9 +104,9 @@ router.delete("/:id", async (req: Request, res: Response) => {
     await prisma.task.delete({
       where: { id: parseInt(req.params.id as string) },
     });
-    res.json({ message: "Task deleted successfully" });
+    sendSuccess(res, { message: "Task deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete task" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -123,9 +124,9 @@ router.get("/zone/:zoneId", async (req: Request, res: Response) => {
         },
       },
     });
-    res.json(tasks);
+    sendSuccess(res, tasks);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch tasks for zone" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -138,9 +139,9 @@ router.get("/difficulty/:level", async (req: Request, res: Response) => {
         zone: true,
       },
     });
-    res.json(tasks);
+    sendSuccess(res, tasks);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch tasks by difficulty" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -154,9 +155,9 @@ router.patch(
         where: { id: parseInt(req.params.id as string) },
         data: { minVolunteers, maxVolunteers },
       });
-      res.json(task);
+      sendSuccess(res, task);
     } catch (error) {
-      res.status(500).json({ error: "Failed to update volunteer count" });
+      sendPrismaError(res, error);
     }
   }
 );

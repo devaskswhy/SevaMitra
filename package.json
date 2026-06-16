@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "build": "cd apps/api && npm ci && npx prisma generate --schema=../../prisma/schema.prisma && npx tsc",
+    "start": "node apps/api/dist/index.js"
+  },
   "dependencies": {
     "@types/node": "^25.9.2"
   },

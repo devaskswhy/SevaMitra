@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 
 const router = Router();
 
@@ -12,9 +13,9 @@ router.get("/", async (_req: Request, res: Response) => {
         incidents: true,
       },
     });
-    res.json(zones);
+    sendSuccess(res, zones);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch zones" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -33,12 +34,12 @@ router.get("/:id", async (req: Request, res: Response) => {
       },
     });
     if (!zone) {
-      res.status(404).json({ error: "Zone not found" });
+      sendError(res, "Zone not found", 404);
       return;
     }
-    res.json(zone);
+    sendSuccess(res, zone);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch zone" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -56,9 +57,9 @@ router.post("/", async (req: Request, res: Response) => {
         priority: priority || "LOW",
       },
     });
-    res.status(201).json(zone);
+    sendSuccess(res, zone, 201);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create zone" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -69,9 +70,9 @@ router.put("/:id", async (req: Request, res: Response) => {
       where: { id: parseInt(req.params.id as string) },
       data: req.body,
     });
-    res.json(zone);
+    sendSuccess(res, zone);
   } catch (error) {
-    res.status(500).json({ error: "Failed to update zone" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -81,9 +82,9 @@ router.delete("/:id", async (req: Request, res: Response) => {
     await prisma.zone.delete({
       where: { id: parseInt(req.params.id as string) },
     });
-    res.json({ message: "Zone deleted successfully" });
+    sendSuccess(res, { message: "Zone deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete zone" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -95,9 +96,9 @@ router.patch("/:id/load", async (req: Request, res: Response) => {
       where: { id: parseInt(req.params.id as string) },
       data: { currentLoad },
     });
-    res.json(zone);
+    sendSuccess(res, zone);
   } catch (error) {
-    res.status(500).json({ error: "Failed to update zone load" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -107,9 +108,9 @@ router.get("/type/:type", async (req: Request, res: Response) => {
     const zones = await prisma.zone.findMany({
       where: { type: req.params.type as string },
     });
-    res.json(zones);
+    sendSuccess(res, zones);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch zones by type" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -119,9 +120,9 @@ router.get("/priority/:priority", async (req: Request, res: Response) => {
     const zones = await prisma.zone.findMany({
       where: { priority: req.params.priority as string },
     });
-    res.json(zones);
+    sendSuccess(res, zones);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch zones by priority" });
+    sendPrismaError(res, error);
   }
 });
 

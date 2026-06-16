@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import AllocationEngine from "../services/allocationEngine";
+import { sendSuccess, sendError } from "../lib/apiResponse";
 
 const router = Router();
 
@@ -9,7 +10,7 @@ router.post("/recommendations", async (req: Request, res: Response) => {
     const { taskId, shiftId, limit } = req.body;
 
     if (!taskId || !shiftId) {
-      res.status(400).json({ error: "taskId and shiftId are required" });
+      sendError(res, "taskId and shiftId are required", 400);
       return;
     }
 
@@ -19,18 +20,16 @@ router.post("/recommendations", async (req: Request, res: Response) => {
       limit || 5
     );
 
-    res.json({
+    sendSuccess(res, {
       taskId,
       shiftId,
       recommendations: recommendations.assignments,
       totalScore: recommendations.totalScore,
       timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
-    res.status(500).json({
-      error: "Failed to generate recommendations",
-      message: error.message,
-    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, "Failed to generate recommendations", 500, message);
   }
 });
 
@@ -40,7 +39,7 @@ router.post("/auto-allocate/:taskId/:shiftId", async (req: Request, res: Respons
     const { taskId, shiftId } = req.params;
 
     if (!taskId || !shiftId) {
-      res.status(400).json({ error: "taskId and shiftId are required" });
+      sendError(res, "taskId and shiftId are required", 400);
       return;
     }
 
@@ -49,18 +48,16 @@ router.post("/auto-allocate/:taskId/:shiftId", async (req: Request, res: Respons
       parseInt(shiftId as string)
     );
 
-    res.json({
+    sendSuccess(res, {
       taskId: parseInt(taskId as string),
       shiftId: parseInt(shiftId as string),
       created: result.created,
       failed: result.failed,
       timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
-    res.status(500).json({
-      error: "Failed to auto-allocate",
-      message: error.message,
-    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, "Failed to auto-allocate", 500, message);
   }
 });
 
@@ -70,7 +67,7 @@ router.post("/batch-recommendations", async (req: Request, res: Response) => {
     const { taskIds, shiftId } = req.body;
 
     if (!Array.isArray(taskIds) || !shiftId) {
-      res.status(400).json({ error: "taskIds (array) and shiftId are required" });
+      sendError(res, "taskIds (array) and shiftId are required", 400);
       return;
     }
 
@@ -79,23 +76,21 @@ router.post("/batch-recommendations", async (req: Request, res: Response) => {
       shiftId
     );
 
-    res.json({
+    sendSuccess(res, {
       shiftId,
       tasks: recommendations,
       timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
-    res.status(500).json({
-      error: "Failed to generate batch recommendations",
-      message: error.message,
-    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, "Failed to generate batch recommendations", 500, message);
   }
 });
 
 // GET allocation stats/insights
 router.get("/stats/overview", async (_req: Request, res: Response) => {
   try {
-    res.json({
+    sendSuccess(res, {
       status: "Allocation engine active",
       weights: {
         skillsMatch: 0.3,
@@ -115,7 +110,7 @@ router.get("/stats/overview", async (_req: Request, res: Response) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch allocation stats" });
+    sendError(res, "Failed to fetch allocation stats", 500);
   }
 });
 

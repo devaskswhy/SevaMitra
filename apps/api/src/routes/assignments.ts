@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 
 const router = Router();
 
@@ -17,9 +18,9 @@ router.get("/", async (_req: Request, res: Response) => {
         shift: true,
       },
     });
-    res.json(assignments);
+    sendSuccess(res, assignments);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch assignments" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -39,12 +40,12 @@ router.get("/:id", async (req: Request, res: Response) => {
       },
     });
     if (!assignment) {
-      res.status(404).json({ error: "Assignment not found" });
+      sendError(res, "Assignment not found", 404);
       return;
     }
-    res.json(assignment);
+    sendSuccess(res, assignment);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch assignment" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -65,7 +66,7 @@ router.post("/", async (req: Request, res: Response) => {
     });
 
     if (existing) {
-      res.status(400).json({ error: "Volunteer already assigned to this task in this shift" });
+      sendError(res, "Volunteer already assigned to this task in this shift", 409);
       return;
     }
 
@@ -85,9 +86,9 @@ router.post("/", async (req: Request, res: Response) => {
         shift: true,
       },
     });
-    res.status(201).json(assignment);
+    sendSuccess(res, assignment, 201);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create assignment" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -107,9 +108,9 @@ router.put("/:id", async (req: Request, res: Response) => {
         shift: true,
       },
     });
-    res.json(assignment);
+    sendSuccess(res, assignment);
   } catch (error) {
-    res.status(500).json({ error: "Failed to update assignment" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -119,9 +120,9 @@ router.delete("/:id", async (req: Request, res: Response) => {
     await prisma.assignment.delete({
       where: { id: parseInt(req.params.id as string) },
     });
-    res.json({ message: "Assignment deleted successfully" });
+    sendSuccess(res, { message: "Assignment deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete assignment" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -139,12 +140,9 @@ router.post("/:id/check-in", async (req: Request, res: Response) => {
         shift: true,
       },
     });
-    res.json({
-      message: "Checked in successfully",
-      assignment,
-    });
+    sendSuccess(res, { message: "Checked in successfully", assignment });
   } catch (error) {
-    res.status(500).json({ error: "Failed to check in" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -168,7 +166,8 @@ router.post("/:id/check-out", async (req: Request, res: Response) => {
 
     // Update volunteer's completed shifts count
     if (!assignment.checkInTime || !assignment.checkOutTime) {
-      throw new Error("Check-in and check-out times are required");
+      sendError(res, "Check-in and check-out times are required", 400);
+      return;
     }
 
     const completedShifts =
@@ -184,12 +183,9 @@ router.post("/:id/check-out", async (req: Request, res: Response) => {
       data: { completedShifts },
     });
 
-    res.json({
-      message: "Checked out successfully",
-      assignment,
-    });
+    sendSuccess(res, { message: "Checked out successfully", assignment });
   } catch (error) {
-    res.status(500).json({ error: "Failed to check out" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -207,9 +203,9 @@ router.get("/volunteer/:volunteerId", async (req: Request, res: Response) => {
         shift: true,
       },
     });
-    res.json(assignments);
+    sendSuccess(res, assignments);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch volunteer assignments" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -223,9 +219,9 @@ router.get("/task/:taskId", async (req: Request, res: Response) => {
         shift: true,
       },
     });
-    res.json(assignments);
+    sendSuccess(res, assignments);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch task assignments" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -243,9 +239,9 @@ router.get("/shift/:shiftId", async (req: Request, res: Response) => {
         },
       },
     });
-    res.json(assignments);
+    sendSuccess(res, assignments);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch shift assignments" });
+    sendPrismaError(res, error);
   }
 });
 

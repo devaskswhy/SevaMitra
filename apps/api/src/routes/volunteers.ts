@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 
 const router = Router();
 
@@ -16,9 +17,9 @@ router.get("/", async (_req: Request, res: Response) => {
         },
       },
     });
-    res.json(volunteers);
+    sendSuccess(res, volunteers);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch volunteers" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -38,12 +39,12 @@ router.get("/:id", async (req: Request, res: Response) => {
       },
     });
     if (!volunteer) {
-      res.status(404).json({ error: "Volunteer not found" });
+      sendError(res, "Volunteer not found", 404);
       return;
     }
-    res.json(volunteer);
+    sendSuccess(res, volunteer);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch volunteer" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -77,13 +78,9 @@ router.post("/", async (req: Request, res: Response) => {
         homeState,
       },
     });
-    res.status(201).json(volunteer);
-  } catch (error: any) {
-    if (error.code === "P2002") {
-      res.status(400).json({ error: "Email or phone already exists" });
-    } else {
-      res.status(500).json({ error: "Failed to create volunteer" });
-    }
+    sendSuccess(res, volunteer, 201);
+  } catch (error) {
+    sendPrismaError(res, error);
   }
 });
 
@@ -94,9 +91,9 @@ router.put("/:id", async (req: Request, res: Response) => {
       where: { id: parseInt(req.params.id as string) },
       data: req.body,
     });
-    res.json(volunteer);
+    sendSuccess(res, volunteer);
   } catch (error) {
-    res.status(500).json({ error: "Failed to update volunteer" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -106,9 +103,9 @@ router.delete("/:id", async (req: Request, res: Response) => {
     await prisma.volunteer.delete({
       where: { id: parseInt(req.params.id as string) },
     });
-    res.json({ message: "Volunteer deleted successfully" });
+    sendSuccess(res, { message: "Volunteer deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete volunteer" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -122,9 +119,9 @@ router.get("/search/skills/:skill", async (req: Request, res: Response) => {
         },
       },
     });
-    res.json(volunteers);
+    sendSuccess(res, volunteers);
   } catch (error) {
-    res.status(500).json({ error: "Failed to search volunteers" });
+    sendPrismaError(res, error);
   }
 });
 
@@ -153,9 +150,9 @@ router.get("/available/list", async (_req: Request, res: Response) => {
       });
     });
 
-    res.json(available);
+    sendSuccess(res, available);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch available volunteers" });
+    sendPrismaError(res, error);
   }
 });
 
