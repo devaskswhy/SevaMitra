@@ -196,7 +196,7 @@ export class AllocationEngine {
 
       // Score each volunteer
       const scores = await Promise.all(
-        volunteers.map((vol) => this.scoreVolunteer(vol, task, shift))
+        volunteers.map((vol: any) => this.scoreVolunteer(vol, task, shift))
       );
 
       // Sort by score descending and take top N

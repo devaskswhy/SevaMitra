@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { Prisma } from "@prisma/client";
 
 // ─── Typed API Response Wrapper ─────────────────────────────
 
@@ -37,17 +36,33 @@ export function sendError(
 }
 
 // ─── Prisma Error Handling ──────────────────────────────────
+// Uses duck-typing instead of instanceof to avoid issues with
+// Prisma client generation paths across monorepo boundaries.
 
 interface PrismaErrorResult {
   status: number;
   message: string;
 }
 
+function isPrismaKnownRequestError(
+  error: unknown
+): error is { code: string; meta?: Record<string, unknown> } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as any).code === "string" &&
+    (error as any).code.startsWith("P")
+  );
+}
+
 export function handlePrismaError(error: unknown): PrismaErrorResult {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+  if (isPrismaKnownRequestError(error)) {
     switch (error.code) {
       case "P2002": {
-        const target = (error.meta?.target as string[])?.join(", ") ?? "field";
+        const target = Array.isArray(error.meta?.target)
+          ? (error.meta!.target as string[]).join(", ")
+          : "field";
         return { status: 409, message: `Unique constraint violation on: ${target}` };
       }
       case "P2003": {
@@ -65,11 +80,14 @@ export function handlePrismaError(error: unknown): PrismaErrorResult {
     }
   }
 
-  if (error instanceof Prisma.PrismaClientValidationError) {
+  // Check constructor name for other Prisma error types
+  const name = error instanceof Error ? error.constructor.name : "";
+
+  if (name === "PrismaClientValidationError") {
     return { status: 400, message: "Invalid data provided" };
   }
 
-  if (error instanceof Prisma.PrismaClientInitializationError) {
+  if (name === "PrismaClientInitializationError") {
     return { status: 503, message: "Database connection failed" };
   }
 
