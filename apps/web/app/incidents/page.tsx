@@ -25,7 +25,7 @@ export default function IncidentsPage() {
     const fetchIncidents = async () => {
       try {
         const res = await axios.get(`${API}/incidents`);
-        setIncidents(res.data);
+        setIncidents(res.data.data || res.data);
       } catch (error) {
         console.error('Failed to fetch incidents:', error);
       }

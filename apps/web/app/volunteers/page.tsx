@@ -27,7 +27,7 @@ export default function VolunteersPage() {
     const fetchVolunteers = async () => {
       try {
         const res = await axios.get(`${API}/volunteers`);
-        setVolunteers(res.data);
+        setVolunteers(res.data.data || res.data);
       } catch (error) {
         console.error('Failed to fetch volunteers:', error);
       }

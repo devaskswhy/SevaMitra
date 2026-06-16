@@ -25,7 +25,7 @@ export default function ZonesPage() {
     const fetchZones = async () => {
       try {
         const res = await axios.get(`${API}/zones`);
-        setZones(res.data);
+        setZones(res.data.data || res.data);
       } catch (error) {
         console.error('Failed to fetch zones:', error);
       }

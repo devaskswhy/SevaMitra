@@ -41,7 +41,8 @@ export default function VolunteerLogin() {
 
     try {
       const response = await axios.get(`${API}/volunteers`);
-      const volunteer = response.data.find((v: { phone: string; id: number; name: string }) => v.phone === `+91${phone}`);
+      const vols = response.data.data || response.data;
+      const volunteer = vols.find((v: { phone: string; id: number; name: string }) => v.phone === `+91${phone}`);
       
       if (volunteer) {
         localStorage.setItem('volunteerId', volunteer.id.toString());

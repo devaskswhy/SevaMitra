@@ -42,7 +42,7 @@ export default function VolunteerProfile() {
     try {
       const volunteerId = localStorage.getItem('volunteerId');
       const response = await axios.get(`${API}/volunteers`);
-      const volunteerData = response.data.find((v: Volunteer) => v.id === parseInt(volunteerId!));
+      const volunteerData = response.data.data.find((v: Volunteer) => v.id === parseInt(volunteerId!));
       setVolunteer(volunteerData || null);
     } catch (error) {
       console.error('Failed to fetch volunteer data:', error);

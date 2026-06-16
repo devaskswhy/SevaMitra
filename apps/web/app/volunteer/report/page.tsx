@@ -37,7 +37,7 @@ export default function IncidentReport() {
   const fetchZones = async () => {
     try {
       const response = await axios.get(`${API}/zones`);
-      setZones(response.data);
+      setZones(response.data.data || response.data);
     } catch (error) {
       console.error('Failed to fetch zones:', error);
     }

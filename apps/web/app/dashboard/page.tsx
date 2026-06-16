@@ -101,11 +101,11 @@ export default function Dashboard() {
         axios.get(`${API}/assignments`),
       ]);
 
-      const volunteers = volunteersRes.data;
-      const zonesData = zonesRes.data;
-      const incidentsData = incidentsRes.data;
-      const tasksData = tasksRes.data;
-      const assignmentsData = assignmentsRes.data;
+      const volunteers = volunteersRes.data.data || volunteersRes.data;
+      const zonesData = zonesRes.data.data || zonesRes.data;
+      const incidentsData = incidentsRes.data.data || incidentsRes.data;
+      const tasksData = tasksRes.data.data || tasksRes.data;
+      const assignmentsData = assignmentsRes.data.data || assignmentsRes.data;
 
       const activeVolunteers = volunteers.filter((v: Volunteer) => v.status === 'ACTIVE').length;
       const zonesOver80 = zonesData.filter((z: Zone) => (z.currentLoad / z.maxCapacity) > 0.8).length;
@@ -183,7 +183,8 @@ export default function Dashboard() {
       const response = await axios.get(`${API}/allocate/recommend`, {
         params: { taskId: selectedTask },
       });
-      setRecommendations(response.data.slice(0, 5));
+      const recs = response.data.data || response.data;
+      setRecommendations(recs.slice(0, 5));
     } catch (error) {
       console.error('Failed to get recommendations:', error);
     }

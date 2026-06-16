@@ -58,8 +58,8 @@ export default function VolunteerHome() {
         axios.get(`${API}/shifts`),
       ]);
 
-      const assignments = assignmentsRes.data;
-      const shifts = shiftsRes.data;
+      const assignments = assignmentsRes.data.data || assignmentsRes.data;
+      const shifts = shiftsRes.data.data || shiftsRes.data;
 
       // Find current assignment (checked in but not checked out)
       const current = assignments.find(

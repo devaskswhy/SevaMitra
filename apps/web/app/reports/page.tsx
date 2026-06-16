@@ -64,10 +64,15 @@ export default function ReportsPage() {
           axios.get(`${API}/incidents`),
           axios.get(`${API}/assignments`),
         ]);
-        setVolunteers(volRes.data);
-        setZones(zoneRes.data);
-        setIncidents(incRes.data);
-        setAssignments(assignRes.data);
+        const volunteersData = volRes.data.data || volRes.data;
+        const zonesData = zoneRes.data.data || zoneRes.data;
+        const incidentsData = incRes.data.data || incRes.data;
+        const assignmentsData = assignRes.data.data || assignRes.data;
+        
+        setVolunteers(volunteersData);
+        setZones(zonesData);
+        setIncidents(incidentsData);
+        setAssignments(assignmentsData);
       } catch (error) {
         console.error('Failed to fetch report data:', error);
       } finally {
