@@ -28,9 +28,17 @@ Many esteemed organizers and senior administrative staff managing the Mahakumbh 
 * **Volunteer App Login:** A streamlined, OTP-based (simulated) mobile-first login experience for volunteers on the ground.
 * **Automated Quick Allocation:** Matches urgent tasks to the closest and most qualified volunteers instantly.
 
+## 📸 Platform Interface
+
+![SevaMitra Hero Section](./docs/assets/hero-section.png)
+*The immersive Mahakumbh 2025 themed landing experience*
+
+![Zone Status Overview](./docs/assets/zones-section.png)
+*Real-time capacity tracking across all managed event zones*
+
 ## 💻 Tech Stack
 
-* **Frontend:** Next.js 14 (App Router), React, Recharts (for Data Visualization), Tailwind CSS
+* **Frontend:** Next.js 14 (App Router), React, Tailwind CSS (Custom "Premium Light Theme"), Vanilla CSS animations (for high-performance scroll reveals without layout thrashing)
 * **Backend:** Node.js + Express
 * **Database:** PostgreSQL (with Prisma ORM)
 * **Real-time Engine:** Socket.io
