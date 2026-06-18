@@ -271,7 +271,7 @@ export default function Home() {
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
   const [recommendations, setRecommendations] = useState<VolunteerRecommendation[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [volunteerSearch, setVolunteerSearch] = useState('');
 
   // FIXED: section visibility
@@ -670,7 +670,7 @@ export default function Home() {
                 gap: '20px',
               }}
             >
-              {zones.map((zone) => {
+              {currentZones.map((zone) => {
                 const ratio = zone.maxCapacity > 0 ? zone.currentLoad / zone.maxCapacity : 0;
                 const pct = Math.min(ratio * 100, 100);
 
