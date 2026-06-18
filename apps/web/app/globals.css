@@ -3,70 +3,57 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════
-   SEVAMITRA — MAHAKUMBH 2025 DESIGN SYSTEM
-   Sacred Color Tokens & Visual Language
+   SEVAMITRA — MAHAKUMBH 2025 IMMERSIVE DARK DESIGN SYSTEM
+   Single-page vertical scroll experience
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Core Sacred Palette ── */
+  /* ── Core Sacred Palette (DARK MODE) ── */
   --saffron: #E8650A;
   --gold: #D4A017;
   --marigold: #F5A623;
   --cream: #FFF8EE;
-  --deep-brown: #1C0A00;
+  --deep-brown: #0D0500;
   --sacred-red: #8B1A1A;
   --night-blue: #0D1B2A;
 
-  /* ── Extended Palette ── */
-  --cream-dark: #F5EDD8;
-  --saffron-glow: rgba(232, 101, 10, 0.1);
-  --gold-glow: rgba(212, 160, 23, 0.15);
-  --saffron-soft: rgba(232, 101, 10, 0.06);
-  --marigold-soft: rgba(245, 166, 35, 0.08);
+  /* ── Dark Surface Scale ── */
+  --bg-base: #0D0500;
+  --bg-section-alt: #100600;
+  --bg-section-alt2: #0A0300;
+  --card-glass: rgba(255, 255, 255, 0.04);
+  --card-glass-hover: rgba(255, 255, 255, 0.07);
+  --border-glow: rgba(232, 101, 10, 0.15);
+  --border-glow-hover: rgba(232, 101, 10, 0.3);
 
-  /* ── Semantic Tokens ── */
-  --bg-primary: var(--cream);
-  --bg-card: #FFFCF5;
-  --bg-sidebar: var(--deep-brown);
-  --bg-header: linear-gradient(135deg, var(--deep-brown) 0%, #2A1200 50%, var(--night-blue) 100%);
+  /* ── Text (on dark) ── */
+  --text-primary: #FFF8EE;
+  --text-secondary: rgba(255, 248, 238, 0.6);
+  --text-muted: rgba(255, 248, 238, 0.35);
 
-  --text-primary: var(--deep-brown);
-  --text-secondary: #5C3D1E;
-  --text-muted: #A0785A;
-  --text-light: var(--cream);
-  --text-gold: var(--gold);
-
-  --border-card: rgba(232, 101, 10, 0.18);
-  --border-gold: rgba(212, 160, 23, 0.3);
-
-  --status-green: #2E7D32;
+  /* ── Status ── */
+  --status-green: #1DB954;
   --status-amber: #E65100;
   --status-red: #B71C1C;
 
-  --shadow-card: 0 4px 24px rgba(232, 101, 10, 0.08);
-  --shadow-card-hover: 0 8px 40px rgba(232, 101, 10, 0.14);
-  --shadow-sacred-glow: inset 0 0 0 1px rgba(232, 101, 10, 0.1);
-
+  /* ── Radius ── */
   --radius: 16px;
   --radius-sm: 10px;
   --radius-lg: 24px;
 
   /* ── Typography ── */
-  --font-heading: 'Tiro Devanagari Sanskrit', 'Georgia', serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: var(--font-tiro), 'Georgia', serif;
+  --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* ── Transitions ── */
   --ease-sacred: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 450ms;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    RESET & BASE
    ═══════════════════════════════════════════════════════════════ */
 
-* {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -80,19 +67,16 @@ html {
 
 body {
   color: var(--text-primary);
-  background-color: var(--cream);
+  background-color: var(--bg-base);
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
   min-height: 100vh;
-
-  /* ── Marigold Petal SVG Pattern (inline, 0.04 opacity) ── */
-  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23F5A623' fill-opacity='0.04'%3E%3Cpath d='M40 20c-4 0-8 6-8 14s4 14 8 14 8-6 8-14-4-14-8-14z'/%3E%3Cpath d='M20 40c0-4 6-8 14-8s14 4 14 8-6 8-14 8-14-4-14-8z'/%3E%3Cpath d='M28.6 28.6c-2.8 2.8-1.4 10.2 4.2 15.8s13 7 15.8 4.2-1.4-10.2-4.2-15.8-13-7-15.8-4.2z'/%3E%3Cpath d='M51.4 28.6c2.8 2.8 1.4 10.2-4.2 15.8s-13 7-15.8 4.2 1.4-10.2 4.2-15.8 13-7 15.8-4.2z'/%3E%3Ccircle cx='40' cy='40' r='4'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: repeat;
+  overflow-x: hidden;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TYPOGRAPHY
+   TYPOGRAPHY — Light on Dark
    ═══════════════════════════════════════════════════════════════ */
 
 h1, h2, h3, h4, h5, h6 {
@@ -100,18 +84,10 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
   color: var(--text-primary);
   letter-spacing: 0.01em;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.625rem; }
-h3 { font-size: 1.375rem; }
-h4 { font-size: 1.25rem; }
-h5 { font-size: 1.125rem; }
-h6 { font-size: 1rem; }
-
-p, span, div, label {
-  font-size: 1rem;
+p, span, div, label, td, th {
   color: var(--text-primary);
 }
 
@@ -120,19 +96,24 @@ small {
   color: var(--text-secondary);
 }
 
+a {
+  color: var(--saffron);
+  text-decoration: none;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    INTERACTIVE ELEMENTS
    ═══════════════════════════════════════════════════════════════ */
 
 button {
-  min-height: 44px;
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: var(--font-body);
-  transition: all var(--duration-normal) var(--ease-sacred);
+  transition: all 250ms var(--ease-sacred);
   cursor: pointer;
   border: none;
   background: none;
+  color: var(--text-primary);
 }
 
 button:focus-visible {
@@ -141,116 +122,82 @@ button:focus-visible {
 }
 
 input, select, textarea {
-  min-height: 48px;
   font-size: 1rem;
   font-family: var(--font-body);
   padding: 12px 16px;
-  border: 1px solid var(--border-card);
+  border: 1px solid var(--border-glow);
   border-radius: var(--radius-sm);
-  background: var(--bg-card);
+  background: var(--card-glass);
   color: var(--text-primary);
-  transition: all var(--duration-normal) var(--ease-sacred);
-  box-shadow: var(--shadow-sacred-glow);
+  transition: all 250ms var(--ease-sacred);
+  backdrop-filter: blur(10px);
+}
+
+input::placeholder {
+  color: var(--text-muted);
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--saffron);
-  box-shadow: var(--shadow-sacred-glow), 0 0 0 3px var(--saffron-soft);
+  box-shadow: 0 0 0 3px rgba(232, 101, 10, 0.15);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CARD SYSTEM — Sacred Warmth
+   GLASSMORPHISM CARD SYSTEM
    ═══════════════════════════════════════════════════════════════ */
 
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
+.glass-card {
+  background: var(--card-glass);
+  border: 1px solid var(--border-glow);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-card), var(--shadow-sacred-glow);
-  transition: all var(--duration-normal) var(--ease-sacred);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 300ms var(--ease-sacred);
 }
 
-.card:hover {
-  border-color: rgba(232, 101, 10, 0.3);
-  box-shadow: var(--shadow-card-hover), var(--shadow-sacred-glow);
-  transform: translateY(-1px);
+.glass-card:hover {
+  background: var(--card-glass-hover);
+  border-color: var(--border-glow-hover);
+  transform: translateY(-2px);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RANGOLI DIVIDER
+   SECTION REVEAL ANIMATION (Intersection Observer)
    ═══════════════════════════════════════════════════════════════ */
 
-.rangoli-divider {
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--saffron) 20%,
-    var(--gold) 40%,
-    var(--marigold) 50%,
-    var(--gold) 60%,
-    var(--saffron) 80%,
-    transparent 100%
-  );
-  border: none;
-  margin: 24px 0;
-  opacity: 0.6;
+/* FIXED: section visibility */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
+.section-visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Staggered children reveal */
+.section-visible .reveal-child {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-child {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s var(--ease-sacred), transform 0.5s var(--ease-sacred);
+}
+
+.reveal-child:nth-child(1) { transition-delay: 0.1s; }
+.reveal-child:nth-child(2) { transition-delay: 0.2s; }
+.reveal-child:nth-child(3) { transition-delay: 0.3s; }
+.reveal-child:nth-child(4) { transition-delay: 0.4s; }
+.reveal-child:nth-child(5) { transition-delay: 0.5s; }
+.reveal-child:nth-child(6) { transition-delay: 0.6s; }
 
 /* ═══════════════════════════════════════════════════════════════
-   OM WATERMARK
-   ═══════════════════════════════════════════════════════════════ */
-
-.om-watermark {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  font-size: 140px;
-  color: var(--saffron);
-  opacity: 0.04;
-  pointer-events: none;
-  z-index: 0;
-  font-family: var(--font-heading);
-  user-select: none;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   LOADING STATES
-   ═══════════════════════════════════════════════════════════════ */
-
-.loading-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--saffron), var(--gold), var(--marigold), var(--gold), var(--saffron));
-  background-size: 200% 100%;
-  animation: loading-shimmer 2s var(--ease-sacred) infinite;
-  z-index: 9999;
-}
-
-@keyframes loading-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.saffron-spinner {
-  border: 3px solid var(--cream-dark);
-  border-top: 3px solid var(--saffron);
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SACRED BUTTON STYLES
+   SACRED BUTTONS
    ═══════════════════════════════════════════════════════════════ */
 
 .btn-sacred {
@@ -258,24 +205,24 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 24px;
+  padding: 12px 28px;
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-family: var(--font-body);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   letter-spacing: 0.02em;
-  transition: all var(--duration-normal) var(--ease-sacred);
+  transition: all 250ms var(--ease-sacred);
 }
 
 .btn-sacred-primary {
   background: linear-gradient(135deg, var(--saffron), var(--marigold));
   color: white;
-  box-shadow: 0 2px 12px rgba(232, 101, 10, 0.3);
+  box-shadow: 0 4px 20px rgba(232, 101, 10, 0.35);
 }
 
 .btn-sacred-primary:hover {
-  box-shadow: 0 4px 20px rgba(232, 101, 10, 0.45);
-  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(232, 101, 10, 0.5);
+  transform: translateY(-2px);
 }
 
 .btn-sacred-outline {
@@ -285,40 +232,104 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-sacred-outline:hover {
-  background: var(--saffron-soft);
+  background: rgba(232, 101, 10, 0.1);
 }
 
 .btn-sacred-danger {
   background: linear-gradient(135deg, var(--sacred-red), #A52020);
   color: white;
-  box-shadow: 0 2px 12px rgba(139, 26, 26, 0.3);
+  box-shadow: 0 4px 16px rgba(139, 26, 26, 0.35);
 }
 
 .btn-sacred-danger:hover {
-  box-shadow: 0 4px 20px rgba(139, 26, 26, 0.45);
-  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(139, 26, 26, 0.5);
+  transform: translateY(-2px);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SCROLLBAR — Saffron Theme
+   LOADING STATES
+   ═══════════════════════════════════════════════════════════════ */
+
+.saffron-spinner {
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top: 3px solid var(--saffron);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OM WATERMARK (dark theme)
+   ═══════════════════════════════════════════════════════════════ */
+
+.om-watermark {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  font-size: 160px;
+  color: var(--saffron);
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+  font-family: var(--font-heading);
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR — Dark Saffron
    ═══════════════════════════════════════════════════════════════ */
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--cream-dark);
+  background: rgba(255,255,255,0.02);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--saffron), var(--gold));
-  border-radius: 4px;
+  background: rgba(232, 101, 10, 0.3);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--marigold), var(--saffron));
+  background: rgba(232, 101, 10, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes sacred-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+@keyframes progress-fill {
+  from { width: 0; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -336,28 +347,58 @@ input:focus, select:focus, textarea:focus {
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-
-  .sacred-border-glow {
-    border: 1px solid var(--border-card);
-    box-shadow: var(--shadow-sacred-glow);
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ANIMATIONS
+   SECTION WAVE DIVIDER
    ═══════════════════════════════════════════════════════════════ */
 
-@keyframes sacred-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+.section-wave {
+  width: 100%;
+  height: 60px;
+  overflow: hidden;
+  position: relative;
 }
 
-@keyframes gentle-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+.section-wave svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-@keyframes divider-flow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
+/* ═══════════════════════════════════════════════════════════════
+   TABLE STYLES (dark theme)
+   ═══════════════════════════════════════════════════════════════ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  border-bottom: 1px solid var(--border-glow);
+}
+
+th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted) !important;
+}
+
+td {
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(232, 101, 10, 0.06);
+}
+
+tbody tr {
+  transition: background 200ms ease;
+}
+
+tbody tr:hover {
+  background: rgba(232, 101, 10, 0.06) !important;
 }

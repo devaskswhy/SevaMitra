@@ -1,5 +1,1020 @@
-import { redirect } from 'next/navigation';
+/* eslint-disable @next/next/no-img-element */
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { io } from 'socket.io-client';
+import axios from 'axios';
+import StickyHeader from '@/components/StickyHeader';
+import WaterRipple from '@/components/WaterRipple';
+
+/* ═══════════════════════════════════════════════════════════════
+   API CONFIG
+   ═══════════════════════════════════════════════════════════════ */
+
+const API = process.env.NEXT_PUBLIC_API_URL
+  ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api')
+    ? process.env.NEXT_PUBLIC_API_URL
+    : `${process.env.NEXT_PUBLIC_API_URL}/api`)
+  : 'http://localhost:4000/api';
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPES
+   ═══════════════════════════════════════════════════════════════ */
+
+interface Volunteer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  skills: string;
+  reliabilityScore: number;
+  status: string;
+}
+
+interface Zone {
+  id: number;
+  name: string;
+  type: string;
+  maxCapacity: number;
+  currentLoad: number;
+  priority: string;
+}
+
+interface Incident {
+  id: number;
+  zoneId: number;
+  type: string;
+  severity: number;
+  description: string;
+  reportedBy: string;
+  resolvedAt: string | null;
+  createdAt?: string;
+}
+
+interface Task {
+  id: number;
+  title: string;
+  zoneId: number;
+  skillsRequired: string;
+}
+
+interface Assignment {
+  id: number;
+  volunteerId: number;
+  taskId: number;
+  shiftId: number;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+}
+
+interface VolunteerRecommendation {
+  volunteerId: number;
+  name: string;
+  score: number;
+  skillMatch: number;
+  availability: number;
+  distance: number;
+}
+
+interface Activity {
+  id: string;
+  message: string;
+  timestamp: Date;
+  type: 'info' | 'warning' | 'success';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION WAVE SVG
+   ═══════════════════════════════════════════════════════════════ */
+
+function SectionWave() {
+  return (
+    <div className="section-wave">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+        <path
+          d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z"
+          fill="rgba(232, 101, 10, 0.04)"
+        />
+      </svg>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION LABEL MARKER
+   ═══════════════════════════════════════════════════════════════ */
+
+function SectionLabel({ number, title }: { number: string; title: string }) {
+  return (
+    <div
+      style={{
+        fontSize: '11px',
+        fontWeight: 600,
+        letterSpacing: '0.15em',
+        textTransform: 'uppercase',
+        color: 'rgba(255,248,238,0.2)',
+        marginBottom: '32px',
+      }}
+    >
+      — {number} {title}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HELPER: useCountUp Hook
+   ═══════════════════════════════════════════════════════════════ */
+
+function useCountUp(end: number, duration: number = 1200, shouldStart: boolean = true): string {
+  const [display, setDisplay] = useState('0');
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
+
+  const animate = useCallback(
+    (ts: number) => {
+      if (!startRef.current) startRef.current = ts;
+      const progress = Math.min((ts - startRef.current) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(eased * end).toLocaleString('en-IN'));
+      if (progress < 1) rafRef.current = requestAnimationFrame(animate);
+    },
+    [end, duration]
+  );
+
+  useEffect(() => {
+    if (!shouldStart) return;
+    startRef.current = null;
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [shouldStart, animate]);
+
+  return display;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STAT CARD with count-up
+   ═══════════════════════════════════════════════════════════════ */
+
+function StatCard({
+  label,
+  value,
+  icon,
+  visible,
+}: {
+  label: string;
+  value: number;
+  icon: string;
+  visible: boolean;
+}) {
+  const display = useCountUp(value, 1200, visible);
+
+  return (
+    <div className="glass-card reveal-child" style={{ padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ fontSize: '28px', marginBottom: '8px' }}>{icon}</div>
+      <div
+        style={{
+          fontSize: '36px',
+          fontWeight: 800,
+          color: '#E8650A',
+          lineHeight: 1,
+          marginBottom: '8px',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {display}
+      </div>
+      <div
+        style={{
+          fontSize: '13px',
+          color: 'rgba(255,248,238,0.5)',
+          fontWeight: 500,
+        }}
+      >
+        {label}
+      </div>
+      {/* Bottom progress accent */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          height: '3px',
+          background: 'linear-gradient(90deg, #E8650A, #F5A623, transparent)',
+          width: visible ? '70%' : '0%',
+          transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1) 0.5s',
+        }}
+      />
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+
+function getCapacityGradient(ratio: number): string {
+  if (ratio > 0.8) return 'linear-gradient(90deg, #E65100, #E8650A)';
+  if (ratio > 0.5) return 'linear-gradient(90deg, #F5A623, #E8650A)';
+  return 'linear-gradient(90deg, #1DB954, #F5A623)';
+}
+
+function getSeverityConfig(severity: number) {
+  if (severity >= 4) return { color: '#B71C1C', bg: 'rgba(183,28,28,0.15)', label: 'CRITICAL' };
+  if (severity >= 3) return { color: '#E65100', bg: 'rgba(230,81,0,0.15)', label: 'HIGH' };
+  if (severity >= 2) return { color: '#D4A017', bg: 'rgba(212,160,23,0.15)', label: 'MEDIUM' };
+  return { color: '#1DB954', bg: 'rgba(29,185,84,0.15)', label: 'LOW' };
+}
+
+function getZoneIcon(type: string): string {
+  const icons: Record<string, string> = {
+    GHAT: '🏊', CAMP: '🏕', MEDICAL: '🏥', TRAFFIC: '🚦',
+    ENTRY_EXIT: '🚪', CROWD_CONTROL: '👥',
+  };
+  return icons[type] || '📍';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INTERSECTION OBSERVER HOOK
+   ═══════════════════════════════════════════════════════════════ */
+
+const FALLBACK_VOLUNTEERS: Volunteer[] = [
+  { id: 1, name: 'Sample Vol 1', email: 'test@test.com', phone: '123', skills: 'Medical', reliabilityScore: 90, status: 'ACTIVE' },
+  { id: 2, name: 'Sample Vol 2', email: 'test2@test.com', phone: '456', skills: 'Traffic', reliabilityScore: 85, status: 'ACTIVE' }
+];
+
+const FALLBACK_ZONES: Zone[] = [
+  { id: 1, name: 'Ghat 1', type: 'GHAT', maxCapacity: 1000, currentLoad: 500, priority: 'MEDIUM' },
+  { id: 2, name: 'Camp A', type: 'CAMP', maxCapacity: 5000, currentLoad: 4500, priority: 'HIGH' }
+];
+
+const FALLBACK_INCIDENTS: Incident[] = [
+  { id: 1, zoneId: 1, type: 'Medical Emergency', severity: 4, description: 'Requires immediate attention', reportedBy: 'System', resolvedAt: null }
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN PAGE COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
 
 export default function Home() {
-  redirect('/dashboard');
+  const [stats, setStats] = useState({
+    totalActiveVolunteers: 0,
+    zonesOverCapacity: 0,
+    openIncidents: 0,
+    pendingAssignments: 0,
+  });
+  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedTask, setSelectedTask] = useState<number | null>(null);
+  const [recommendations, setRecommendations] = useState<VolunteerRecommendation[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [volunteerSearch, setVolunteerSearch] = useState('');
+
+  // FIXED: section visibility
+  useEffect(() => {
+    const init = () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('section-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+
+      document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    };
+
+    if (document.readyState === 'complete') {
+      init();
+    } else {
+      window.addEventListener('load', init);
+      return () => window.removeEventListener('load', init);
+    }
+  }, []);
+
+  /* ── Data Fetching ── */
+  const fetchData = useCallback(async () => {
+    try {
+      const [volunteersRes, zonesRes, incidentsRes, tasksRes, assignmentsRes] = await Promise.all([
+        axios.get(`${API}/volunteers`),
+        axios.get(`${API}/zones`),
+        axios.get(`${API}/incidents`),
+        axios.get(`${API}/tasks`),
+        axios.get(`${API}/assignments`),
+      ]);
+
+      const volunteersData = volunteersRes.data.data || volunteersRes.data;
+      const zonesData = zonesRes.data.data || zonesRes.data;
+      const incidentsData = incidentsRes.data.data || incidentsRes.data;
+      const tasksData = tasksRes.data.data || tasksRes.data;
+      const assignmentsData = assignmentsRes.data.data || assignmentsRes.data;
+
+      const activeVolunteers = volunteersData.filter((v: Volunteer) => v.status === 'ACTIVE').length;
+      const zonesOver80 = zonesData.filter((z: Zone) => (z.currentLoad / z.maxCapacity) > 0.8).length;
+      const openIncidents = incidentsData.filter((i: Incident) => !i.resolvedAt).length;
+      const pendingAssignments = assignmentsData.filter((a: Assignment) => !a.checkInTime).length;
+
+      setStats({ totalActiveVolunteers: activeVolunteers, zonesOverCapacity: zonesOver80, openIncidents, pendingAssignments });
+      setVolunteers(volunteersData);
+      setZones(zonesData);
+      setIncidents(incidentsData);
+      setTasks(tasksData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+      setLoading(false);
+    }
+  }, []);
+
+  /* ── Socket.io ── */
+  const initSocket = useCallback(() => {
+    const socketUrl = process.env.NEXT_PUBLIC_API_URL
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, '')
+      : 'http://localhost:4000';
+    const socketInstance = io(socketUrl);
+
+    socketInstance.on('connect', () => console.log('Socket connected'));
+
+    socketInstance.on('activity', (data: Activity) => {
+      setActivities((prev) => [{ ...data, id: data.id || Date.now().toString() }, ...prev.slice(0, 49)]);
+    });
+
+    socketInstance.on('assignment:updated', (data: string) => {
+      setActivities((prev) => [
+        { id: Date.now().toString(), message: `Assignment updated: ${data}`, timestamp: new Date(), type: 'info' },
+        ...prev.slice(0, 49),
+      ]);
+      fetchData();
+    });
+
+    socketInstance.on('incident:reported', (data: string) => {
+      setActivities((prev) => [
+        { id: Date.now().toString(), message: `Incident reported: ${data}`, timestamp: new Date(), type: 'warning' },
+        ...prev.slice(0, 49),
+      ]);
+      fetchData();
+    });
+
+    return () => { socketInstance.disconnect(); };
+  }, [fetchData]);
+
+  useEffect(() => {
+    fetchData();
+    const cleanup = initSocket();
+    return cleanup;
+  }, [fetchData, initSocket]);
+
+  /* ── Actions ── */
+  const handleDeployVolunteers = async (incidentId: number) => {
+    try {
+      await axios.post(`${API}/incidents/${incidentId}/deploy`);
+      setActivities((prev) => [
+        { id: Date.now().toString(), message: `Volunteers deployed for incident #${incidentId}`, timestamp: new Date(), type: 'success' },
+        ...prev.slice(0, 49),
+      ]);
+      fetchData();
+    } catch (error) {
+      console.error('Failed to deploy volunteers:', error);
+    }
+  };
+
+  const handleFindBestVolunteers = async () => {
+    if (!selectedTask) return;
+    try {
+      const response = await axios.get(`${API}/allocate/recommend`, { params: { taskId: selectedTask } });
+      const recs = response.data.data || response.data;
+      setRecommendations(recs.slice(0, 5));
+    } catch (error) {
+      console.error('Failed to get recommendations:', error);
+    }
+  };
+
+  /* ── Derived data ── */
+  // FIXED: section visibility - fallback data
+  const currentVolunteers = volunteers.length ? volunteers : FALLBACK_VOLUNTEERS;
+  const currentZones = zones.length ? zones : FALLBACK_ZONES;
+  const currentIncidents = incidents.length ? incidents : FALLBACK_INCIDENTS;
+
+  const filteredVolunteers = currentVolunteers.filter(
+    (v) => v.name.toLowerCase().includes(volunteerSearch.toLowerCase()) || v.email.toLowerCase().includes(volunteerSearch.toLowerCase())
+  );
+  const unresolvedIncidents = currentIncidents.filter((i) => !i.resolvedAt);
+  const resolvedIncidents = currentIncidents.filter((i) => i.resolvedAt);
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDER
+     ═══════════════════════════════════════════════════════════════ */
+
+  return (
+    <>
+      <WaterRipple />
+      <StickyHeader
+        zones={zones}
+        volunteers={volunteers}
+        incidents={incidents}
+        activeVolunteerCount={stats.totalActiveVolunteers}
+      />
+
+      {/* OM Watermark */}
+      <div className="om-watermark" aria-hidden="true">ॐ</div>
+
+      {/* ═════════════════════════════════════════════════════════
+         HERO SECTION
+         ═════════════════════════════════════════════════════════ */}
+      {/* FIXED: section visibility */}
+      <section
+        id="hero"
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0D0500',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background image */}
+        <img
+          src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 0,
+            objectFit: 'cover',
+            opacity: 0.35,
+            pointerEvents: 'none',
+          }}
+        />
+        {/* Dark overlay gradient */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(13,5,0,0.3) 0%, rgba(13,5,0,0.7) 70%, #0D0500 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Content */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            textAlign: 'center',
+            padding: '0 24px',
+            maxWidth: '800px',
+            animation: 'fade-in-up 1s ease-out',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: 'clamp(48px, 8vw, 96px)',
+              fontFamily: 'var(--font-heading)',
+              color: '#FFF8EE',
+              lineHeight: 1.1,
+              marginBottom: '20px',
+              textShadow: '0 4px 40px rgba(232, 101, 10, 0.3)',
+            }}
+          >
+            सेवा ही पूजा है
+          </h1>
+          <p
+            style={{
+              fontSize: 'clamp(16px, 2.5vw, 22px)',
+              color: 'rgba(255,248,238,0.7)',
+              marginBottom: '40px',
+              lineHeight: 1.5,
+              fontWeight: 300,
+            }}
+          >
+            SevaMitra — Mahakumbh 2025 Volunteer Intelligence Platform
+          </p>
+          <button
+            className="btn-sacred btn-sacred-primary"
+            style={{ fontSize: '16px', padding: '16px 36px', borderRadius: '12px' }}
+            onClick={() => {
+              document.getElementById('stats')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            Explore Operations ↓
+          </button>
+        </div>
+
+        {/* Scroll indicator */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '40px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+            animation: 'scroll-bounce 2s ease-in-out infinite',
+          }}
+        >
+          <span style={{ fontSize: '11px', color: 'rgba(255,248,238,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            Scroll
+          </span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(232,101,10,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════
+         STATS SECTION
+         ═════════════════════════════════════════════════════════ */}
+      {/* FIXED: section visibility */}
+      <section id="stats" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#100600', padding: '100px 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <SectionWave />
+          <div>
+            <SectionLabel number="01" title="OPERATIONS" />
+            <h2
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(28px, 4vw, 42px)',
+                color: '#FFF8EE',
+                marginBottom: '48px',
+              }}
+            >
+              Real-Time Operations
+            </h2>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '20px',
+              }}
+            >
+              <StatCard label="Active Volunteers" value={stats.totalActiveVolunteers} icon="👥" visible={true} />
+              <StatCard label="Zones >80% Capacity" value={stats.zonesOverCapacity} icon="📍" visible={true} />
+              <StatCard label="Open Incidents" value={stats.openIncidents} icon="⚠️" visible={true} />
+              <StatCard label="Pending Assignments" value={stats.pendingAssignments} icon="📋" visible={true} />
+            </div>
+
+            {/* Quick Allocation Panel */}
+            <div className="glass-card" style={{ marginTop: '40px', padding: '28px' }}>
+              <h3 style={{ color: '#FFF8EE', fontSize: '18px', fontFamily: 'var(--font-body)', fontWeight: 600, marginBottom: '16px' }}>
+                ⚡ Quick Volunteer Allocation
+              </h3>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div style={{ flex: '1 1 300px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', color: 'rgba(255,248,238,0.4)', marginBottom: '6px', fontWeight: 500 }}>
+                    Select Task
+                  </label>
+                  <select
+                    value={selectedTask || ''}
+                    onChange={(e) => setSelectedTask(Number(e.target.value))}
+                    style={{
+                      width: '100%',
+                      height: '44px',
+                      minHeight: '44px',
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(232,101,10,0.2)',
+                      borderRadius: '10px',
+                      color: '#FFF8EE',
+                      padding: '0 12px',
+                      fontSize: '14px',
+                    }}
+                  >
+                    <option value="" style={{ background: '#1C0A00' }}>Choose a task...</option>
+                    {tasks.map((task) => (
+                      <option key={task.id} value={task.id} style={{ background: '#1C0A00' }}>{task.title}</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={handleFindBestVolunteers}
+                  disabled={!selectedTask}
+                  className="btn-sacred btn-sacred-primary"
+                  style={{
+                    opacity: selectedTask ? 1 : 0.4,
+                    cursor: selectedTask ? 'pointer' : 'not-allowed',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Find Best Volunteers
+                </button>
+              </div>
+
+              {recommendations.length > 0 && (
+                <div style={{ marginTop: '20px' }}>
+                  <h4 style={{ color: 'rgba(255,248,238,0.6)', fontSize: '13px', fontWeight: 600, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Top Recommendations
+                  </h4>
+                  <div style={{ display: 'grid', gap: '8px' }}>
+                    {recommendations.map((rec) => (
+                      <div
+                        key={rec.volunteerId}
+                        className="glass-card"
+                        style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}
+                      >
+                        <span style={{ fontWeight: 600, fontSize: '14px' }}>{rec.name}</span>
+                        <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'rgba(255,248,238,0.5)' }}>
+                          <span>Skill: <b style={{ color: '#D4A017' }}>{rec.skillMatch}%</b></span>
+                          <span>Avail: <b style={{ color: '#1DB954' }}>{rec.availability}%</b></span>
+                          <span>Dist: <b style={{ color: '#FFF8EE' }}>{rec.distance}km</b></span>
+                        </div>
+                        <span style={{ fontWeight: 700, fontSize: '16px', color: '#E8650A' }}>{rec.score}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════
+         ZONES SECTION
+         ═════════════════════════════════════════════════════════ */}
+      {/* FIXED: section visibility */}
+      <section id="zones" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: '100px 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <SectionWave />
+          <div>
+            <SectionLabel number="02" title="ZONE MANAGEMENT" />
+            <h2
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(28px, 4vw, 42px)',
+                color: '#FFF8EE',
+                marginBottom: '48px',
+              }}
+            >
+              Zone Status Overview
+            </h2>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: '20px',
+              }}
+            >
+              {zones.map((zone) => {
+                const ratio = zone.maxCapacity > 0 ? zone.currentLoad / zone.maxCapacity : 0;
+                const pct = Math.min(ratio * 100, 100);
+
+                return (
+                  <div key={zone.id} className="glass-card" style={{ padding: '24px', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '20px' }}>{getZoneIcon(zone.type)}</span>
+                          <h3 style={{ fontSize: '16px', fontWeight: 600, fontFamily: 'var(--font-body)', color: '#FFF8EE' }}>{zone.name}</h3>
+                        </div>
+                        <span style={{ fontSize: '12px', color: 'rgba(255,248,238,0.35)' }}>{zone.type}</span>
+                      </div>
+                      <span
+                        style={{
+                          padding: '3px 10px',
+                          borderRadius: '20px',
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          color: '#fff',
+                          background: zone.priority === 'HIGH' ? '#B71C1C' : zone.priority === 'MEDIUM' ? '#E65100' : '#1DB954',
+                        }}
+                      >
+                        {zone.priority}
+                      </span>
+                    </div>
+
+                    {/* Capacity */}
+                    <div style={{ marginBottom: '6px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '6px' }}>
+                        <span style={{ color: 'rgba(255,248,238,0.4)' }}>Capacity</span>
+                        <span style={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                          {zone.currentLoad.toLocaleString()} / {zone.maxCapacity.toLocaleString()}
+                        </span>
+                      </div>
+                      <div style={{ height: '6px', borderRadius: '3px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            height: '100%',
+                            borderRadius: '3px',
+                            background: getCapacityGradient(ratio),
+                            width: `${pct}%`,
+                            transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s',
+                          }}
+                        />
+                      </div>
+                      <div style={{ textAlign: 'right', marginTop: '4px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: ratio > 0.8 ? '#E8650A' : ratio > 0.5 ? '#F5A623' : '#1DB954' }}>
+                          {pct.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════
+         INCIDENTS SECTION
+         ═════════════════════════════════════════════════════════ */}
+      {/* FIXED: section visibility */}
+      <section id="incidents" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: '100px 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <SectionWave />
+          <div>
+            <SectionLabel number="03" title="INCIDENT MANAGEMENT" />
+            <h2
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(28px, 4vw, 42px)',
+                color: '#FFF8EE',
+                marginBottom: '48px',
+              }}
+            >
+              Incident Tracker
+            </h2>
+
+            {/* Active Incidents */}
+            {unresolvedIncidents.length > 0 && (
+              <div style={{ marginBottom: '48px' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'rgba(255,248,238,0.5)', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Active ({unresolvedIncidents.length})
+                </h3>
+                <div style={{ display: 'grid', gap: '16px' }}>
+                  {unresolvedIncidents.map((incident) => {
+                    const sev = getSeverityConfig(incident.severity);
+                    return (
+                      <div
+                        key={incident.id}
+                        className="glass-card"
+                        style={{
+                          padding: '24px',
+                          borderLeft: `4px solid ${sev.color}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          flexWrap: 'wrap',
+                          gap: '16px',
+                        }}
+                      >
+                        <div style={{ flex: '1 1 300px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                            <span
+                              style={{
+                                padding: '3px 10px',
+                                borderRadius: '6px',
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                color: sev.color,
+                                background: sev.bg,
+                                letterSpacing: '0.05em',
+                              }}
+                            >
+                              {sev.label}
+                            </span>
+                            <span style={{ fontWeight: 600, fontSize: '15px' }}>{incident.type}</span>
+                          </div>
+                          <p style={{ color: 'rgba(255,248,238,0.55)', fontSize: '13px', lineHeight: 1.5 }}>
+                            {incident.description}
+                          </p>
+                          {incident.reportedBy && (
+                            <p style={{ color: 'rgba(255,248,238,0.25)', fontSize: '11px', marginTop: '6px' }}>
+                              Reported by: {incident.reportedBy}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleDeployVolunteers(incident.id)}
+                          className="btn-sacred btn-sacred-primary"
+                          style={{ whiteSpace: 'nowrap', fontSize: '13px', padding: '10px 20px' }}
+                        >
+                          🔥 Deploy
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {unresolvedIncidents.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(255,248,238,0.3)' }}>
+                <p style={{ fontSize: '40px', marginBottom: '12px' }}>✅</p>
+                <p>No active incidents</p>
+              </div>
+            )}
+
+            {/* Resolved Incidents */}
+            {resolvedIncidents.length > 0 && (
+              <div>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'rgba(255,248,238,0.3)', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Resolved ({resolvedIncidents.length})
+                </h3>
+                <div style={{ display: 'grid', gap: '12px' }}>
+                  {resolvedIncidents.map((incident) => (
+                    <div
+                      key={incident.id}
+                      className="glass-card"
+                      style={{
+                        padding: '16px 20px',
+                        borderLeft: '4px solid #1DB954',
+                        opacity: 0.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '12px',
+                      }}
+                    >
+                      <div>
+                        <span style={{ fontWeight: 600, fontSize: '14px' }}>{incident.type}</span>
+                        <span style={{ marginLeft: '12px', fontSize: '12px', color: 'rgba(255,248,238,0.35)' }}>{incident.description.substring(0, 60)}</span>
+                      </div>
+                      <span style={{ fontSize: '10px', fontWeight: 600, color: '#1DB954', padding: '2px 8px', borderRadius: '4px', background: 'rgba(29,185,84,0.15)' }}>
+                        RESOLVED
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════
+         VOLUNTEERS SECTION
+         ═════════════════════════════════════════════════════════ */}
+      {/* FIXED: section visibility */}
+      <section id="volunteers" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#100600', padding: '100px 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <SectionWave />
+          <div>
+            <SectionLabel number="04" title="VOLUNTEER ROSTER" />
+            <h2
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(28px, 4vw, 42px)',
+                color: '#FFF8EE',
+                marginBottom: '32px',
+              }}
+            >
+              Volunteer Directory
+            </h2>
+
+            {/* Search filter */}
+            <div style={{ marginBottom: '28px', maxWidth: '400px' }}>
+              <input
+                type="text"
+                placeholder="Filter by name or email..."
+                value={volunteerSearch}
+                onChange={(e) => setVolunteerSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  height: '42px',
+                  minHeight: '42px',
+                  padding: '0 16px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(232, 101, 10, 0.15)',
+                  background: 'rgba(255,255,255,0.04)',
+                  color: '#FFF8EE',
+                  fontSize: '13px',
+                }}
+              />
+            </div>
+
+            {/* Table */}
+            <div className="glass-card" style={{ overflow: 'auto' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Skills</th>
+                    <th>Reliability</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredVolunteers.map((v) => (
+                    <tr key={v.id}>
+                      <td style={{ fontWeight: 600, fontSize: '14px' }}>{v.name}</td>
+                      <td style={{ color: 'rgba(255,248,238,0.5)', fontSize: '13px' }}>{v.email}</td>
+                      <td style={{ color: 'rgba(255,248,238,0.5)', fontSize: '13px' }}>{v.phone}</td>
+                      <td>
+                        <span style={{ padding: '3px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 500, background: 'rgba(232,101,10,0.12)', color: '#E8650A' }}>
+                          {v.skills.length > 20 ? v.skills.substring(0, 20) + '...' : v.skills}
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 700, color: v.reliabilityScore >= 80 ? '#1DB954' : v.reliabilityScore >= 60 ? '#F5A623' : '#B71C1C', fontVariantNumeric: 'tabular-nums' }}>
+                          {v.reliabilityScore}%
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          style={{
+                            padding: '3px 10px',
+                            borderRadius: '6px',
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            color: '#fff',
+                            background: v.status === 'ACTIVE' ? '#1DB954' : '#B71C1C',
+                          }}
+                        >
+                          {v.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {filteredVolunteers.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,248,238,0.3)', fontSize: '14px' }}>
+                  No volunteers found.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════
+         LIVE ACTIVITY FEED (Bottom section)
+         ═════════════════════════════════════════════════════════ */}
+      {/* FIXED: section visibility */}
+      <section style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: '80px 24px 120px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <SectionWave />
+          <SectionLabel number="05" title="LIVE FEED" />
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(28px, 4vw, 42px)',
+              color: '#FFF8EE',
+              marginBottom: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1DB954', animation: 'sacred-pulse 2s ease-in-out infinite' }} />
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#E8650A', fontFamily: 'var(--font-body)' }}>LIVE</span>
+            </span>
+            Activity Feed
+          </h2>
+
+          <div className="glass-card" style={{ padding: '24px', maxHeight: '500px', overflowY: 'auto' }}>
+            {activities.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(255,248,238,0.3)' }}>
+                <p style={{ fontSize: '32px', marginBottom: '12px' }}>📡</p>
+                <p style={{ fontSize: '14px' }}>Waiting for live updates...</p>
+                <p style={{ fontSize: '12px', marginTop: '6px', color: 'rgba(255,248,238,0.2)' }}>Connected to Socket.io</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gap: '8px' }}>
+                {activities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    style={{
+                      padding: '10px 16px',
+                      borderRadius: '8px',
+                      borderLeft: `3px solid ${activity.type === 'warning' ? '#E65100' : activity.type === 'success' ? '#1DB954' : '#1565C0'}`,
+                      background: activity.type === 'warning' ? 'rgba(230,81,0,0.06)' : activity.type === 'success' ? 'rgba(29,185,84,0.06)' : 'rgba(21,101,192,0.06)',
+                    }}
+                  >
+                    <p style={{ fontSize: '13px', fontWeight: 500, color: activity.type === 'warning' ? '#E65100' : activity.type === 'success' ? '#1DB954' : '#4FC3F7' }}>
+                      {activity.message}
+                    </p>
+                    <p style={{ fontSize: '11px', color: 'rgba(255,248,238,0.2)', marginTop: '2px' }}>
+                      {new Date(activity.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
