@@ -9,7 +9,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 interface SearchResult {
   id: string;
   label: string;
-  category: 'Zones' | 'Volunteers' | 'Incidents';
+  category: 'Zones' | 'Volunteers' | 'Incidents' | 'Map Zones';
   sectionId: string;
   icon: string;
 }
@@ -65,10 +65,29 @@ export default function StickyHeader({
   }, []);
 
   // Build searchable index
+  // Map zone data for search
+  const MAP_ZONES = useMemo(() => [
+    { id: 'z1', name: 'Triveni Sangam' },
+    { id: 'z2', name: 'Sector 1 Ghat' },
+    { id: 'z3', name: 'Sector 2 Ghat' },
+    { id: 'z4', name: 'Sector 3 Ghat' },
+    { id: 'z5', name: 'Medical Camp North' },
+    { id: 'z6', name: 'Medical Camp South' },
+    { id: 'z7', name: 'Parking Zone A' },
+    { id: 'z8', name: 'Parking Zone B' },
+    { id: 'z9', name: 'VIP Enclosure' },
+    { id: 'z10', name: 'Food Court Zone' },
+    { id: 'z11', name: 'Gate 2 Entry' },
+    { id: 'z12', name: 'Lost & Found Center' },
+  ], []);
+
   const searchIndex = useMemo<SearchResult[]>(() => {
     const results: SearchResult[] = [];
     zones.forEach((z) => {
       results.push({ id: `zone-${z.id}`, label: z.name, category: 'Zones', sectionId: 'zones', icon: '📍' });
+    });
+    MAP_ZONES.forEach((mz) => {
+      results.push({ id: `mapzone-${mz.id}`, label: mz.name, category: 'Map Zones', sectionId: 'map', icon: '🗺️' });
     });
     volunteers.forEach((v) => {
       results.push({ id: `vol-${v.id}`, label: v.name, category: 'Volunteers', sectionId: 'volunteers', icon: '👤' });
@@ -77,7 +96,7 @@ export default function StickyHeader({
       results.push({ id: `inc-${i.id}`, label: `${i.type}: ${i.description.substring(0, 40)}`, category: 'Incidents', sectionId: 'incidents', icon: '⚠️' });
     });
     return results;
-  }, [zones, volunteers, incidents]);
+  }, [zones, volunteers, incidents, MAP_ZONES]);
 
   // Filter results
   const filteredResults = useMemo(() => {
@@ -96,10 +115,19 @@ export default function StickyHeader({
 
   const hasResults = Object.keys(filteredResults).length > 0;
 
-  const scrollToSection = useCallback((sectionId: string) => {
+  const scrollToSection = useCallback((sectionId: string, resultId?: string) => {
     const el = document.getElementById(sectionId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
+    }
+    // If it's a map zone search result, set URL param so MapSection can auto-select
+    if (sectionId === 'map' && resultId?.startsWith('mapzone-')) {
+      const zoneId = resultId.replace('mapzone-', '');
+      const url = new URL(window.location.href);
+      url.searchParams.set('zone', zoneId);
+      window.history.replaceState({}, '', url.toString());
+      // Dispatch a custom event so MapSection picks up the change
+      window.dispatchEvent(new CustomEvent('zone-select', { detail: zoneId }));
     }
     setSearchQuery('');
     setIsSearchFocused(false);
@@ -309,7 +337,7 @@ export default function StickyHeader({
                     {results.map((r) => (
                       <button
                         key={r.id}
-                        onClick={() => scrollToSection(r.sectionId)}
+                        onClick={() => scrollToSection(r.sectionId, r.id)}
                         style={{
                           display: 'flex',
                           alignItems: 'center',

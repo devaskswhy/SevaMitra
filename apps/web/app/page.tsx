@@ -6,6 +6,9 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import StickyHeader from '@/components/StickyHeader';
 import WaterRipple from '@/components/WaterRipple';
+import dynamic from 'next/dynamic';
+
+const MapSection = dynamic(() => import('@/components/MapSection'), { ssr: false });
 
 /* ═══════════════════════════════════════════════════════════════
    API CONFIG
@@ -728,6 +731,54 @@ export default function Home() {
               })}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════
+         ZONE MAP SECTION
+         ═════════════════════════════════════════════════════════ */}
+      <section
+        id="map"
+        style={{
+          minHeight: '100vh',
+          width: '100%',
+          position: 'relative',
+          zIndex: 2,
+          background: '#100600',
+          padding: '80px 24px 48px',
+        }}
+      >
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <p
+            style={{
+              color: 'rgba(255,248,238,0.4)',
+              fontSize: '12px',
+              letterSpacing: '0.15em',
+              marginBottom: '8px',
+            }}
+          >
+            — 03 ZONE MAP
+          </p>
+          <h2
+            style={{
+              color: '#FFF8EE',
+              fontSize: 'clamp(28px, 4vw, 42px)',
+              fontWeight: '500',
+              marginBottom: '8px',
+            }}
+          >
+            Mahakumbh Zone Intelligence
+          </h2>
+          <p
+            style={{
+              color: 'rgba(255,248,238,0.5)',
+              marginBottom: '32px',
+              fontSize: '15px',
+            }}
+          >
+            Live density monitoring across all 12 sectors
+          </p>
+          <MapSection />
         </div>
       </section>
 
