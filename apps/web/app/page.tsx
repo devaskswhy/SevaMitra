@@ -9,6 +9,10 @@ import WaterRipple from '@/components/WaterRipple';
 import dynamic from 'next/dynamic';
 
 const MapSection = dynamic(() => import('@/components/MapSection'), { ssr: false });
+import SevaSahayak from '@/components/SevaSahayak';
+const SevaSahayakFloat = dynamic(
+  () => import('@/components/SevaSahayak'), { ssr: false }
+);
 
 /* ═══════════════════════════════════════════════════════════════
    API CONFIG
@@ -243,13 +247,29 @@ function getZoneIcon(type: string): string {
    ═══════════════════════════════════════════════════════════════ */
 
 const FALLBACK_VOLUNTEERS: Volunteer[] = [
-  { id: 1, name: 'Sample Vol 1', email: 'test@test.com', phone: '123', skills: 'Medical', reliabilityScore: 90, status: 'ACTIVE' },
-  { id: 2, name: 'Sample Vol 2', email: 'test2@test.com', phone: '456', skills: 'Traffic', reliabilityScore: 85, status: 'ACTIVE' }
+  { id: 1, name: 'Rajesh Kumar', email: 'rajesh@sevamitra.in', phone: '9876543210', skills: 'Medical, First Aid', reliabilityScore: 92, status: 'ACTIVE' },
+  { id: 2, name: 'Priya Sharma', email: 'priya@sevamitra.in', phone: '9876543211', skills: 'Navigation, Languages', reliabilityScore: 88, status: 'ACTIVE' },
+  { id: 3, name: 'Amit Singh', email: 'amit@sevamitra.in', phone: '9876543212', skills: 'Security, Crowd Control', reliabilityScore: 95, status: 'ACTIVE' },
+  { id: 4, name: 'Sunita Devi', email: 'sunita@sevamitra.in', phone: '9876543213', skills: 'First Aid, Counseling', reliabilityScore: 79, status: 'ACTIVE' },
+  { id: 5, name: 'Vikram Yadav', email: 'vikram@sevamitra.in', phone: '9876543214', skills: 'Traffic, Security', reliabilityScore: 85, status: 'ACTIVE' },
+  { id: 6, name: 'Meera Gupta', email: 'meera@sevamitra.in', phone: '9876543215', skills: 'Medical, Hindi/English', reliabilityScore: 91, status: 'ACTIVE' },
+  { id: 7, name: 'Suresh Patel', email: 'suresh@sevamitra.in', phone: '9876543216', skills: 'Crowd Control, Navigation', reliabilityScore: 83, status: 'ACTIVE' },
+  { id: 8, name: 'Anita Verma', email: 'anita@sevamitra.in', phone: '9876543217', skills: 'Counseling, Lost & Found', reliabilityScore: 87, status: 'ACTIVE' },
 ];
 
 const FALLBACK_ZONES: Zone[] = [
-  { id: 1, name: 'Ghat 1', type: 'GHAT', maxCapacity: 1000, currentLoad: 500, priority: 'MEDIUM' },
-  { id: 2, name: 'Camp A', type: 'CAMP', maxCapacity: 5000, currentLoad: 4500, priority: 'HIGH' }
+  { id: 1, name: 'Triveni Sangam', type: 'GHAT', maxCapacity: 100, currentLoad: 88, priority: 'HIGH' },
+  { id: 2, name: 'Sector 1 Ghat', type: 'GHAT', maxCapacity: 100, currentLoad: 45, priority: 'LOW' },
+  { id: 3, name: 'Sector 2 Ghat', type: 'GHAT', maxCapacity: 100, currentLoad: 32, priority: 'LOW' },
+  { id: 4, name: 'Sector 3 Ghat', type: 'GHAT', maxCapacity: 100, currentLoad: 67, priority: 'MEDIUM' },
+  { id: 5, name: 'Sector 4 Ghat', type: 'GHAT', maxCapacity: 100, currentLoad: 71, priority: 'MEDIUM' },
+  { id: 6, name: 'Medical Camp North', type: 'MEDICAL', maxCapacity: 100, currentLoad: 28, priority: 'LOW' },
+  { id: 7, name: 'Medical Camp South', type: 'MEDICAL', maxCapacity: 100, currentLoad: 35, priority: 'LOW' },
+  { id: 8, name: 'Parking Zone A', type: 'PARKING', maxCapacity: 100, currentLoad: 74, priority: 'MEDIUM' },
+  { id: 9, name: 'Parking Zone B', type: 'PARKING', maxCapacity: 100, currentLoad: 55, priority: 'MEDIUM' },
+  { id: 10, name: 'VIP Enclosure', type: 'VIP', maxCapacity: 100, currentLoad: 40, priority: 'LOW' },
+  { id: 11, name: 'Food Court Zone', type: 'FACILITY', maxCapacity: 100, currentLoad: 58, priority: 'MEDIUM' },
+  { id: 12, name: 'Gate 2 Entry', type: 'GATE', maxCapacity: 100, currentLoad: 93, priority: 'HIGH' },
 ];
 
 const FALLBACK_INCIDENTS: Incident[] = [
@@ -910,6 +930,31 @@ export default function Home() {
       </section>
 
       {/* ═════════════════════════════════════════════════════════
+         CHATBOT SECTION
+         ═════════════════════════════════════════════════════════ */}
+      <section id="chatbot" style={{
+        minHeight: '100vh', width: '100%', position: 'relative',
+        zIndex: 2, background: '#0D0500', padding: '80px 24px 48px'
+      }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <p style={{ color: 'rgba(255,248,238,0.4)', fontSize: '12px',
+            letterSpacing: '0.15em', marginBottom: '8px' }}>— 04 AI ASSISTANT</p>
+          <h2 style={{ color: '#FFF8EE', fontSize: 'clamp(28px, 4vw, 42px)',
+            fontWeight: '500', marginBottom: '8px' }}>SevaSahayak</h2>
+          <p style={{ color: 'rgba(255,248,238,0.5)', marginBottom: '32px',
+            fontSize: '15px' }}>
+            AI guide for pilgrims and volunteers — Shahi Snaan schedules, 
+            crowd levels, zone assignments
+          </p>
+          <div style={{ background: 'rgba(255,255,255,0.04)', 
+            border: '1px solid rgba(232,101,10,0.15)', borderRadius: '20px',
+            overflow: 'hidden' }}>
+            <SevaSahayak isInline={true} />
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════
          VOLUNTEERS SECTION
          ═════════════════════════════════════════════════════════ */}
       {/* FIXED: section visibility */}
@@ -1066,6 +1111,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Floating Chatbot Bubble */}
+      <SevaSahayakFloat isInline={false} />
     </>
   );
 }

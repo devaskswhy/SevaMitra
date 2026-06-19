@@ -10,6 +10,7 @@ import assignmentRoutes from "./routes/assignments";
 import incidentRoutes from "./routes/incidents";
 import allocationRoutes from "./routes/allocation";
 import demoRoutes from "./routes/demo";
+import chatRoutes from "./routes/chat";
 
 const app: Express = express();
 const PORT = process.env.PORT || 4000;
@@ -38,6 +39,7 @@ app.use("/api/assignments", assignmentRoutes);
 app.use("/api/incidents", incidentRoutes);
 app.use("/api/allocation", allocationRoutes);
 app.use("/api/demo", demoRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Error handling middleware
 app.use((err: any, _req: Request, res: Response) => {
