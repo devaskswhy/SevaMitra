@@ -45,7 +45,6 @@ function startCounter() {
 }
 
 export default function Loader() {
-  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     // Always show full loader on every visit

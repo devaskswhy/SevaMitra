@@ -350,9 +350,10 @@ function HeroSection() {
       .to('.hero-subtitle', { opacity: 0, y: -40 }, '<0.1')
       .to('.hero-cta', { opacity: 0, y: -20 }, '<0.1');
 
+    const heroEl = heroRef.current;
     return () => {
       ScrollTrigger.getAll()
-        .filter((t) => t.vars.trigger === '#hero' || t.trigger === heroRef.current)
+        .filter((t) => t.vars.trigger === '#hero' || t.trigger === heroEl)
         .forEach((t) => t.kill());
     };
   }, []);

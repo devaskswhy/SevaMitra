@@ -122,6 +122,7 @@ export default function VolunteerBadge({
           }}
         >
           {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt={name} className="w-full h-full object-cover rounded-full" />
           ) : (
             <span className="text-white text-sm font-bold">
