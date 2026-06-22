@@ -291,6 +291,244 @@ const FALLBACK_TASKS: Task[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════
+   HERO IMAGES
+   ═══════════════════════════════════════════════════════════════ */
+
+const HERO_IMAGES = [
+  '/GkxMDfdWoAArpe4-scaled.jpg',
+  '/Guide-Kumbh-Mela.jpg',
+  '/img29.jpg',
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO SECTION — Parallax Gallery with Crossfade
+   ═══════════════════════════════════════════════════════════════ */
+
+function HeroSection() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const heroRef = useRef<HTMLElement>(null);
+
+  /* ── Image crossfade rotator ── */
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  /* ── GSAP parallax + hero text scroll animations ── */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Parallax: slide the background layer up as user scrolls
+    gsap.to('.hero-bg-layer', {
+      yPercent: 25,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+      },
+    });
+
+    // Hero text shrink / fade on scroll
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#hero',
+        start: 'top top',
+        end: '+=600',
+        scrub: 1,
+      },
+    });
+    tl.to('.hero-title', { scale: 0.85, opacity: 0.3, y: -60 })
+      .to('.hero-subtitle', { opacity: 0, y: -40 }, '<0.1')
+      .to('.hero-cta', { opacity: 0, y: -20 }, '<0.1');
+
+    return () => {
+      ScrollTrigger.getAll()
+        .filter((t) => t.vars.trigger === '#hero' || t.trigger === heroRef.current)
+        .forEach((t) => t.kill());
+    };
+  }, []);
+
+  return (
+    <section
+      ref={heroRef}
+      id="hero"
+      style={{
+        position: 'relative',
+        zIndex: 1,
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0D0500',
+        overflow: 'hidden',
+      }}
+    >
+      {/* ── Parallax image gallery layer ── */}
+      <div
+        className="hero-bg-layer"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+        }}
+      >
+        {HERO_IMAGES.map((src, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={src}
+            src={src}
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              opacity: activeIdx === i ? 0.7 : 0,
+              transition: 'opacity 2s ease',
+              pointerEvents: 'none',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* ── Dark overlay gradient ── */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          background:
+            'linear-gradient(to bottom, rgba(13,5,0,0.15) 0%, rgba(13,5,0,0.4) 50%, rgba(13,5,0,0.92) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ── Hero content ── */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          textAlign: 'center',
+          padding: '0 24px',
+          maxWidth: '800px',
+          animation: 'fade-in-up 1s ease-out',
+        }}
+      >
+        {/* ── Decorative OM divider (top) ── */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            marginBottom: '16px',
+          }}
+        >
+          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(232,101,10,0.5))' }} />
+          <span style={{ fontSize: '12px', color: 'rgba(255,248,238,0.35)', letterSpacing: '0.15em', fontWeight: 500 }}>|| सेवा ही पूजा है ||</span>
+          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, rgba(232,101,10,0.5), transparent)' }} />
+          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+        </div>
+
+        <h1
+          className="hero-title"
+          style={{
+            fontSize: 'clamp(48px, 8vw, 96px)',
+            fontFamily: 'var(--font-heading)',
+            color: '#FFF8EE',
+            lineHeight: 1.1,
+            marginBottom: '16px',
+            textShadow: '0 4px 40px rgba(232, 101, 10, 0.3)',
+          }}
+        >
+          सेवा ही पूजा है
+        </h1>
+
+        {/* ── Decorative OM divider (bottom) ── */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            marginBottom: '24px',
+          }}
+        >
+          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(232,101,10,0.5))' }} />
+          <span style={{ fontSize: '12px', color: 'rgba(255,248,238,0.35)', letterSpacing: '0.15em', fontWeight: 500 }}>|| सेवा ही पूजा है ||</span>
+          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, rgba(232,101,10,0.5), transparent)' }} />
+          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+        </div>
+        <p
+          className="hero-subtitle"
+          style={{
+            fontSize: 'clamp(16px, 2.5vw, 22px)',
+            color: 'rgba(255,248,238,0.7)',
+            marginBottom: '40px',
+            lineHeight: 1.5,
+            fontWeight: 300,
+          }}
+        >
+          SevaMitra — Mahakumbh 2025 Volunteer Intelligence Platform
+        </p>
+        <button
+          className="btn-sacred btn-sacred-primary hero-cta"
+          style={{ fontSize: '16px', padding: '16px 36px', borderRadius: '12px' }}
+          onClick={() => {
+            document.getElementById('stats')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
+          Explore Operations ↓
+        </button>
+      </div>
+
+      {/* ── Image dot indicators ── */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '32px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '6px',
+          zIndex: 3,
+        }}
+      >
+        {HERO_IMAGES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveIdx(i)}
+            aria-label={`Show image ${i + 1}`}
+            style={{
+              width: activeIdx === i ? '24px' : '8px',
+              height: '8px',
+              borderRadius: activeIdx === i ? '4px' : '50%',
+              background: activeIdx === i ? '#E8650A' : 'rgba(255,248,238,0.3)',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              transition: 'width 0.3s ease, background 0.3s ease, border-radius 0.3s ease',
+            }}
+          />
+        ))}
+      </div>
+
+
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN PAGE COMPONENT
    ═══════════════════════════════════════════════════════════════ */
 
@@ -528,117 +766,9 @@ export default function Home() {
       <div className="om-watermark" aria-hidden="true">ॐ</div>
 
       {/* ═════════════════════════════════════════════════════════
-         HERO SECTION
+         HERO SECTION — Multi-layer parallax image gallery
          ═════════════════════════════════════════════════════════ */}
-      {/* FIXED: section visibility */}
-      <section
-        id="hero"
-        style={{
-          position: 'relative',
-          zIndex: 1,
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#0D0500',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Background image */}
-        <img
-          src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600"
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 0,
-            objectFit: 'cover',
-            opacity: 0.35,
-            pointerEvents: 'none',
-          }}
-        />
-        {/* Dark overlay gradient */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(180deg, rgba(13,5,0,0.3) 0%, rgba(13,5,0,0.7) 70%, #0D0500 100%)',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Content */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            textAlign: 'center',
-            padding: '0 24px',
-            maxWidth: '800px',
-            animation: 'fade-in-up 1s ease-out',
-          }}
-        >
-          <h1
-            style={{
-              fontSize: 'clamp(48px, 8vw, 96px)',
-              fontFamily: 'var(--font-heading)',
-              color: '#FFF8EE',
-              lineHeight: 1.1,
-              marginBottom: '20px',
-              textShadow: '0 4px 40px rgba(232, 101, 10, 0.3)',
-            }}
-          >
-            सेवा ही पूजा है
-          </h1>
-          <p
-            style={{
-              fontSize: 'clamp(16px, 2.5vw, 22px)',
-              color: 'rgba(255,248,238,0.7)',
-              marginBottom: '40px',
-              lineHeight: 1.5,
-              fontWeight: 300,
-            }}
-          >
-            SevaMitra — Mahakumbh 2025 Volunteer Intelligence Platform
-          </p>
-          <button
-            className="btn-sacred btn-sacred-primary"
-            style={{ fontSize: '16px', padding: '16px 36px', borderRadius: '12px' }}
-            onClick={() => {
-              document.getElementById('stats')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            Explore Operations ↓
-          </button>
-        </div>
-
-        {/* Scroll indicator */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '40px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '8px',
-            animation: 'scroll-bounce 2s ease-in-out infinite',
-          }}
-        >
-          <span style={{ fontSize: '11px', color: 'rgba(255,248,238,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            Scroll
-          </span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(232,101,10,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* ═════════════════════════════════════════════════════════
          STATS SECTION
