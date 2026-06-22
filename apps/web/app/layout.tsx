@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Tiro_Devanagari_Sanskrit } from "next/font/google";
 import "./globals.css";
+import Loader from "@/components/Loader";
 
 /* ═══════════════════════════════════════════════════════════════
    GOOGLE FONTS — Sacred Typography System
@@ -63,12 +64,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${tiroDevanagari.variable}`}>
+      <head>
+        <style>{`html { scroll-behavior: auto; }`}</style>
+      </head>
       <body
         className="antialiased"
         style={{
           fontFamily: "var(--font-inter), -apple-system, sans-serif",
         }}
       >
+        <Loader />
         {children}
       </body>
     </html>

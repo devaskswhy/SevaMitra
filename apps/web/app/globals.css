@@ -198,38 +198,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SECTION REVEAL ANIMATION (Intersection Observer)
+   SECTION REVEAL — now handled by GSAP ScrollTrigger (lib/scroll.ts)
    ═══════════════════════════════════════════════════════════════ */
-
-/* FIXED: section visibility */
-.animate-on-scroll {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.section-visible {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-}
-
-/* Staggered children reveal */
-.section-visible .reveal-child {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.reveal-child {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s var(--ease-sacred), transform 0.5s var(--ease-sacred);
-}
-
-.reveal-child:nth-child(1) { transition-delay: 0.1s; }
-.reveal-child:nth-child(2) { transition-delay: 0.2s; }
-.reveal-child:nth-child(3) { transition-delay: 0.3s; }
-.reveal-child:nth-child(4) { transition-delay: 0.4s; }
-.reveal-child:nth-child(5) { transition-delay: 0.5s; }
-.reveal-child:nth-child(6) { transition-delay: 0.6s; }
 
 /* ═══════════════════════════════════════════════════════════════
    SACRED BUTTONS

@@ -2,6 +2,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { initScroll, EASE, DUR } from '@/lib/scroll';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import StickyHeader from '@/components/StickyHeader';
@@ -178,7 +181,7 @@ function StatCard({
   const display = useCountUp(value, 1200, visible);
 
   return (
-    <div className="glass-card reveal-child" style={{ padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
+    <div className="glass-card stat-card" style={{ padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ fontSize: '28px', marginBottom: '8px' }}>{icon}</div>
       <div
         style={{
@@ -273,7 +276,18 @@ const FALLBACK_ZONES: Zone[] = [
 ];
 
 const FALLBACK_INCIDENTS: Incident[] = [
-  { id: 1, zoneId: 1, type: 'Medical Emergency', severity: 4, description: 'Requires immediate attention', reportedBy: 'System', resolvedAt: null }
+  { id: 1, zoneId: 1, type: 'Medical Emergency', severity: 4, description: 'Requires immediate attention at Triveni Sangam ghat area', reportedBy: 'System', resolvedAt: null },
+  { id: 2, zoneId: 12, type: 'Crowd Surge', severity: 5, description: 'Gate 2 Entry exceeding capacity — immediate crowd control needed', reportedBy: 'Zone Monitor', resolvedAt: null },
+  { id: 3, zoneId: 4, type: 'Lost Person', severity: 3, description: 'Elderly pilgrim reported missing near Sector 3 Ghat', reportedBy: 'Volunteer', resolvedAt: null },
+  { id: 4, zoneId: 8, type: 'Traffic Jam', severity: 2, description: 'Vehicle congestion blocking emergency route in Parking Zone A', reportedBy: 'Traffic Cell', resolvedAt: '2025-01-15T10:30:00Z' },
+];
+
+const FALLBACK_TASKS: Task[] = [
+  { id: 1, title: 'Medical Response — Triveni Sangam', zoneId: 1, skillsRequired: 'Medical, First Aid' },
+  { id: 2, title: 'Crowd Control — Gate 2 Entry', zoneId: 12, skillsRequired: 'Security, Crowd Control' },
+  { id: 3, title: 'Search & Rescue — Sector 3', zoneId: 4, skillsRequired: 'Navigation, Languages' },
+  { id: 4, title: 'Traffic Management — Parking A', zoneId: 8, skillsRequired: 'Traffic, Security' },
+  { id: 5, title: 'Counseling Support — Medical Camp', zoneId: 6, skillsRequired: 'Counseling, First Aid' },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
@@ -297,27 +311,59 @@ export default function Home() {
   const [, setLoading] = useState(true);
   const [volunteerSearch, setVolunteerSearch] = useState('');
 
-  // FIXED: section visibility
+  // FIXED: force scroll to top on mount
   useEffect(() => {
-    const init = () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('section-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+  }, []);
 
-      document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+  // Lenis smooth scroll + GSAP ScrollTrigger
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const lenis = initScroll();
+
+    // Animate every section below hero
+    const sections = document.querySelectorAll<HTMLElement>(
+      '#stats, #zones, #map, #incidents, #chatbot, #volunteers, section:not(#hero)'
+    );
+    sections.forEach((el) => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: DUR.slow,
+          ease: EASE,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
+    });
+
+    // Stagger stat cards
+    gsap.fromTo(
+      '.stat-card',
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: DUR.base,
+        ease: EASE,
+        stagger: 0.12,
+        scrollTrigger: {
+          trigger: '#stats',
+          start: 'top 80%',
+        },
+      }
+    );
+
+    return () => {
+      lenis.destroy();
+      ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-
-    if (document.readyState === 'complete') {
-      init();
-    } else {
-      window.addEventListener('load', init);
-      return () => window.removeEventListener('load', init);
-    }
   }, []);
 
   /* ── Data Fetching ── */
@@ -349,7 +395,23 @@ export default function Home() {
       setTasks(tasksData);
       setLoading(false);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('Failed to fetch data, using fallback:', error);
+
+      // Compute stats from fallback data so cards aren't all 0
+      const activeVolunteers = FALLBACK_VOLUNTEERS.filter((v) => v.status === 'ACTIVE').length;
+      const zonesOver80 = FALLBACK_ZONES.filter((z) => (z.currentLoad / z.maxCapacity) > 0.8).length;
+      const openIncidents = FALLBACK_INCIDENTS.filter((i) => !i.resolvedAt).length;
+
+      setStats({
+        totalActiveVolunteers: activeVolunteers,
+        zonesOverCapacity: zonesOver80,
+        openIncidents,
+        pendingAssignments: 3,
+      });
+      setVolunteers(FALLBACK_VOLUNTEERS);
+      setZones(FALLBACK_ZONES);
+      setIncidents(FALLBACK_INCIDENTS);
+      setTasks(FALLBACK_TASKS);
       setLoading(false);
     }
   }, []);
@@ -413,15 +475,34 @@ export default function Home() {
       const recs = response.data.data || response.data;
       setRecommendations(recs.slice(0, 5));
     } catch (error) {
-      console.error('Failed to get recommendations:', error);
+      console.error('Failed to get API recommendations, using local scoring:', error);
+
+      // Local fallback: score volunteers by skill match + reliability
+      const task = currentTasks.find((t) => t.id === selectedTask);
+      const requiredSkills = task ? task.skillsRequired.toLowerCase().split(/,\s*/) : [];
+
+      const localRecs: VolunteerRecommendation[] = currentVolunteers
+        .map((v) => {
+          const volSkills = v.skills.toLowerCase().split(/,\s*/);
+          const matched = requiredSkills.filter((rs) => volSkills.some((vs) => vs.includes(rs) || rs.includes(vs)));
+          const skillMatch = requiredSkills.length > 0 ? Math.round((matched.length / requiredSkills.length) * 100) : 50;
+          const availability = v.status === 'ACTIVE' ? 80 + Math.round(Math.random() * 20) : 20;
+          const distance = Math.round(Math.random() * 4 * 10) / 10 + 0.5;
+          const score = Math.round(skillMatch * 0.4 + v.reliabilityScore * 0.35 + availability * 0.25);
+          return { volunteerId: v.id, name: v.name, score, skillMatch, availability, distance };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+      setRecommendations(localRecs);
     }
   };
 
   /* ── Derived data ── */
-  // FIXED: section visibility - fallback data
   const currentVolunteers = volunteers.length ? volunteers : FALLBACK_VOLUNTEERS;
   const currentZones = zones.length ? zones : FALLBACK_ZONES;
   const currentIncidents = incidents.length ? incidents : FALLBACK_INCIDENTS;
+  const currentTasks = tasks.length ? tasks : FALLBACK_TASKS;
 
   const filteredVolunteers = currentVolunteers.filter(
     (v) => v.name.toLowerCase().includes(volunteerSearch.toLowerCase()) || v.email.toLowerCase().includes(volunteerSearch.toLowerCase())
@@ -618,7 +699,7 @@ export default function Home() {
                     }}
                   >
                     <option value="" style={{ background: '#1C0A00' }}>Choose a task...</option>
-                    {tasks.map((task) => (
+                    {currentTasks.map((task) => (
                       <option key={task.id} value={task.id} style={{ background: '#1C0A00' }}>{task.title}</option>
                     ))}
                   </select>
