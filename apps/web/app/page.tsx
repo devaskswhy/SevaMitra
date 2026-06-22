@@ -548,7 +548,7 @@ export default function Home() {
 
     // Animate every section below hero
     const sections = document.querySelectorAll<HTMLElement>(
-      '#stats, #zones, #map, #incidents, #chatbot, #volunteers, section:not(#hero)'
+      '#zones, #map, #incidents, #chatbot, #volunteers, section:not(#hero):not(#stats)'
     );
     sections.forEach((el) => {
       gsap.fromTo(
