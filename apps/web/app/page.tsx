@@ -422,52 +422,33 @@ function HeroSection() {
           animation: 'fade-in-up 1s ease-out',
         }}
       >
-        {/* ── Decorative OM divider (top) ── */}
         <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            marginBottom: '16px',
-          }}
-        >
-          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
-          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(232,101,10,0.5))' }} />
-          <span style={{ fontSize: '12px', color: 'rgba(255,248,238,0.35)', letterSpacing: '0.15em', fontWeight: 500 }}>|| सेवा ही पूजा है ||</span>
-          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, rgba(232,101,10,0.5), transparent)' }} />
-          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
-        </div>
-
-        <h1
           className="hero-title"
           style={{
-            fontSize: 'clamp(48px, 8vw, 96px)',
-            fontFamily: 'var(--font-heading)',
-            color: '#FFF8EE',
-            lineHeight: 1.1,
-            marginBottom: '16px',
-            textShadow: '0 4px 40px rgba(232, 101, 10, 0.3)',
-          }}
-        >
-          सेवा ही पूजा है
-        </h1>
-
-        {/* ── Decorative OM divider (bottom) ── */}
-        <div
-          style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '12px',
-            marginBottom: '24px',
+            gap: '16px',
+            marginBottom: '16px',
           }}
         >
-          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
-          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(232,101,10,0.5))' }} />
-          <span style={{ fontSize: '12px', color: 'rgba(255,248,238,0.35)', letterSpacing: '0.15em', fontWeight: 500 }}>|| सेवा ही पूजा है ||</span>
-          <span style={{ width: '40px', height: '1px', background: 'linear-gradient(90deg, rgba(232,101,10,0.5), transparent)' }} />
-          <span style={{ fontSize: '20px', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+          <span style={{ fontSize: 'clamp(24px, 4vw, 40px)', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+          <span style={{ width: 'clamp(40px, 8vw, 80px)', height: '2px', background: 'linear-gradient(90deg, transparent, rgba(232,101,10,0.5))' }} />
+          <h1
+            style={{
+              fontSize: 'clamp(40px, 7vw, 80px)',
+              fontFamily: 'var(--font-heading)',
+              color: '#FFF8EE',
+              lineHeight: 1.1,
+              textShadow: '0 4px 40px rgba(232, 101, 10, 0.3)',
+              margin: 0,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            || सेवा ही पूजा है ||
+          </h1>
+          <span style={{ width: 'clamp(40px, 8vw, 80px)', height: '2px', background: 'linear-gradient(90deg, rgba(232,101,10,0.5), transparent)' }} />
+          <span style={{ fontSize: 'clamp(24px, 4vw, 40px)', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
         </div>
         <p
           className="hero-subtitle"
