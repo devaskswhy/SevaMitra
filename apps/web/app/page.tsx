@@ -178,12 +178,11 @@ function StatCard({
   icon: string;
   visible: boolean;
 }) {
-  const display = useCountUp(value, 1200, visible);
-
   return (
     <div className="glass-card stat-card" style={{ padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ fontSize: '28px', marginBottom: '8px' }}>{icon}</div>
       <div
+        className="stat-number"
         style={{
           fontSize: '36px',
           fontWeight: 800,
@@ -193,7 +192,7 @@ function StatCard({
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {display}
+        {value}
       </div>
       <div
         style={{
@@ -569,22 +568,62 @@ export default function Home() {
       );
     });
 
-    // Stagger stat cards
-    gsap.fromTo(
-      '.stat-card',
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: DUR.base,
-        ease: EASE,
-        stagger: 0.12,
+    // Storytelling Pinned Sequence for Stats
+    const mm = gsap.matchMedia();
+
+    mm.add('(min-width: 768px)', () => {
+      const statsTl = gsap.timeline({
         scrollTrigger: {
-          trigger: '#stats',
-          start: 'top 80%',
+          trigger: '#stats-pin-container',
+          start: 'top top',
+          end: '+=1200',
+          pin: '#stats',
+          scrub: 1,
+          anticipatePin: 1,
         },
-      }
-    );
+      });
+
+      statsTl
+        // Section label slides in first
+        .from('.stats-chapter-label', {
+          x: -40, opacity: 0, duration: 0.3,
+        })
+        // Heading reveals
+        .from('.stats-heading', {
+          y: 60, opacity: 0, duration: 0.4, ease: EASE,
+        }, '-=0.1')
+        // Cards stagger in one by one
+        .from('.stat-card', {
+          y: 80, opacity: 0, scale: 0.9,
+          stagger: 0.2, duration: 0.4, ease: EASE,
+        }, '-=0.2')
+        // Numbers count up as cards appear
+        .from('.stat-number', {
+          textContent: 0,
+          duration: 0.5,
+          snap: { textContent: 1 },
+          stagger: 0.2,
+        }, '<');
+    });
+
+    mm.add('(max-width: 767px)', () => {
+      // Mobile fallback: simple fade in
+      gsap.fromTo(
+        '.stat-card',
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: DUR.base,
+          ease: EASE,
+          stagger: 0.12,
+          scrollTrigger: {
+            trigger: '#stats',
+            start: 'top 80%',
+          },
+        }
+      );
+    });
 
     return () => {
       lenis.destroy();
@@ -761,13 +800,15 @@ export default function Home() {
       {/* ═════════════════════════════════════════════════════════
          STATS SECTION
          ═════════════════════════════════════════════════════════ */}
-      {/* FIXED: section visibility */}
-      <section id="stats" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#100600', padding: '100px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <SectionWave />
-          <div>
-            <SectionLabel number="01" title="OPERATIONS" />
+      <div id="stats-pin-container" style={{ height: '300vh' }}>
+        <section id="stats" style={{ minHeight: '100vh', width: '100%', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#100600', padding: '60px 24px' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+            <SectionWave />
+            <div className="stats-chapter-label">
+              <SectionLabel number="01" title="OPERATIONS" />
+            </div>
             <h2
+              className="stats-heading"
               style={{
                 fontFamily: 'var(--font-heading)',
                 fontSize: 'clamp(28px, 4vw, 42px)',
@@ -862,8 +903,8 @@ export default function Home() {
               )}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* ═════════════════════════════════════════════════════════
          ZONES SECTION
