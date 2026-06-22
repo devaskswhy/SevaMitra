@@ -178,6 +178,8 @@ function StatCard({
   icon: string;
   visible: boolean;
 }) {
+  const display = useCountUp(value, 1200, visible);
+
   return (
     <div className="glass-card stat-card" style={{ padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ fontSize: '28px', marginBottom: '8px' }}>{icon}</div>
@@ -192,7 +194,7 @@ function StatCard({
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {value}
+        {display}
       </div>
       <div
         style={{
@@ -546,88 +548,87 @@ export default function Home() {
     gsap.registerPlugin(ScrollTrigger);
     const lenis = initScroll();
 
-    // Animate every section below hero
-    const sections = document.querySelectorAll<HTMLElement>(
-      '#zones, #map, #incidents, #chatbot, #volunteers, section:not(#hero):not(#stats)'
-    );
-    sections.forEach((el) => {
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: DUR.slow,
-          ease: EASE,
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-        }
+    const ctx = gsap.context(() => {
+      // Animate every section below hero
+      const sections = document.querySelectorAll<HTMLElement>(
+        '#zones, #map, #incidents, #chatbot, #volunteers, section:not(#hero):not(#stats)'
       );
-    });
-
-    // Storytelling Pinned Sequence for Stats
-    const mm = gsap.matchMedia();
-
-    mm.add('(min-width: 768px)', () => {
-      const statsTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: '#stats-pin-container',
-          start: 'top top',
-          end: '+=1200',
-          pin: '#stats',
-          scrub: 1,
-          anticipatePin: 1,
-        },
+      sections.forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: DUR.slow,
+            ease: EASE,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          }
+        );
       });
 
-      statsTl
-        // Section label slides in first
-        .from('.stats-chapter-label', {
-          x: -40, opacity: 0, duration: 0.3,
-        })
-        // Heading reveals
-        .from('.stats-heading', {
-          y: 60, opacity: 0, duration: 0.4, ease: EASE,
-        }, '-=0.1')
-        // Cards stagger in one by one
-        .from('.stat-card', {
-          y: 80, opacity: 0, scale: 0.9,
-          stagger: 0.2, duration: 0.4, ease: EASE,
-        }, '-=0.2')
-        // Numbers count up as cards appear
-        .from('.stat-number', {
-          textContent: 0,
-          duration: 0.5,
-          snap: { textContent: 1 },
-          stagger: 0.2,
-        }, '<');
-    });
+      // Storytelling Pinned Sequence for Stats
+      const mm = gsap.matchMedia();
 
-    mm.add('(max-width: 767px)', () => {
-      // Mobile fallback: simple fade in
-      gsap.fromTo(
-        '.stat-card',
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: DUR.base,
-          ease: EASE,
-          stagger: 0.12,
+      mm.add('(min-width: 768px)', () => {
+        const statsTl = gsap.timeline({
           scrollTrigger: {
             trigger: '#stats',
-            start: 'top 80%',
+            start: 'top top',
+            end: '+=2000',
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
           },
-        }
-      );
+        });
+
+        statsTl
+          // Section label slides in first
+          .fromTo('.stats-chapter-label',
+            { x: -40, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.3 }
+          )
+          // Heading reveals
+          .fromTo('.stats-heading',
+            { y: 60, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.4, ease: EASE },
+            '-=0.1'
+          )
+          // Cards stagger in one by one
+          .fromTo('.stat-card',
+            { y: 80, opacity: 0, scale: 0.9 },
+            { y: 0, opacity: 1, scale: 1, stagger: 0.2, duration: 0.4, ease: EASE },
+            '-=0.2'
+          );
+      });
+
+      mm.add('(max-width: 767px)', () => {
+        // Mobile fallback: simple fade in
+        gsap.fromTo(
+          '.stat-card',
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: DUR.base,
+            ease: EASE,
+            stagger: 0.12,
+            scrollTrigger: {
+              trigger: '#stats',
+              start: 'top 80%',
+            },
+          }
+        );
+      });
     });
 
     return () => {
       lenis.destroy();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
+      ctx.revert();
     };
   }, []);
 
@@ -800,9 +801,8 @@ export default function Home() {
       {/* ═════════════════════════════════════════════════════════
          STATS SECTION
          ═════════════════════════════════════════════════════════ */}
-      <div id="stats-pin-container" style={{ height: '300vh' }}>
-        <section id="stats" style={{ minHeight: '100vh', width: '100%', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#100600', padding: '60px 24px' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+      <section id="stats" style={{ minHeight: '100vh', width: '100%', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#100600', padding: '60px 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             <SectionWave />
             <div className="stats-chapter-label">
               <SectionLabel number="01" title="OPERATIONS" />
@@ -904,7 +904,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </div>
 
       {/* ═════════════════════════════════════════════════════════
          ZONES SECTION
