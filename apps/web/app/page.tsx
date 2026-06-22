@@ -321,16 +321,20 @@ function HeroSection() {
     if (typeof window === 'undefined') return;
 
     // Parallax: slide the background layer up as user scrolls
-    gsap.to('.hero-bg-layer', {
-      yPercent: 25,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '#hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true,
-      },
-    });
+    gsap.fromTo(
+      '.hero-bg-layer',
+      { y: 0 },
+      {
+        y: '25vh',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        },
+      }
+    );
 
     // Hero text shrink / fade on scroll
     const tl = gsap.timeline({
@@ -373,7 +377,10 @@ function HeroSection() {
         className="hero-bg-layer"
         style={{
           position: 'absolute',
-          inset: 0,
+          top: '-25vh',
+          left: 0,
+          width: '100%',
+          height: '125vh',
           zIndex: 0,
         }}
       >
