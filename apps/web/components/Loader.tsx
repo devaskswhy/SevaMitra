@@ -72,8 +72,6 @@ export default function Loader() {
     });
   }, []);
 
-  if (!visible) return null;
-
   return (
     <div
       className="loader-overlay"
