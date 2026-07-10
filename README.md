@@ -1,5 +1,7 @@
 # ॐ SevaMitra — Volunteer Management System
 
+**Live Demo:** [https://seva-mitra-wheat.vercel.app/](https://seva-mitra-wheat.vercel.app/)
+
 SevaMitra is a comprehensive, real-time Volunteer Management System specifically designed and built for **Mahakumbh 2025**. It is capable of intelligently handling over 10,000 volunteers across 20+ zones to ensure a safe and organized event for millions of attendees.
 
 ## 🌟 What Makes SevaMitra Unique & Helpful?
@@ -24,6 +26,7 @@ Many esteemed organizers and senior administrative staff managing the Mahakumbh 
 * **Live Operations Dashboard:** A centralized command center displaying live metrics (active volunteers, zones over capacity, open incidents), zone status overviews, and an auto-updating activity feed.
 * **Zone Capacity Tracking:** Visual progress bars track the capacity of critical zones (Ghats, Camps, Medical, Traffic) to prevent dangerous overcrowding.
 * **Incident Management System:** Real-time reporting and resolution of incidents, complete with severity levels and one-click "Deploy Volunteers" functionality.
+* **SevaSahayak AI Assistant:** A fully integrated AI chatbot powered by Groq LLaMA 3.3 70B, trained on Mahakumbh 2025 context to guide both pilgrims and volunteers with real-time insights like Shahi Snaan dates, crowd levels, and emergency helplines.
 * **Reports & Analytics:** Deep insights into event performance, including average incident response times and a competitive **Volunteer Leaderboard** showcasing the top 10 most reliable volunteers with rank badges.
 * **Volunteer App Login:** A streamlined, OTP-based (simulated) mobile-first login experience for volunteers on the ground.
 * **Automated Quick Allocation:** Matches urgent tasks to the closest and most qualified volunteers instantly.
