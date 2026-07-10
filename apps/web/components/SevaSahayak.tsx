@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const QUICK_REPLIES = {
   pilgrim: [
@@ -45,8 +45,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId] = useState(() => 
-    Math.random().toString(36).substring(2));
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -72,7 +71,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
       });
       const data = await response.json();
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: data.reply }]);
-    } catch (error) {
+    } catch {
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: 'Kshama karein, kuch takniki samasya hai. Dobara koshish karein. 🙏' }]);
     } finally {
       setIsLoading(false);
