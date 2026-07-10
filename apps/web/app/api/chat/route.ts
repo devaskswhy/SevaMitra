@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
   )
   
   const data = await response.json()
+  console.log("GEMINI API RESPONSE:", JSON.stringify(data, null, 2))
   const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Kshama karein, abhi jawab dene mein asmarth hoon. 🙏'
   
   return NextResponse.json({ reply })
