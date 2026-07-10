@@ -97,7 +97,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
     setMessages(prev => [...prev, userMsg, { 
       id: assistantId, 
       role: 'assistant', 
-      content: '', 
+      content: 'SevaSahayak is thinking... 🙏', 
       streaming: true 
     }]);
     setInput('');
@@ -115,44 +115,13 @@ export default function SevaSahayak({ isInline = false }: Props) {
         throw new Error('API unavailable');
       }
 
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      let accumulated = '';
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-          
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6));
-                if (data.text) {
-                  accumulated += data.text;
-                  setMessages(prev => prev.map(m => 
-                    m.id === assistantId 
-                      ? { ...m, content: accumulated, streaming: true }
-                      : m
-                  ));
-                }
-                if (data.done || data.error) {
-                  setMessages(prev => prev.map(m =>
-                    m.id === assistantId
-                      ? { ...m, 
-                          content: data.error || accumulated, 
-                          streaming: false }
-                      : m
-                  ));
-                }
-              } catch {}
-            }
-          }
-        }
-      }
+      const data = await res.json();
+      
+      setMessages(prev => prev.map(m =>
+        m.id === assistantId
+          ? { ...m, content: data.reply, streaming: false }
+          : m
+      ));
     } catch {
       const fallbackText = getOfflineResponse(text, role);
       setMessages(prev => prev.map(m =>
