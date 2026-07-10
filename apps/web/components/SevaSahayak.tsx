@@ -29,35 +29,7 @@ interface Props {
   isInline?: boolean;
 }
 
-function getOfflineResponse(message: string, role: string): string {
-  const msg = message.toLowerCase();
-  
-  if (msg.includes('shahi') || msg.includes('snaan') || msg.includes('bath')) {
-    return `Shahi Snaan dates for Mahakumbh 2025:\n\n• 13 Jan — Makar Sankranti (most sacred, arrive before 4am)\n• 29 Jan — Mauni Amavasya (silence observed, extreme crowds)\n• 3 Feb — Basant Panchami\n• 12 Feb — Maghi Purnima\n• 26 Feb — Maha Shivratri\n\nArrive 2-3 hours early on these dates.`;
-  }
-  if (msg.includes('crowd') || msg.includes('ghat') || msg.includes('least')) {
-    return `Current crowd levels (live data unavailable, showing estimates):\n\n🟢 Low: Sector 2 Ghat, Medical Camp North, Parking Zone B\n🟡 Medium: Sector 1 Ghat, Food Court Zone, Sector 3 Ghat\n🔴 High: Triveni Sangam, Gate 2 Entry, Sector 4 Ghat\n\nRecommended: Sector 2 Ghat is currently least crowded.`;
-  }
-  if (msg.includes('medical') || msg.includes('doctor') || msg.includes('hospital')) {
-    return `Medical facilities at Mahakumbh 2025:\n\n🏥 Medical Camp North — Sector 4 (24/7)\n🏥 Medical Camp South — Near Sangam Ghat (24/7)\n🚑 Emergency: 108 (Ambulance)\n📞 Kumbh Helpline: 1920\n\nFor serious emergencies call 108 immediately.`;
-  }
-  if (msg.includes('emergency') || msg.includes('help') || msg.includes('lost')) {
-    return `Emergency contacts for Mahakumbh 2025:\n\n📞 Kumbh Helpline: 1920\n🚔 Police: 112\n🚑 Ambulance: 108\n🏥 Medical Emergency: 108\n\nLost & Found center is located near Gate 2 Entry. If you are lost, stay where you are and call 1920.`;
-  }
-  if (msg.includes('aarti') || msg.includes('pooja') || msg.includes('timing')) {
-    return `Pooja & Aarti timings at Triveni Sangam:\n\n🌅 Morning Aarti: 6:00 AM daily\n🌇 Evening Aarti: 7:00 PM daily\n\nGanga Aarti is most crowded on Shahi Snaan days. Arrive 45 minutes early for a good spot.`;
-  }
-  if (msg.includes('volunteer') || msg.includes('assignment') || msg.includes('zone')) {
-    return role === 'volunteer' 
-      ? `Volunteer protocol:\n\n1. Check your zone assignment on the Zones section above\n2. Report to your sector supervisor 30 min before shift\n3. For incidents: log in Incident Tracker immediately\n4. Emergency escalation: call supervisor → 1920\n\nYour shift details are in the Volunteer Roster section.`
-      : `Volunteer information:\n\nSevaMitra has 44 active volunteers across 12 zones. Volunteers wear orange vests and are stationed at all major ghats. For volunteer assistance, look for the orange vest or call 1920.`;
-  }
-  if (msg.includes('parking') || msg.includes('transport') || msg.includes('route')) {
-    return `Transport & Parking at Mahakumbh 2025:\n\n🅿️ Parking Zone A — North entry (74% full)\n🅿️ Parking Zone B — South entry (55% full)\n\n🚌 Free shuttle buses run every 15 min from parking to Sangam\n🚶 Walking routes are marked with saffron flags\n\nFor least traffic: use Parking Zone B and enter via Sector 2 Ghat route.`;
-  }
-  
-  return `Namaste ji 🙏 I am SevaSahayak, your Mahakumbh 2025 guide.\n\nI can help you with:\n• Shahi Snaan dates and timings\n• Ghat crowd levels and routes\n• Medical camps and emergency contacts\n• Aarti and pooja timings\n• Volunteer assignments and protocols\n\nWhat would you like to know?`;
-}
+
 
 export default function SevaSahayak({ isInline = false }: Props) {
   const [isOpen, setIsOpen] = useState(isInline);
@@ -84,55 +56,28 @@ export default function SevaSahayak({ isInline = false }: Props) {
 
   useEffect(() => { scrollToBottom(); }, [messages]);
 
-  const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isLoading) return;
-    
-    const userMsg: Message = { 
-      id: Date.now().toString(), 
-      role: 'user', 
-      content: text 
-    };
-    const assistantId = (Date.now() + 1).toString();
-    
-    setMessages(prev => [...prev, userMsg, { 
-      id: assistantId, 
-      role: 'assistant', 
-      content: 'SevaSahayak is thinking... 🙏', 
-      streaming: true 
-    }]);
-    setInput('');
+  const sendMessage = async (userMessage: string) => {
+    if (!userMessage.trim() || isLoading) return;
+
+    // Add user message to chat
+    setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', content: userMessage }]);
     setIsLoading(true);
+    setInput('');
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
-      const res = await fetch(`${apiBase}/api/chat`, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, role, sessionId }),
+        body: JSON.stringify({ message: userMessage })
       });
-      
-      if (!res.ok) {
-        throw new Error('API unavailable');
-      }
-
-      const data = await res.json();
-      
-      setMessages(prev => prev.map(m =>
-        m.id === assistantId
-          ? { ...m, content: data.reply, streaming: false }
-          : m
-      ));
-    } catch {
-      const fallbackText = getOfflineResponse(text, role);
-      setMessages(prev => prev.map(m =>
-        m.id === assistantId
-          ? { ...m, content: fallbackText, streaming: false }
-          : m
-      ));
+      const data = await response.json();
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: data.reply }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: 'Kshama karein, kuch takniki samasya hai. Dobara koshish karein. 🙏' }]);
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, role, sessionId]);
+  };
 
   const chatPanel = (
     <div style={{
@@ -188,18 +133,22 @@ export default function SevaSahayak({ isInline = false }: Props) {
               color: '#FFF8EE', fontSize: '14px', lineHeight: '1.5',
               border: msg.role === 'assistant' ? '1px solid rgba(232,101,10,0.1)' : 'none',
             }}>
-              {msg.streaming && msg.content === '' ? (
-                <span style={{ display: 'inline-flex', gap: '3px', marginLeft: '6px', verticalAlign: 'middle' }}>
-                  {[0,1,2].map(i => (
-                    <span key={i} style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(255,248,238,0.6)', display: 'inline-block', animation: `dot-bounce 1.2s ${i * 0.2}s infinite` }} />
-                  ))}
-                </span>
-              ) : (
-                msg.content
-              )}
+              {msg.content}
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', alignItems: 'flex-start' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(232,101,10,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', flexShrink: 0, marginTop: '2px' }}>ॐ</div>
+            <div style={{
+              maxWidth: '78%', padding: '10px 14px', borderRadius: '18px 18px 18px 4px',
+              background: 'rgba(255,255,255,0.06)',
+              color: '#FFF8EE', fontSize: '14px', lineHeight: '1.5',
+            }}>
+              SevaSahayak soch raha hai... 🙏
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
