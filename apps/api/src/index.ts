@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 import { Server } from "socket.io";
 import cors from "cors";
 import helmet from "helmet";
@@ -42,7 +42,7 @@ app.use("/api/demo", demoRoutes);
 app.use("/api/chat", chatRoutes);
 
 // Error handling middleware
-app.use((err: any, _req: Request, res: Response) => {
+app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err);
   res.status(500).json({
     error: "Internal server error",
