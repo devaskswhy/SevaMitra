@@ -4,12 +4,11 @@
     "start": "node apps/api/dist/index.js"
   },
   "dependencies": {
-    "@types/node": "^25.9.2"
-  },
-  "devDependencies": {
+    "@types/node": "^25.9.2",
     "@prisma/client": "^5.22.0",
     "prisma": "^5.22.0"
   },
+  "devDependencies": {},
   "prisma": {
     "seed": "npx ts-node prisma/seed.ts"
   }
