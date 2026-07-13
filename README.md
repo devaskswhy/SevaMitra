@@ -1,101 +1,149 @@
-# ॐ SevaMitra — Volunteer Management System
+<div align="center">
 
-**Live Demo:** [https://seva-mitra-wheat.vercel.app/](https://seva-mitra-wheat.vercel.app/)
+# SevaMitra
+### Real-time Volunteer Management Platform for Mahakumbh 2025
 
-SevaMitra is a comprehensive, real-time Volunteer Management System specifically designed and built for **Mahakumbh 2025**. It is capable of intelligently handling over 10,000 volunteers across 20+ zones to ensure a safe and organized event for millions of attendees.
+![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
+![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-Real--time-010101?logo=socket.io)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)
+![Groq LLaMA](https://img.shields.io/badge/AI-Groq%20LLaMA%203.3%2070B-7C3AED)
+![Hackathon Rank](https://img.shields.io/badge/Expert%20Hire%20Mahakumbh%20Hackathon-23rd%20Place-FF6B00)
 
-## 🌟 What Makes SevaMitra Unique & Helpful?
+<img src="./assets/Screenshot%202026-07-13%20121659.png" alt="SevaMitra landing hero" width="100%" />
 
-SevaMitra goes beyond a traditional CRUD application by serving as a **Real-time Operations Center**. During a massive event like the Mahakumbh, seconds matter. SevaMitra is uniquely designed to solve on-the-ground challenges:
+</div>
 
-* **Instant Awareness:** Leveraging real-time Socket.io connections, the activity feed, incident reports, and zone capacity levels update instantaneously across the dashboard.
-* **Smart Allocation Engine:** Instead of manually assigning tasks, the system features a "Find Best Volunteers" engine that scores available volunteers based on a custom algorithm matching **skills**, **distance**, **current availability**, and **historical reliability score**. 
-* **Cultural Aesthetic:** The application doesn't look like generic enterprise software. It adopts a custom "Premium Light Theme" featuring Saffron (`#FF6B00`), Gold (`#D4A017`), and Deep Brown (`#1C0A00`), complete with an OM watermark (`ॐ` in Tiro Devanagari Sanskrit) and curated imagery of sacred moments, bringing the spirit of the event into the software.
+## About
+SevaMitra is a mission-focused command platform that helps coordinators manage volunteer operations during high-density pilgrimage events like Mahakumbh. It brings live zone intelligence, incident response, volunteer deployment, and AI-assisted guidance into one unified system—so decisions can be made quickly, safely, and at scale.
 
-## ♿ Designed for Accessibility (Older Age Friendly)
+<img src="./assets/Screenshot%202026-07-13%20121722.png" alt="Landing carousel with sadhu visual" width="100%" />
 
-Many esteemed organizers and senior administrative staff managing the Mahakumbh belong to an older demographic. SevaMitra is heavily optimized for them:
+## ✨ Features
 
-* **Larger Typography:** Employs large, highly readable fonts (Poppins and Inter) with increased base font sizes (16px minimum, often larger). Text weights are optimized for readability.
-* **High Contrast UI:** The stark contrast between the warm cream backgrounds (`#FFF8F0`) and the dark brown text (`#1A0A00`) significantly reduces eye strain.
-* **Large Interactive Elements:** Buttons, form fields, and navigation links have been given ample padding (`min-height: 48px/52px`) to provide large click/tap targets, reducing precision requirements.
-* **Clear Visual Indicators:** Uses universally understood, color-coded badges (Green, Orange, Red) and emojis for immediate visual processing of priorities, rather than relying solely on text. 
+| Feature | What it does |
+|---|---|
+| 🗺️ **Zone Map** | Interactive Leaflet.js map for Mahakumbh zone-level situational awareness. |
+| 📈 **Zone Status** | Real-time zone capacity tracking with severity states: **Low / Medium / High / Critical**. |
+| 🚨 **Incident Tracker** | Handles incidents like **Medical Emergency**, **Crowd Surge**, and **Lost Person** with deploy actions. |
+| 👥 **Volunteer Directory** | Searchable volunteer roster with skills and reliability scores for smarter assignment. |
+| 📡 **Live Feed** | Instant activity stream powered by Socket.io for synchronized operations. |
+| 🤖 **SevaSahayak AI** | In-app Groq LLaMA 3.3 70B assistant with bilingual Hindi-English guidance (e.g., *Namaste*, *Kshama karein*, *Dhanyavaad*). |
 
-## 🚀 Key Features
+## 🤖 SevaSahayak — AI in Action
+SevaSahayak is an in-app operational assistant that responds to pilgrim and volunteer questions in real time, including crowd-aware route decisions and emergency support guidance.
 
-* **Live Operations Dashboard:** A centralized command center displaying live metrics (active volunteers, zones over capacity, open incidents), zone status overviews, and an auto-updating activity feed.
-* **Zone Capacity Tracking:** Visual progress bars track the capacity of critical zones (Ghats, Camps, Medical, Traffic) to prevent dangerous overcrowding.
-* **Incident Management System:** Real-time reporting and resolution of incidents, complete with severity levels and one-click "Deploy Volunteers" functionality.
-* **SevaSahayak AI Assistant:** A fully integrated AI chatbot powered by Groq LLaMA 3.3 70B, trained on Mahakumbh 2025 context to guide both pilgrims and volunteers with real-time insights like Shahi Snaan dates, crowd levels, and emergency helplines.
-* **Reports & Analytics:** Deep insights into event performance, including average incident response times and a competitive **Volunteer Leaderboard** showcasing the top 10 most reliable volunteers with rank badges.
-* **Volunteer App Login:** A streamlined, OTP-based (simulated) mobile-first login experience for volunteers on the ground.
-* **Automated Quick Allocation:** Matches urgent tasks to the closest and most qualified volunteers instantly.
+| Crowd Avoidance Query | Nearest Medical Camp Query |
+|---|---|
+| <img src="./assets/Screenshot%202026-07-13%20121913.png" alt="SevaSahayak crowd avoidance conversation" width="100%" /><br/><sub>SevaSahayak helps avoid high-density areas and suggests safer alternatives.</sub> | <img src="./assets/Screenshot%202026-07-13%20121938.png" alt="SevaSahayak nearest medical camp conversation" width="100%" /><br/><sub>SevaSahayak gives fast medical camp guidance with contextual support language.</sub> |
 
-## 📸 Platform Interface
+## 📊 Dashboards
 
-![SevaMitra Hero Section](./docs/assets/hero-section.png)
-*The immersive Mahakumbh 2025 themed landing experience*
+| Zone Status Overview | Mahakumbh Zone Intelligence Map |
+|---|---|
+| <img src="./assets/Screenshot%202026-07-13%20121736.png" alt="Zone status cards" width="100%" /><br/><sub>Dashboard cards provide immediate capacity risk visibility across zones.</sub> | <img src="./assets/Screenshot%202026-07-13%20121753.png" alt="Zone intelligence map" width="100%" /><br/><sub>Leaflet-powered geographic intelligence for command-level coordination.</sub> |
 
-![Zone Status Overview](./docs/assets/zones-section.png)
-*Real-time capacity tracking across all managed event zones*
+## 🚨 Incident Tracker
+<img src="./assets/Screenshot%202026-07-13%20121805.png" alt="Incident tracker with active and resolved incidents" width="100%" />
 
-## 💻 Tech Stack
+<sub>Monitor and resolve operational incidents with deploy-ready workflows.</sub>
 
-* **Frontend:** Next.js 14 (App Router), React, Tailwind CSS (Custom "Premium Light Theme"), Vanilla CSS animations (for high-performance scroll reveals without layout thrashing)
-* **Backend:** Node.js + Express
-* **Database:** PostgreSQL (with Prisma ORM)
-* **Real-time Engine:** Socket.io
-* **Caching:** Redis
+## 👥 Volunteer Directory
+<img src="./assets/Screenshot%202026-07-13%20121816.png" alt="Volunteer directory table" width="100%" />
 
-## 🛠️ Setup Instructions
+<sub>Prioritize assignments using volunteer skill tags and reliability insights.</sub>
 
-### Prerequisites
-* Node.js (v14 or higher)
-* Docker
-* PostgreSQL
-* Redis
+## 🧰 Tech Stack
 
-### Installation & Running
+| Layer | Tech | Purpose |
+|---|---|---|
+| Frontend | Next.js, React, Tailwind CSS | Responsive command UI and dashboard experience |
+| Animations & UX | GSAP, Lenis | Smooth, immersive motion and scroll interactions |
+| Mapping | Leaflet.js, React-Leaflet | Zone visualization and geospatial interaction |
+| Backend | Node.js, Express | API services, orchestration, and business logic |
+| Realtime | Socket.io | Live activity feed and instant state synchronization |
+| Database | PostgreSQL, Prisma | Structured operational data and ORM access |
+| AI Assistant | Groq API + LLaMA 3.3 70B | SevaSahayak conversational intelligence |
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd SevaMitra
-   ```
+## 🏗️ Architecture
 
-2. **Install dependencies:**
-   ```bash
-   cd apps/api && npm install
-   cd ../web && npm install
-   ```
+<details>
+<summary><strong>Expand architecture flow</strong></summary>
 
-3. **Environment Setup:**
-   * Copy `.env.example` to `.env` in the respective folders and fill in the required values.
+```text
+Frontend (Next.js)
+  ├─ Live UI updates ↔ Socket.io channel
+  ├─ REST requests ───────────▶ Backend (Node/Express)
+  │                              ├─ Prisma ORM ─────────▶ PostgreSQL
+  │                              └─ AI route ───────────▶ Groq LLaMA 3.3 70B
+  └─ Leaflet zone map rendering with backend-fed zone/incident data
+```
 
-4. **Start Infrastructure:**
-   ```bash
-   docker-compose up
-   ```
+</details>
 
-5. **Database Setup:**
-   ```bash
-   npx prisma migrate dev
-   ```
+## 🚀 Getting Started
 
-6. **Start the Applications:**
-   ```bash
-   # Terminal 1: Start API
-   cd apps/api
-   npm run dev
+```bash
+git clone https://github.com/devaskswhy/SevaMitra.git
+cd SevaMitra
+```
 
-   # Terminal 2: Start Web App
-   cd apps/web
-   npm run dev
-   ```
+```bash
+# Install root dependencies
+npm install
 
-## 🛡️ Code Quality
-* ESLint and Prettier configured.
-* Husky pre-commit hooks enabled for strict code quality enforcement before commits.
+# Install app dependencies
+cd apps/api && npm install
+cd ../web && npm install
+cd ../..
+```
 
-## 📄 License
-This project is licensed under the MIT License.
+```bash
+# Environment setup
+cp .env.example .env
+# TODO: Confirm if app-specific .env files are also required in apps/api and apps/web
+# TODO: Add Groq API key variable name and setup example
+```
+
+```bash
+# Optional infra (if using local containers)
+docker-compose up -d
+```
+
+```bash
+# Prisma generation and migrations (from repository root)
+npx prisma generate --schema=./prisma/schema.prisma
+# TODO: Confirm canonical migration command for first-time setup
+```
+
+```bash
+# Run backend
+cd apps/api
+npm run dev
+```
+
+```bash
+# Run frontend (new terminal)
+cd apps/web
+npm run dev
+```
+
+## 🛣️ Roadmap
+- Ongoing migration to stable free-tier hosting stack:
+  - **Backend:** Render
+  - **Database:** Neon
+  - **Realtime/cache:** Upstash
+  - **Frontend:** Vercel
+- Harden production observability and incident analytics.
+- Expand multilingual support and voice-assisted SevaSahayak flows.
+
+---
+
+<div align="center">
+
+![Hackathon](https://img.shields.io/badge/Expert%20Hire%20Mahakumbh%20Hackathon-23rd%20Place-FF6B00)
+
+**Made with 🧡 for Mahakumbh 2025**  
+If this project inspires you, please consider giving it a ⭐
+
+</div>
