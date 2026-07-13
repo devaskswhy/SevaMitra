@@ -10,14 +10,14 @@
 ![Groq LLaMA](https://img.shields.io/badge/AI-Groq%20LLaMA%203.3%2070B-7C3AED)
 ![Hackathon Rank](https://img.shields.io/badge/Expert%20Hire%20Mahakumbh%20Hackathon-23rd%20Place-FF6B00)
 
-<img src="./assets/Screenshot%202026-07-13%20121659.png" alt="SevaMitra landing hero" width="100%" />
+<img src="./Screenshot%202026-07-13%20121659.png" alt="SevaMitra landing hero" width="100%" />
 
 </div>
 
 ## About
-SevaMitra is a mission-focused command platform that helps coordinators manage volunteer operations during high-density pilgrimage events like Mahakumbh. It brings live zone intelligence, incident response, volunteer deployment, and AI-assisted guidance into one unified system—so decisions can be made quickly, safely, and at scale.
+SevaMitra is a mission-focused command platform that helps coordinators manage volunteer operations during high-density pilgrimage events like Mahakumbh. It brings live zone intelligence, incident workflows, and AI-assisted support into one unified interface.
 
-<img src="./assets/Screenshot%202026-07-13%20121722.png" alt="Landing carousel with sadhu visual" width="100%" />
+<img src="./Screenshot%202026-07-13%20121722.png" alt="Landing carousel with sadhu visual" width="100%" />
 
 ## ✨ Features
 
@@ -35,21 +35,21 @@ SevaSahayak is an in-app operational assistant that responds to pilgrim and volu
 
 | Crowd Avoidance Query | Nearest Medical Camp Query |
 |---|---|
-| <img src="./assets/Screenshot%202026-07-13%20121913.png" alt="SevaSahayak crowd avoidance conversation" width="100%" /><br/><sub>SevaSahayak helps avoid high-density areas and suggests safer alternatives.</sub> | <img src="./assets/Screenshot%202026-07-13%20121938.png" alt="SevaSahayak nearest medical camp conversation" width="100%" /><br/><sub>SevaSahayak gives fast medical camp guidance with contextual support language.</sub> |
+| <img src="./Screenshot%202026-07-13%20121913.png" alt="SevaSahayak crowd avoidance conversation" width="100%" /><br/><sub>SevaSahayak helps avoid high-density areas and suggests safer alternate routes.</sub> | <img src="./Screenshot%202026-07-13%20121938.png" alt="SevaSahayak nearest medical camp response" width="100%" /><br/><sub>SevaSahayak identifies nearest aid options with quick operational guidance.</sub> |
 
 ## 📊 Dashboards
 
 | Zone Status Overview | Mahakumbh Zone Intelligence Map |
 |---|---|
-| <img src="./assets/Screenshot%202026-07-13%20121736.png" alt="Zone status cards" width="100%" /><br/><sub>Dashboard cards provide immediate capacity risk visibility across zones.</sub> | <img src="./assets/Screenshot%202026-07-13%20121753.png" alt="Zone intelligence map" width="100%" /><br/><sub>Leaflet-powered geographic intelligence for command-level coordination.</sub> |
+| <img src="./Screenshot%202026-07-13%20121736.png" alt="Zone status cards" width="100%" /><br/><sub>Dashboard cards provide immediate capacity risk visibility across zones.</sub> | <img src="./Screenshot%202026-07-13%20121753.png" alt="Interactive Mahakumbh zone map" width="100%" /><br/><sub>Leaflet-based map gives visual operational awareness by zone.</sub> |
 
 ## 🚨 Incident Tracker
-<img src="./assets/Screenshot%202026-07-13%20121805.png" alt="Incident tracker with active and resolved incidents" width="100%" />
+<img src="./Screenshot%202026-07-13%20121805.png" alt="Incident tracker with active and resolved incidents" width="100%" />
 
 <sub>Monitor and resolve operational incidents with deploy-ready workflows.</sub>
 
 ## 👥 Volunteer Directory
-<img src="./assets/Screenshot%202026-07-13%20121816.png" alt="Volunteer directory table" width="100%" />
+<img src="./Screenshot%202026-07-13%20121816.png" alt="Volunteer directory table" width="100%" />
 
 <sub>Prioritize assignments using volunteer skill tags and reliability insights.</sub>
 
