@@ -776,7 +776,9 @@ export default function Home() {
 
     socketInstance.on('incident:new', (incident: Incident) => {
       setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
-      setHighlightedIncidentIds((prev) => [...new Set([incident.id, ...prev])]);
+      setHighlightedIncidentIds((prev) =>
+        prev.includes(incident.id) ? prev : [incident.id, ...prev]
+      );
       window.setTimeout(() => {
         setHighlightedIncidentIds((prev) => prev.filter((id) => id !== incident.id));
       }, 4500);
@@ -793,7 +795,9 @@ export default function Home() {
 
   /* ── Actions ── */
   const handleDeployVolunteers = async (incidentId: number) => {
-    setDeployingIncidentIds((prev) => [...new Set([...prev, incidentId])]);
+    setDeployingIncidentIds((prev) =>
+      prev.includes(incidentId) ? prev : [...prev, incidentId]
+    );
     try {
       const response = await axios.post<DeployIncidentResponse>(`${API}/incidents/${incidentId}/deploy`);
       const data = response.data.data;
