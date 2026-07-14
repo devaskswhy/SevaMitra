@@ -57,6 +57,8 @@ interface Incident {
   severity: number;
   description: string;
   reportedBy: string;
+  status?: string;
+  volunteersDeployed?: Volunteer[];
   resolvedAt: string | null;
   createdAt?: string;
 }
@@ -91,6 +93,19 @@ interface Activity {
   message: string;
   timestamp: Date;
   type: 'info' | 'warning' | 'success';
+}
+
+interface DeployIncidentResponse {
+  success: boolean;
+  data: {
+    assignedVolunteer: {
+      name: string;
+      phone: string;
+      skills: string;
+    };
+    estimatedResolution: string;
+    incident: Incident;
+  };
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -244,6 +259,19 @@ function getZoneIcon(type: string): string {
     ENTRY_EXIT: '🚪', CROWD_CONTROL: '👥',
   };
   return icons[type] || '📍';
+}
+
+function getResolvedDurationLabel(incident: Incident): string {
+  if (!incident.createdAt || !incident.resolvedAt) return 'N/A';
+  const created = new Date(incident.createdAt).getTime();
+  const resolved = new Date(incident.resolvedAt).getTime();
+  if (Number.isNaN(created) || Number.isNaN(resolved) || resolved <= created) return 'N/A';
+
+  const totalMinutes = Math.round((resolved - created) / (1000 * 60));
+  if (totalMinutes < 60) return `${totalMinutes} minutes`;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -538,11 +566,20 @@ export default function Home() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [, setLoading] = useState(true);
   const [volunteerSearch, setVolunteerSearch] = useState('');
+  const [deployingIncidentIds, setDeployingIncidentIds] = useState<number[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [highlightedIncidentIds, setHighlightedIncidentIds] = useState<number[]>([]);
 
   // FIXED: force scroll to top on mount
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
   }, []);
+
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timeout = window.setTimeout(() => setToastMessage(null), 3500);
+    return () => window.clearTimeout(timeout);
+  }, [toastMessage]);
 
   // Lenis smooth scroll + GSAP ScrollTrigger
   useEffect(() => {
@@ -636,10 +673,11 @@ export default function Home() {
   /* ── Data Fetching ── */
   const fetchData = useCallback(async () => {
     try {
-      const [volunteersRes, zonesRes, incidentsRes, tasksRes, assignmentsRes] = await Promise.all([
+      const [volunteersRes, zonesRes, incidentsRes, resolvedRes, tasksRes, assignmentsRes] = await Promise.all([
         axios.get(`${API}/volunteers`),
         axios.get(`${API}/zones`),
         axios.get(`${API}/incidents`),
+        axios.get(`${API}/incidents/resolved`),
         axios.get(`${API}/tasks`),
         axios.get(`${API}/assignments`),
       ]);
@@ -647,18 +685,26 @@ export default function Home() {
       const volunteersData = volunteersRes.data.data || volunteersRes.data;
       const zonesData = zonesRes.data.data || zonesRes.data;
       const incidentsData = incidentsRes.data.data || incidentsRes.data;
+      const resolvedData = resolvedRes.data.data || resolvedRes.data;
       const tasksData = tasksRes.data.data || tasksRes.data;
       const assignmentsData = assignmentsRes.data.data || assignmentsRes.data;
+      const resolvedById = new Map<number, Incident>(
+        (resolvedData as Incident[]).map((incident: Incident) => [incident.id, incident])
+      );
+      const mergedIncidents = [
+        ...(incidentsData as Incident[]).filter((incident: Incident) => !resolvedById.has(incident.id)),
+        ...Array.from(resolvedById.values()),
+      ];
 
       const activeVolunteers = volunteersData.filter((v: Volunteer) => v.status === 'ACTIVE').length;
       const zonesOver80 = zonesData.filter((z: Zone) => (z.currentLoad / z.maxCapacity) > 0.8).length;
-      const openIncidents = incidentsData.filter((i: Incident) => !i.resolvedAt).length;
+      const openIncidents = mergedIncidents.filter((i: Incident) => !i.resolvedAt).length;
       const pendingAssignments = assignmentsData.filter((a: Assignment) => !a.checkInTime).length;
 
       setStats({ totalActiveVolunteers: activeVolunteers, zonesOverCapacity: zonesOver80, openIncidents, pendingAssignments });
       setVolunteers(volunteersData);
       setZones(zonesData);
-      setIncidents(incidentsData);
+      setIncidents(mergedIncidents);
       setTasks(tasksData);
       setLoading(false);
     } catch (error) {
@@ -712,6 +758,32 @@ export default function Home() {
       fetchData();
     });
 
+    socketInstance.on('incident:deployed', (incident: Incident) => {
+      setIncidents((prev) => {
+        const withoutIncident = prev.filter((item) => item.id !== incident.id);
+        return [incident, ...withoutIncident];
+      });
+      const volunteerName = incident.volunteersDeployed?.[0]?.name || 'Volunteer';
+      setToastMessage(`✅ Deployed! ${volunteerName} assigned.`);
+    });
+
+    socketInstance.on('incident:resolved', (incident: Incident) => {
+      setIncidents((prev) => {
+        const withoutIncident = prev.filter((item) => item.id !== incident.id);
+        return [incident, ...withoutIncident];
+      });
+    });
+
+    socketInstance.on('incident:new', (incident: Incident) => {
+      setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
+      setHighlightedIncidentIds((prev) =>
+        prev.includes(incident.id) ? prev : [incident.id, ...prev]
+      );
+      window.setTimeout(() => {
+        setHighlightedIncidentIds((prev) => prev.filter((id) => id !== incident.id));
+      }, 4500);
+    });
+
     return () => { socketInstance.disconnect(); };
   }, [fetchData]);
 
@@ -723,15 +795,30 @@ export default function Home() {
 
   /* ── Actions ── */
   const handleDeployVolunteers = async (incidentId: number) => {
+    setDeployingIncidentIds((prev) =>
+      prev.includes(incidentId) ? prev : [...prev, incidentId]
+    );
     try {
-      await axios.post(`${API}/incidents/${incidentId}/deploy`);
+      const response = await axios.post<DeployIncidentResponse>(`${API}/incidents/${incidentId}/deploy`);
+      const data = response.data.data;
+      setIncidents((prev) => {
+        const withoutIncident = prev.filter((incident) => incident.id !== incidentId);
+        return data?.incident ? [data.incident, ...withoutIncident] : withoutIncident;
+      });
+      if (data?.assignedVolunteer) {
+        setToastMessage(
+          `✅ Deployed! ${data.assignedVolunteer.name} assigned. Est. resolution: ${data.estimatedResolution}`
+        );
+      }
       setActivities((prev) => [
         { id: Date.now().toString(), message: `Volunteers deployed for incident #${incidentId}`, timestamp: new Date(), type: 'success' },
         ...prev.slice(0, 49),
       ]);
-      fetchData();
     } catch (error) {
       console.error('Failed to deploy volunteers:', error);
+      window.alert('Deployment failed. Please try again.');
+    } finally {
+      setDeployingIncidentIds((prev) => prev.filter((id) => id !== incidentId));
     }
   };
 
@@ -793,6 +880,27 @@ export default function Home() {
 
       {/* OM Watermark */}
       <div className="om-watermark" aria-hidden="true">ॐ</div>
+      {toastMessage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '92px',
+            right: '20px',
+            zIndex: 1200,
+            background: 'rgba(17, 34, 17, 0.95)',
+            border: '1px solid rgba(29,185,84,0.5)',
+            color: '#D6FFE0',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            fontSize: '13px',
+            fontWeight: 600,
+            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            maxWidth: '360px',
+          }}
+        >
+          {toastMessage}
+        </div>
+      )}
 
       {/* ═════════════════════════════════════════════════════════
          HERO SECTION — Multi-layer parallax image gallery
@@ -1071,6 +1179,8 @@ export default function Home() {
                 <div style={{ display: 'grid', gap: '16px' }}>
                   {unresolvedIncidents.map((incident) => {
                     const sev = getSeverityConfig(incident.severity);
+                    const isDeploying = deployingIncidentIds.includes(incident.id);
+                    const isHighlighted = highlightedIncidentIds.includes(incident.id);
                     return (
                       <div
                         key={incident.id}
@@ -1083,6 +1193,7 @@ export default function Home() {
                           justifyContent: 'space-between',
                           flexWrap: 'wrap',
                           gap: '16px',
+                          animation: isHighlighted ? 'sacred-pulse 1.25s ease-in-out 3' : 'none',
                         }}
                       >
                         <div style={{ flex: '1 1 300px' }}>
@@ -1100,6 +1211,18 @@ export default function Home() {
                             >
                               {sev.label}
                             </span>
+                            {incident.severity >= 5 && (
+                              <span
+                                style={{
+                                  width: '10px',
+                                  height: '10px',
+                                  borderRadius: '50%',
+                                  background: '#ff2d2d',
+                                  animation: 'sacred-pulse 1s ease-in-out infinite',
+                                  boxShadow: '0 0 0 4px rgba(255,45,45,0.2)',
+                                }}
+                              />
+                            )}
                             <span style={{ fontWeight: 600, fontSize: '15px' }}>{incident.type}</span>
                           </div>
                           <p style={{ color: 'rgba(255,248,238,0.55)', fontSize: '13px', lineHeight: 1.5 }}>
@@ -1113,10 +1236,11 @@ export default function Home() {
                         </div>
                         <button
                           onClick={() => handleDeployVolunteers(incident.id)}
+                          disabled={isDeploying}
                           className="btn-sacred btn-sacred-primary"
-                          style={{ whiteSpace: 'nowrap', fontSize: '13px', padding: '10px 20px' }}
+                          style={{ whiteSpace: 'nowrap', fontSize: '13px', padding: '10px 20px', minWidth: '140px', opacity: isDeploying ? 0.75 : 1 }}
                         >
-                          🔥 Deploy
+                          {isDeploying ? '⏳ Deploying...' : '🔥 Deploy'}
                         </button>
                       </div>
                     );
@@ -1139,29 +1263,39 @@ export default function Home() {
                   Resolved ({resolvedIncidents.length})
                 </h3>
                 <div style={{ display: 'grid', gap: '12px' }}>
-                  {resolvedIncidents.map((incident) => (
+                  {resolvedIncidents.map((incident) => {
+                    const resolverName = incident.volunteersDeployed?.[0]?.name || 'Unassigned';
+                    const resolvedIn = getResolvedDurationLabel(incident);
+                    return (
                     <div
                       key={incident.id}
                       className="glass-card"
                       style={{
                         padding: '16px 20px',
                         borderLeft: '4px solid #1DB954',
-                        opacity: 0.5,
+                        opacity: 0.75,
                         display: 'flex',
-                        alignItems: 'center',
+                        alignItems: 'flex-start',
                         justifyContent: 'space-between',
                         gap: '12px',
                       }}
                     >
                       <div>
-                        <span style={{ fontWeight: 600, fontSize: '14px' }}>{incident.type}</span>
-                        <span style={{ marginLeft: '12px', fontSize: '12px', color: 'rgba(255,248,238,0.35)' }}>{incident.description.substring(0, 60)}</span>
+                        <p style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>{incident.type}</p>
+                        <p style={{ fontSize: '12px', color: 'rgba(255,248,238,0.45)', marginBottom: '8px' }}>{incident.description}</p>
+                        <p style={{ fontSize: '11px', color: 'rgba(255,248,238,0.35)' }}>
+                          Resolved by: <span style={{ color: '#E7FFE9' }}>{resolverName}</span>
+                        </p>
+                        <p style={{ fontSize: '11px', color: 'rgba(255,248,238,0.35)' }}>
+                          Resolved in: <span style={{ color: '#E7FFE9' }}>{resolvedIn}</span>
+                        </p>
                       </div>
-                      <span style={{ fontSize: '10px', fontWeight: 600, color: '#1DB954', padding: '2px 8px', borderRadius: '4px', background: 'rgba(29,185,84,0.15)' }}>
-                        RESOLVED
+                      <span style={{ fontSize: '10px', fontWeight: 600, color: '#1DB954', padding: '2px 8px', borderRadius: '4px', background: 'rgba(29,185,84,0.15)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        ✅ RESOLVED
                       </span>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

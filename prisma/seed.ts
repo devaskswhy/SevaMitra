@@ -256,16 +256,18 @@ async function main() {
     const type = pick(incidentTypes);
     const descriptions = incidentDescriptions[type] ?? [`Incident at ${zone.name}`];
     const deployedVols = pickN(createdVolunteers, randomInt(1, 4));
+    const resolvedAt = Math.random() > 0.4 ? daysAgo(randomInt(0, 5)) : null;
 
     await prisma.incident.create({
       data: {
         zoneId: zone.id,
         reportedBy: `Coordinator_${randomInt(1, 10)}`,
+        status: resolvedAt ? "RESOLVED" : "ACTIVE",
         severity: randomInt(1, 5),
         type,
         description: pick(descriptions),
         createdAt: daysAgo(randomInt(0, 30)),
-        resolvedAt: Math.random() > 0.4 ? daysAgo(randomInt(0, 5)) : null,
+        resolvedAt,
         volunteersDeployed: {
           connect: deployedVols.map((v) => ({ id: v.id })),
         },
