@@ -88,6 +88,7 @@ model Incident {
   zoneId             Int
   zone               Zone        @relation(fields: [zoneId], references: [id])
   reportedBy         String
+  status             String      @default("ACTIVE")
   severity           Int
   type               String
   description        String
