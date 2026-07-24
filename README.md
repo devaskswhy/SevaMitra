@@ -1,6 +1,13 @@
 <div align="center">
 
 # SevaMitra
+
+##  Live Demo
+
+**<a href="https://seva-mitra-wheat.vercel.app/">View Live Site</a>**
+
+> **Note:** The site is hosted on a free-tier backend, so the database may take 5–10 seconds to connect on first load. If data doesn't appear immediately, please **reload the page after 5 seconds**.
+
 ### Real-time Volunteer Management Platform for Mahakumbh 2025
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
