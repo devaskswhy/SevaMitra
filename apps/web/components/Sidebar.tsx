@@ -67,7 +67,7 @@ export default function Sidebar() {
                   <span className="text-2xl">{item.icon}</span>
                   <span className="text-base font-medium" style={{
                     color: isActive ? 'var(--accent-gold)' : 'var(--text-light)',
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'var(--font-body)'
                   }}>
                     {item.label}
                   </span>
@@ -94,7 +94,7 @@ export default function Sidebar() {
           <span className="text-2xl">📱</span>
           <span className="text-base font-medium" style={{
             color: 'var(--text-light)',
-            fontFamily: 'Poppins, sans-serif'
+            fontFamily: 'var(--font-body)'
           }}>
             Volunteer App
           </span>

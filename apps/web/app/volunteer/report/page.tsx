@@ -14,6 +14,9 @@ interface Zone {
   type: string;
 }
 
+// KNOWN LIMITATION: volunteerId is trusted from localStorage with no
+// server-side session verification (see apps/web/app/volunteer/page.tsx).
+// A future auth phase should replace this with a verified session token.
 export default function IncidentReport() {
   const router = useRouter();
   const [zones, setZones] = useState<Zone[]>([]);
@@ -103,7 +106,7 @@ export default function IncidentReport() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>Report Incident</h1>
+          <h1 className="text-xl font-bold" style={{ fontFamily: 'var(--font-body)' }}>Report Incident</h1>
         </div>
       </div>
 
@@ -114,14 +117,14 @@ export default function IncidentReport() {
             <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(76, 175, 80, 0.1)' }}>
               <span className="text-4xl">✓</span>
             </div>
-            <h2 className="text-2xl font-bold mb-2" style={{ color: '#4CAF50', fontFamily: 'Poppins, sans-serif' }}>Report Submitted</h2>
+            <h2 className="text-2xl font-bold mb-2" style={{ color: '#4CAF50', fontFamily: 'var(--font-body)' }}>Report Submitted</h2>
             <p style={{ color: '#C4B49A' }}>Thank you for reporting. Redirecting to home...</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Severity Selector */}
             <div className="card p-6">
-              <label className="block mb-4" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Severity Level</label>
+              <label className="block mb-4" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Severity Level</label>
               <div className="grid grid-cols-5 gap-2">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <button
@@ -156,7 +159,7 @@ export default function IncidentReport() {
               <div className="mt-3 text-center">
                 <span className={`font-bold ${
                   severity <= 2 ? 'text-green-400' : severity === 3 ? 'text-amber-400' : 'text-red-400'
-                }`} style={{ fontFamily: 'Poppins, sans-serif' }}>
+                }`} style={{ fontFamily: 'var(--font-body)' }}>
                   {severity <= 2 ? 'LOW' : severity === 3 ? 'MEDIUM' : severity === 4 ? 'HIGH' : 'CRITICAL'}
                 </span>
               </div>
@@ -164,7 +167,7 @@ export default function IncidentReport() {
 
             {/* Zone Selector */}
             <div className="card p-6">
-              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Location / Zone</label>
+              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Location / Zone</label>
               <select
                 value={zoneId}
                 onChange={(e) => setZoneId(e.target.value)}
@@ -188,7 +191,7 @@ export default function IncidentReport() {
 
             {/* Incident Type */}
             <div className="card p-6">
-              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Incident Type</label>
+              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Incident Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
@@ -212,7 +215,7 @@ export default function IncidentReport() {
 
             {/* Description */}
             <div className="card p-6">
-              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}>Description</label>
+              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -241,7 +244,7 @@ export default function IncidentReport() {
               style={{
                 background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
                 color: '#0D0A1A',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'var(--font-body)',
                 fontSize: '18px'
               }}
             >

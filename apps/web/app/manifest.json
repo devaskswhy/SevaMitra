@@ -4,8 +4,8 @@
   "description": "Volunteer Management System for Mahakumbh",
   "start_url": "/volunteer",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#FF6B35",
+  "background_color": "#0D0500",
+  "theme_color": "#0D0500",
   "orientation": "portrait",
   "icons": [
     {

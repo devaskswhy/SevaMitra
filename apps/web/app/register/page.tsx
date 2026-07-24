@@ -20,6 +20,13 @@ const SKILLS = [
   'general',
 ];
 
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Delhi', 'Gujarat',
+  'Haryana', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
+  'Maharashtra', 'Odisha', 'Punjab', 'Rajasthan', 'Tamil Nadu',
+  'Telangana', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+];
+
 interface AxiosError {
   response?: {
     data?: {
@@ -33,12 +40,16 @@ export default function RegisterPage() {
     name: '',
     email: '',
     phone: '',
+    age: '',
+    gender: '',
+    homeState: '',
+    aadhaarNumber: '',
     skills: [] as string[],
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -62,14 +73,16 @@ export default function RegisterPage() {
         email: formData.email,
         phone: formData.phone,
         skills: formData.skills.join(','),
-        aadhaarHash: 'hash_' + Date.now(),
-        age: 25,
-        gender: 'M',
-        homeState: 'Uttar Pradesh',
+        age: parseInt(formData.age, 10),
+        gender: formData.gender,
+        homeState: formData.homeState,
+        // Raw Aadhaar number is never stored — the API hashes it
+        // server-side before persisting (see apps/api/src/routes/volunteers.ts).
+        aadhaarNumber: formData.aadhaarNumber,
       });
 
       setMessage('✅ Registration successful! Thank you for volunteering.');
-      setFormData({ name: '', email: '', phone: '', skills: [] });
+      setFormData({ name: '', email: '', phone: '', age: '', gender: '', homeState: '', aadhaarNumber: '', skills: [] });
     } catch (error: unknown) {
       const axiosError = error as AxiosError;
       setMessage(`❌ Registration failed: ${axiosError.response?.data?.error || 'Unknown error'}`);
@@ -134,6 +147,82 @@ export default function RegisterPage() {
                 />
               </div>
 
+              {/* Age + Gender */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Age</label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleChange}
+                    required
+                    min={16}
+                    max={100}
+                    className="w-full px-4 py-2 rounded-lg focus:outline-none"
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                    placeholder="e.g. 28"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Gender</label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg focus:outline-none"
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  >
+                    <option value="">Select...</option>
+                    <option value="F">Female</option>
+                    <option value="M">Male</option>
+                    <option value="O">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Home State */}
+              <div>
+                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Home State</label>
+                <select
+                  name="homeState"
+                  value={formData.homeState}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none"
+                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                >
+                  <option value="">Select your home state...</option>
+                  {INDIAN_STATES.map((state) => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+                  Used by the allocation engine to weigh assignment proximity.
+                </p>
+              </div>
+
+              {/* Aadhaar */}
+              <div>
+                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Aadhaar Number</label>
+                <input
+                  type="text"
+                  name="aadhaarNumber"
+                  value={formData.aadhaarNumber}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, aadhaarNumber: e.target.value.replace(/\D/g, '').slice(0, 12) }))}
+                  required
+                  inputMode="numeric"
+                  maxLength={12}
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none"
+                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  placeholder="12-digit Aadhaar number"
+                />
+                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+                  Used only for identity verification — never stored in plain text.
+                </p>
+              </div>
+
               {/* Skills */}
               <div>
                 <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Skills</label>
@@ -168,7 +257,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3 font-semibold rounded-lg transition-all hover:shadow-lg disabled:opacity-50"
+                className="w-full px-6 py-3 font-semibold rounded-lg transition-all hover:shadow-lg"
                 style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
               >
                 {loading ? 'Registering...' : 'Register as Volunteer'}

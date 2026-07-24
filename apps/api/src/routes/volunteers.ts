@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { createHash } from "crypto";
 import { prisma } from "../lib/prisma";
 import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 
@@ -55,7 +56,7 @@ router.post("/", async (req: Request, res: Response) => {
       name,
       phone,
       email,
-      aadhaarHash,
+      aadhaarNumber,
       age,
       gender,
       languages,
@@ -63,6 +64,15 @@ router.post("/", async (req: Request, res: Response) => {
       certifications,
       homeState,
     } = req.body;
+
+    if (!aadhaarNumber) {
+      sendError(res, "aadhaarNumber is required", 400);
+      return;
+    }
+
+    // The raw Aadhaar number is never persisted — only a one-way hash of
+    // it is stored, matching the Volunteer.aadhaarHash schema field.
+    const aadhaarHash = createHash("sha256").update(String(aadhaarNumber)).digest("hex");
 
     const volunteer = await prisma.volunteer.create({
       data: {

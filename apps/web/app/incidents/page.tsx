@@ -20,17 +20,24 @@ interface Incident {
 
 export default function IncidentsPage() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchIncidents = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await axios.get(`${API}/incidents`);
+      setIncidents(res.data.data || res.data);
+    } catch (error) {
+      console.error('Failed to fetch incidents:', error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchIncidents = async () => {
-      try {
-        const res = await axios.get(`${API}/incidents`);
-        setIncidents(res.data.data || res.data);
-      } catch (error) {
-        console.error('Failed to fetch incidents:', error);
-      }
-    };
-
     fetchIncidents();
   }, []);
 
@@ -51,7 +58,28 @@ export default function IncidentsPage() {
         <div className="p-8">
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Incident Management</h1>
 
+          {error && (
+            <div className="card rounded-lg p-6 mb-6 text-center">
+              <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load incidents.</p>
+              <button
+                onClick={fetchIncidents}
+                className="px-5 py-2 rounded-lg font-semibold"
+                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!error && loading && (
+            <div className="card rounded-lg p-8 text-center mb-6" style={{ color: 'var(--text-muted)' }}>
+              Loading incidents...
+            </div>
+          )}
+
           {/* Unresolved Incidents */}
+          {!error && !loading && (
+          <>
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Active Incidents ({unresolved.length})
@@ -94,6 +122,8 @@ export default function IncidentsPage() {
               ))}
             </div>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

@@ -1,8 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+interface ChatTurn {
+  role: 'user' | 'assistant'
+  content: string
+}
+
 export async function POST(req: NextRequest) {
-  const { message } = await req.json()
-  
+  const body = await req.json()
+
+  // Accept either the new { messages: ChatTurn[] } shape (full history) or
+  // the legacy { message: string } shape (single turn), so older callers
+  // don't break.
+  const history: ChatTurn[] = Array.isArray(body.messages)
+    ? body.messages
+    : body.message
+      ? [{ role: 'user', content: body.message }]
+      : []
+
+  if (history.length === 0) {
+    return NextResponse.json({ reply: 'Kshama karein, message khaali hai. 🙏' })
+  }
+
   const systemPrompt = `You are SevaSahayak, a friendly and knowledgeable AI assistant for Mahakumbh 2025 built into SevaMitra volunteer management system. You were created by the SevaMitra team for Mahakumbh 2025. You run on an advanced AI model. Answer ALL questions naturally and conversationally — greetings, casual chat, opinions, anything.
 
 Key knowledge:
@@ -31,7 +49,7 @@ Keep responses concise — max 4-5 lines.`
         model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
+          ...history
         ],
         max_tokens: 300,
         temperature: 0.7

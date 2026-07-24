@@ -17,6 +17,8 @@ interface Volunteer {
   id: number;
   name: string;
   status: string;
+  skills: string;
+  reliabilityScore: number;
 }
 
 interface Zone {
@@ -53,13 +55,20 @@ interface Assignment {
   checkOutTime: string | null;
 }
 
+interface Shift {
+  id: number;
+  startTime: string;
+  endTime: string;
+}
+
 interface VolunteerRecommendation {
   volunteerId: number;
   name: string;
   score: number;
   skillMatch: number;
   availability: number;
-  distance: number;
+  proximity: number;
+  offline?: boolean;
 }
 
 interface Activity {
@@ -76,9 +85,11 @@ export default function Dashboard() {
     openIncidents: 0,
     pendingAssignments: 0,
   });
+  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [shifts, setShifts] = useState<Shift[]>([]);
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
   const [recommendations, setRecommendations] = useState<VolunteerRecommendation[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -93,21 +104,23 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const [volunteersRes, zonesRes, incidentsRes, tasksRes, assignmentsRes] = await Promise.all([
+      const [volunteersRes, zonesRes, incidentsRes, tasksRes, assignmentsRes, shiftsRes] = await Promise.all([
         axios.get(`${API}/volunteers`),
         axios.get(`${API}/zones`),
         axios.get(`${API}/incidents`),
         axios.get(`${API}/tasks`),
         axios.get(`${API}/assignments`),
+        axios.get(`${API}/shifts`),
       ]);
 
-      const volunteers = volunteersRes.data.data || volunteersRes.data;
+      const volunteersData = volunteersRes.data.data || volunteersRes.data;
       const zonesData = zonesRes.data.data || zonesRes.data;
       const incidentsData = incidentsRes.data.data || incidentsRes.data;
       const tasksData = tasksRes.data.data || tasksRes.data;
       const assignmentsData = assignmentsRes.data.data || assignmentsRes.data;
+      const shiftsData = shiftsRes.data.data || shiftsRes.data;
 
-      const activeVolunteers = volunteers.filter((v: Volunteer) => v.status === 'ACTIVE').length;
+      const activeVolunteers = volunteersData.filter((v: Volunteer) => v.status === 'ACTIVE').length;
       const zonesOver80 = zonesData.filter((z: Zone) => (z.currentLoad / z.maxCapacity) > 0.8).length;
       const openIncidents = incidentsData.filter((i: Incident) => !i.resolvedAt).length;
       const pendingAssignments = assignmentsData.filter((a: Assignment) => !a.checkInTime).length;
@@ -119,9 +132,11 @@ export default function Dashboard() {
         pendingAssignments,
       });
 
+      setVolunteers(volunteersData);
       setZones(zonesData);
       setIncidents(incidentsData);
       setTasks(tasksData);
+      setShifts(shiftsData);
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -130,7 +145,10 @@ export default function Dashboard() {
   };
 
   const initSocket = () => {
-    const socketInstance = io('http://localhost:4000');
+    const socketUrl = process.env.NEXT_PUBLIC_API_URL
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, '')
+      : 'http://localhost:4000';
+    const socketInstance = io(socketUrl);
 
     socketInstance.on('connect', () => {
       console.log('Connected to socket');
@@ -164,29 +182,123 @@ export default function Dashboard() {
     };
   };
 
+  // Pick a shift to score allocation against — there is no shift selector
+  // UI here, so default to the nearest upcoming shift (or the first known
+  // shift if none are upcoming).
+  const getDefaultShiftId = (): number | null => {
+    if (shifts.length === 0) return null;
+    const now = new Date();
+    const upcoming = shifts
+      .filter((s) => new Date(s.startTime) > now)
+      .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    return (upcoming[0] || shifts[0]).id;
+  };
+
+  const pickVolunteersToDeploy = async (zoneId: number): Promise<number[]> => {
+    const zoneTasks = tasks.filter((t) => t.zoneId === zoneId);
+    const shiftId = getDefaultShiftId();
+
+    if (zoneTasks.length > 0 && shiftId) {
+      try {
+        const response = await axios.post(`${API}/allocation/recommendations`, {
+          taskId: zoneTasks[0].id,
+          shiftId,
+          limit: 3,
+        });
+        const payload = response.data.data || response.data;
+        const recs = payload.recommendations || [];
+        if (recs.length > 0) return recs.map((r: { volunteerId: number }) => r.volunteerId);
+      } catch (error) {
+        console.error('Allocation engine unavailable, falling back to reliability ranking:', error);
+      }
+    }
+
+    // Fallback: top 3 active volunteers by reliability score
+    return [...volunteers]
+      .filter((v) => v.status === 'ACTIVE')
+      .sort((a, b) => b.reliabilityScore - a.reliabilityScore)
+      .slice(0, 3)
+      .map((v) => v.id);
+  };
+
   const handleDeployVolunteers = async (incidentId: number) => {
     try {
-      await axios.post(`${API}/incidents/${incidentId}/deploy`);
+      const incident = incidents.find((i) => i.id === incidentId);
+      if (!incident) return;
+
+      const volunteerIds = await pickVolunteersToDeploy(incident.zoneId);
+      if (volunteerIds.length === 0) {
+        setActivities((prev) => [
+          { id: Date.now().toString(), message: `No available volunteers to deploy for incident #${incidentId}`, timestamp: new Date(), type: 'warning' },
+          ...prev.slice(0, 49),
+        ]);
+        return;
+      }
+
+      await axios.post(`${API}/incidents/${incidentId}/deploy-volunteers`, { volunteerIds });
       setActivities((prev) => [
-        { id: Date.now().toString(), message: `Volunteers deployed for incident #${incidentId}`, timestamp: new Date(), type: 'success' },
+        { id: Date.now().toString(), message: `${volunteerIds.length} volunteer(s) deployed for incident #${incidentId}`, timestamp: new Date(), type: 'success' },
         ...prev.slice(0, 49),
       ]);
       fetchData();
     } catch (error) {
       console.error('Failed to deploy volunteers:', error);
+      setActivities((prev) => [
+        { id: Date.now().toString(), message: `Failed to deploy volunteers for incident #${incidentId}`, timestamp: new Date(), type: 'warning' },
+        ...prev.slice(0, 49),
+      ]);
     }
   };
 
   const handleFindBestVolunteers = async () => {
     if (!selectedTask) return;
+    const shiftId = getDefaultShiftId();
     try {
-      const response = await axios.get(`${API}/allocate/recommend`, {
-        params: { taskId: selectedTask },
+      if (!shiftId) throw new Error('No shifts available to score against');
+
+      const response = await axios.post(`${API}/allocation/recommendations`, {
+        taskId: selectedTask,
+        shiftId,
+        limit: 5,
       });
-      const recs = response.data.data || response.data;
-      setRecommendations(recs.slice(0, 5));
+      const payload = response.data.data || response.data;
+      const recs: VolunteerRecommendation[] = (payload.recommendations || []).map(
+        (r: { volunteerId: number; score: number; skills_match: number; availability: number; location_proximity: number }) => {
+          const vol = volunteers.find((v) => v.id === r.volunteerId);
+          return {
+            volunteerId: r.volunteerId,
+            name: vol?.name || `Volunteer #${r.volunteerId}`,
+            score: Math.round(r.score),
+            skillMatch: Math.round(r.skills_match),
+            availability: Math.round(r.availability),
+            proximity: Math.round(r.location_proximity),
+          };
+        }
+      );
+      setRecommendations(recs);
     } catch (error) {
-      console.error('Failed to get recommendations:', error);
+      console.error('Failed to get API recommendations, using offline estimate:', error);
+
+      // Offline fallback — only used when the real allocation engine is
+      // unreachable or there's no shift to score against. Marked distinctly
+      // in the UI (offline: true) so it's never mistaken for a real result.
+      const task = tasks.find((t) => t.id === selectedTask);
+      const requiredSkills = task ? task.skillsRequired.toLowerCase().split(/,\s*/) : [];
+
+      const localRecs: VolunteerRecommendation[] = volunteers
+        .map((v) => {
+          const volSkills = (v.skills || '').toLowerCase().split(/,\s*/);
+          const matched = requiredSkills.filter((rs) => volSkills.some((vs) => vs.includes(rs) || rs.includes(vs)));
+          const skillMatch = requiredSkills.length > 0 ? Math.round((matched.length / requiredSkills.length) * 100) : 50;
+          const availability = v.status === 'ACTIVE' ? 80 + Math.round(Math.random() * 20) : 20;
+          const proximity = Math.round(50 + Math.random() * 50);
+          const score = Math.round(skillMatch * 0.4 + v.reliabilityScore * 0.35 + availability * 0.25);
+          return { volunteerId: v.id, name: v.name, score, skillMatch, availability, proximity, offline: true };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+      setRecommendations(localRecs);
     }
   };
 
@@ -398,7 +510,14 @@ export default function Dashboard() {
                 </button>
                 {recommendations.length > 0 && (
                   <div className="space-y-2 mt-4">
-                    <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Top 5 Recommendations</h3>
+                    <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      Top 5 Recommendations
+                      {recommendations.some((r) => r.offline) && (
+                        <span style={{ marginLeft: '8px', color: 'var(--accent-deep)', fontSize: '12px', fontWeight: 400 }}>
+                          (using offline estimate — API unreachable)
+                        </span>
+                      )}
+                    </h3>
                     {recommendations.map((rec) => (
                       <div key={rec.volunteerId} className="card p-4">
                         <div className="flex justify-between items-center mb-2">
@@ -415,8 +534,8 @@ export default function Dashboard() {
                             <span className="ml-1" style={{ color: 'var(--text-primary)' }}>{rec.availability}%</span>
                           </div>
                           <div>
-                            <span style={{ color: 'var(--text-muted)' }}>Distance:</span>
-                            <span className="ml-1" style={{ color: 'var(--text-primary)' }}>{rec.distance}km</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Proximity:</span>
+                            <span className="ml-1" style={{ color: 'var(--text-primary)' }}>{rec.proximity}%</span>
                           </div>
                         </div>
                       </div>

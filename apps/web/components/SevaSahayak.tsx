@@ -59,15 +59,23 @@ export default function SevaSahayak({ isInline = false }: Props) {
     if (!userMessage.trim() || isLoading) return;
 
     // Add user message to chat
-    setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', content: userMessage }]);
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: userMessage };
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
     setIsLoading(true);
     setInput('');
 
     try {
+      // Send recent conversation history so the assistant has context
+      // across turns, not just the latest message.
+      const history = nextMessages
+        .slice(-10)
+        .map(({ role, content }) => ({ role, content }));
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ messages: history })
       });
       const data = await response.json();
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: data.reply }]);

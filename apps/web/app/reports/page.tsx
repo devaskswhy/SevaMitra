@@ -54,32 +54,36 @@ export default function ReportsPage() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchAll = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const [volRes, zoneRes, incRes, assignRes] = await Promise.all([
+        axios.get(`${API}/volunteers`),
+        axios.get(`${API}/zones`),
+        axios.get(`${API}/incidents`),
+        axios.get(`${API}/assignments`),
+      ]);
+      const volunteersData = volRes.data.data || volRes.data;
+      const zonesData = zoneRes.data.data || zoneRes.data;
+      const incidentsData = incRes.data.data || incRes.data;
+      const assignmentsData = assignRes.data.data || assignRes.data;
+
+      setVolunteers(volunteersData);
+      setZones(zonesData);
+      setIncidents(incidentsData);
+      setAssignments(assignmentsData);
+    } catch (error) {
+      console.error('Failed to fetch report data:', error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const [volRes, zoneRes, incRes, assignRes] = await Promise.all([
-          axios.get(`${API}/volunteers`),
-          axios.get(`${API}/zones`),
-          axios.get(`${API}/incidents`),
-          axios.get(`${API}/assignments`),
-        ]);
-        const volunteersData = volRes.data.data || volRes.data;
-        const zonesData = zoneRes.data.data || zoneRes.data;
-        const incidentsData = incRes.data.data || incRes.data;
-        const assignmentsData = assignRes.data.data || assignRes.data;
-        
-        setVolunteers(volunteersData);
-        setZones(zonesData);
-        setIncidents(incidentsData);
-        setAssignments(assignmentsData);
-      } catch (error) {
-        console.error('Failed to fetch report data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAll();
   }, []);
 
@@ -124,8 +128,39 @@ export default function ReportsPage() {
     return { emoji: `#${rank}`, color: 'var(--text-muted)', bg: 'rgba(160, 120, 90, 0.05)' };
   };
 
+  const toCsvValue = (value: string | number) => {
+    const str = String(value);
+    return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+  };
+
   const handleExport = () => {
-    alert('Exporting...');
+    const zoneRows = [
+      ['Zone Name', 'Assigned Volunteers', 'Incidents', 'Avg Response Time'],
+      ...zonePerformance.map((z) => [z.name, z.assignedVolunteers, z.incidents, z.avgResponseTime]),
+    ];
+
+    const leaderboardRows = [
+      ['Rank', 'Name', 'Skills', 'Status', 'Reliability Score'],
+      ...leaderboard.map((v, i) => [i + 1, v.name, v.skills, v.status, `${v.reliabilityScore}%`]),
+    ];
+
+    const csv = [
+      'Zone Performance',
+      ...zoneRows.map((row) => row.map(toCsvValue).join(',')),
+      '',
+      'Volunteer Leaderboard',
+      ...leaderboardRows.map((row) => row.map(toCsvValue).join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sevamitra-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -133,6 +168,23 @@ export default function ReportsPage() {
       <div className="min-h-screen flex items-center justify-center lotus-pattern" style={{ background: 'var(--bg-primary)' }}>
         <div className="saffron-spinner"></div>
         <div className="loading-bar"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center lotus-pattern" style={{ background: 'var(--bg-primary)' }}>
+        <div className="card p-8 text-center" style={{ maxWidth: '420px' }}>
+          <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load report data.</p>
+          <button
+            onClick={fetchAll}
+            className="px-6 py-3 rounded-lg font-semibold"
+            style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }

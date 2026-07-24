@@ -24,6 +24,9 @@ interface Volunteer {
   completedShifts: number;
 }
 
+// KNOWN LIMITATION: volunteerId is trusted from localStorage with no
+// server-side session verification (see apps/web/app/volunteer/page.tsx).
+// A future auth phase should replace this with a verified session token.
 export default function VolunteerProfile() {
   const router = useRouter();
   const [volunteer, setVolunteer] = useState<Volunteer | null>(null);
@@ -77,7 +80,7 @@ export default function VolunteerProfile() {
             style={{
               background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
               color: '#0D0A1A',
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'var(--font-body)'
             }}
           >
             Back to Login
@@ -128,7 +131,7 @@ export default function VolunteerProfile() {
               <span className="text-4xl">👤</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>{volunteer.name}</h1>
+              <h1 className="text-2xl font-bold" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>{volunteer.name}</h1>
               <p style={{ color: '#C4B49A' }}>{volunteer.email}</p>
               <div className="mt-2">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -142,11 +145,11 @@ export default function VolunteerProfile() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-xl text-center" style={{ background: 'rgba(255, 107, 0, 0.1)' }}>
-              <p className="text-3xl font-bold" style={{ color: '#FF6B00', fontFamily: 'Poppins, sans-serif' }}>{volunteer.reliabilityScore}</p>
+              <p className="text-3xl font-bold" style={{ color: '#FF6B00', fontFamily: 'var(--font-body)' }}>{volunteer.reliabilityScore}</p>
               <p className="text-sm" style={{ color: '#C4B49A' }}>Reliability Score</p>
             </div>
             <div className="p-4 rounded-xl text-center" style={{ background: 'rgba(255, 215, 0, 0.1)' }}>
-              <p className="text-3xl font-bold" style={{ color: '#FFD700', fontFamily: 'Poppins, sans-serif' }}>{volunteer.completedShifts}</p>
+              <p className="text-3xl font-bold" style={{ color: '#FFD700', fontFamily: 'var(--font-body)' }}>{volunteer.completedShifts}</p>
               <p className="text-sm" style={{ color: '#C4B49A' }}>Completed Shifts</p>
             </div>
           </div>
@@ -154,7 +157,7 @@ export default function VolunteerProfile() {
 
         {/* Personal Info */}
         <div className="card p-6 mb-4">
-          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Personal Information</h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Personal Information</h2>
           <div className="space-y-3">
             <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(255, 165, 0, 0.2)' }}>
               <span style={{ color: '#C4B49A' }}>Phone</span>
@@ -177,7 +180,7 @@ export default function VolunteerProfile() {
 
         {/* Skills */}
         <div className="card p-6 mb-4">
-          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Skills</h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Skills</h2>
           {skillsArray.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {skillsArray.map((skill, index) => (
@@ -193,7 +196,7 @@ export default function VolunteerProfile() {
 
         {/* Languages */}
         <div className="card p-6 mb-4">
-          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Languages</h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Languages</h2>
           {languagesArray.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {languagesArray.map((lang, index) => (
@@ -209,7 +212,7 @@ export default function VolunteerProfile() {
 
         {/* Certifications */}
         <div className="card p-6 mb-4">
-          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Certifications</h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Certifications</h2>
           {volunteer.certifications ? (
             <p style={{ color: '#F5F0E8' }}>{volunteer.certifications}</p>
           ) : (
@@ -226,7 +229,7 @@ export default function VolunteerProfile() {
             <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(255, 107, 0, 0.1)' }}>
               <span className="text-2xl">🏠</span>
             </div>
-            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Home</p>
+            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Home</p>
           </button>
           
           <button
@@ -236,7 +239,7 @@ export default function VolunteerProfile() {
             <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(244, 67, 54, 0.1)' }}>
               <span className="text-2xl">⚠️</span>
             </div>
-            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Report Incident</p>
+            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Report Incident</p>
           </button>
         </div>
       </div>

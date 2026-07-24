@@ -20,17 +20,24 @@ interface Zone {
 
 export default function ZonesPage() {
   const [zones, setZones] = useState<Zone[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchZones = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await axios.get(`${API}/zones`);
+      setZones(res.data.data || res.data);
+    } catch (error) {
+      console.error('Failed to fetch zones:', error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchZones = async () => {
-      try {
-        const res = await axios.get(`${API}/zones`);
-        setZones(res.data.data || res.data);
-      } catch (error) {
-        console.error('Failed to fetch zones:', error);
-      }
-    };
-
     fetchZones();
   }, []);
 
@@ -49,6 +56,31 @@ export default function ZonesPage() {
       <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
         <div className="p-8">
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Zones</h1>
+
+          {error && (
+            <div className="card rounded-lg p-6 mb-6 text-center">
+              <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load zones.</p>
+              <button
+                onClick={fetchZones}
+                className="px-5 py-2 rounded-lg font-semibold"
+                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!error && loading && (
+            <div className="card rounded-lg p-8 text-center" style={{ color: 'var(--text-muted)' }}>
+              Loading zones...
+            </div>
+          )}
+
+          {!error && !loading && zones.length === 0 && (
+            <div className="card rounded-lg p-8 text-center" style={{ color: 'var(--text-muted)' }}>
+              No zones found.
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {zones.map((zone) => {

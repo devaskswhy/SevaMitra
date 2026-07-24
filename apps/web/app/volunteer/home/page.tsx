@@ -28,16 +28,13 @@ interface Assignment {
   checkOutTime: string | null;
 }
 
-interface Shift {
-  id: number;
-  startTime: string;
-  endTime: string;
-}
-
+// KNOWN LIMITATION: volunteerId is trusted from localStorage with no
+// server-side session verification (see apps/web/app/volunteer/page.tsx).
+// A future auth phase should replace this with a verified session token.
 export default function VolunteerHome() {
   const router = useRouter();
   const [currentAssignment, setCurrentAssignment] = useState<Assignment | null>(null);
-  const [nextShift, setNextShift] = useState<Shift | null>(null);
+  const [nextAssignment, setNextAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkInLoading, setCheckInLoading] = useState(false);
 
@@ -53,27 +50,24 @@ export default function VolunteerHome() {
   const fetchData = async () => {
     try {
       const volunteerId = localStorage.getItem('volunteerId');
-      const [assignmentsRes, shiftsRes] = await Promise.all([
-        axios.get(`${API}/assignments`),
-        axios.get(`${API}/shifts`),
-      ]);
-
-      const assignments = assignmentsRes.data.data || assignmentsRes.data;
-      const shifts = shiftsRes.data.data || shiftsRes.data;
-
-      // Find current assignment (checked in but not checked out)
-      const current = assignments.find(
-        (a: Assignment) => a.volunteerId === parseInt(volunteerId!) && a.checkInTime && !a.checkOutTime
+      const response = await axios.get(`${API}/assignments`);
+      const assignments: Assignment[] = response.data.data || response.data;
+      const myAssignments = assignments.filter(
+        (a) => a.volunteerId === parseInt(volunteerId!)
       );
+
+      // Current assignment: checked in but not checked out
+      const current = myAssignments.find((a) => a.checkInTime && !a.checkOutTime);
       setCurrentAssignment(current || null);
 
-      // Find next shift (future shift without assignment)
+      // Next assignment: not yet checked in, shift starts in the future,
+      // soonest first — this is what "Check In Now" acts on.
       const now = new Date();
-      const futureShifts = shifts
-        .filter((s: Shift) => new Date(s.startTime) > now)
-        .sort((a: Shift, b: Shift) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
-      
-      setNextShift(futureShifts[0] || null);
+      const upcoming = myAssignments
+        .filter((a) => !a.checkInTime && new Date(a.shift.startTime) > now)
+        .sort((a, b) => new Date(a.shift.startTime).getTime() - new Date(b.shift.startTime).getTime());
+
+      setNextAssignment(upcoming[0] || null);
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -82,14 +76,10 @@ export default function VolunteerHome() {
   };
 
   const handleCheckIn = async () => {
+    if (!nextAssignment) return;
     setCheckInLoading(true);
     try {
-      const volunteerId = localStorage.getItem('volunteerId');
-      // Mock check-in - in real app, this would call the API
-      await axios.post(`${API}/assignments/check-in`, {
-        volunteerId: parseInt(volunteerId!),
-        timestamp: new Date().toISOString(),
-      });
+      await axios.post(`${API}/assignments/${nextAssignment.id}/check-in`);
       fetchData();
     } catch (error) {
       console.error('Failed to check in:', error);
@@ -99,14 +89,10 @@ export default function VolunteerHome() {
   };
 
   const handleCheckOut = async () => {
+    if (!currentAssignment) return;
     setCheckInLoading(true);
     try {
-      const volunteerId = localStorage.getItem('volunteerId');
-      // Mock check-out - in real app, this would call the API
-      await axios.post(`${API}/assignments/check-out`, {
-        volunteerId: parseInt(volunteerId!),
-        timestamp: new Date().toISOString(),
-      });
+      await axios.post(`${API}/assignments/${currentAssignment.id}/check-out`);
       fetchData();
     } catch (error) {
       console.error('Failed to check out:', error);
@@ -142,7 +128,7 @@ export default function VolunteerHome() {
         <div className="flex justify-between items-start">
           <div>
             <p className="text-sm mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Welcome back,</p>
-            <h1 className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>{volunteerName}</h1>
+            <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-body)' }}>{volunteerName}</h1>
           </div>
           <button
             onClick={handleLogout}
@@ -160,7 +146,7 @@ export default function VolunteerHome() {
       <div className="px-4 -mt-16 pb-24">
         {/* Current Assignment Card */}
         <div className="card p-6 mb-4">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             Current Assignment
           </h2>
@@ -168,7 +154,7 @@ export default function VolunteerHome() {
           {currentAssignment ? (
             <div className="space-y-4">
               <div className="p-4 rounded-xl" style={{ background: 'rgba(255, 107, 0, 0.1)' }}>
-                <p className="font-semibold text-lg" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>{currentAssignment.task.title}</p>
+                <p className="font-semibold text-lg" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>{currentAssignment.task.title}</p>
                 <p className="mt-1" style={{ color: '#C4B49A' }}>{currentAssignment.task.zone.name}</p>
                 <div className="mt-3 flex items-center gap-2 text-sm" style={{ color: '#C4B49A' }}>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,7 +171,7 @@ export default function VolunteerHome() {
                 style={{
                   background: 'linear-gradient(135deg, #F44336, #FF9800)',
                   color: '#F5F0E8',
-                  fontFamily: 'Poppins, sans-serif'
+                  fontFamily: 'var(--font-body)'
                 }}
               >
                 {checkInLoading ? 'Processing...' : 'Check Out'}
@@ -203,19 +189,22 @@ export default function VolunteerHome() {
 
         {/* Next Shift Card */}
         <div className="card p-6 mb-4">
-          <h2 className="text-xl font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Next Shift</h2>
+          <h2 className="text-xl font-bold mb-4" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Next Shift</h2>
           
-          {nextShift ? (
+          {nextAssignment ? (
             <div className="space-y-4">
               <div className="p-4 rounded-xl" style={{ background: 'rgba(255, 215, 0, 0.1)' }}>
                 <div className="flex items-center gap-2 text-sm mb-2" style={{ color: '#C4B49A' }}>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  {new Date(nextShift.startTime).toLocaleDateString()}
+                  {new Date(nextAssignment.shift.startTime).toLocaleDateString()}
                 </div>
-                <p className="font-semibold text-lg" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>
-                  {new Date(nextShift.startTime).toLocaleTimeString()} - {new Date(nextShift.endTime).toLocaleTimeString()}
+                <p className="font-semibold text-lg" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>
+                  {nextAssignment.task.title} — {nextAssignment.task.zone.name}
+                </p>
+                <p className="text-sm mt-1" style={{ color: '#C4B49A' }}>
+                  {new Date(nextAssignment.shift.startTime).toLocaleTimeString()} - {new Date(nextAssignment.shift.endTime).toLocaleTimeString()}
                 </p>
               </div>
               
@@ -227,7 +216,7 @@ export default function VolunteerHome() {
                   style={{
                     background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
                     color: '#0D0A1A',
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'var(--font-body)'
                   }}
                 >
                   {checkInLoading ? 'Processing...' : 'Check In Now'}
@@ -253,7 +242,7 @@ export default function VolunteerHome() {
             <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(244, 67, 54, 0.1)' }}>
               <span className="text-2xl">⚠️</span>
             </div>
-            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>Report Incident</p>
+            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>Report Incident</p>
           </button>
           
           <button
@@ -263,7 +252,7 @@ export default function VolunteerHome() {
             <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(255, 215, 0, 0.1)' }}>
               <span className="text-2xl">👤</span>
             </div>
-            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'Poppins, sans-serif' }}>My Profile</p>
+            <p className="font-semibold" style={{ color: '#F5F0E8', fontFamily: 'var(--font-body)' }}>My Profile</p>
           </button>
         </div>
       </div>

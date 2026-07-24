@@ -22,17 +22,24 @@ interface Volunteer {
 export default function VolunteersPage() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchVolunteers = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await axios.get(`${API}/volunteers`);
+      setVolunteers(res.data.data || res.data);
+    } catch (error) {
+      console.error('Failed to fetch volunteers:', error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchVolunteers = async () => {
-      try {
-        const res = await axios.get(`${API}/volunteers`);
-        setVolunteers(res.data.data || res.data);
-      } catch (error) {
-        console.error('Failed to fetch volunteers:', error);
-      }
-    };
-
     fetchVolunteers();
   }, []);
 
@@ -66,7 +73,27 @@ export default function VolunteersPage() {
             />
           </div>
 
+          {error && (
+            <div className="card rounded-lg p-6 mb-6 text-center">
+              <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load volunteers.</p>
+              <button
+                onClick={fetchVolunteers}
+                className="px-5 py-2 rounded-lg font-semibold"
+                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!error && loading && (
+            <div className="card rounded-lg p-8 text-center" style={{ color: 'var(--text-muted)' }}>
+              Loading volunteers...
+            </div>
+          )}
+
           {/* Volunteers Table */}
+          {!error && !loading && (
           <div className="card rounded-lg overflow-hidden">
             <table className="w-full">
               <thead style={{ background: 'var(--bg-secondary)' }}>
@@ -103,8 +130,9 @@ export default function VolunteersPage() {
               </tbody>
             </table>
           </div>
+          )}
 
-          {filtered.length === 0 && (
+          {!error && !loading && filtered.length === 0 && (
             <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No volunteers found.</div>
           )}
         </div>

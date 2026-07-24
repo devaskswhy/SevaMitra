@@ -8,6 +8,14 @@ const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
   : 'http://localhost:4000/api';
 
+// KNOWN LIMITATION: OTP delivery/verification here is fully simulated
+// (intentional demo behavior — see DEMO.md — there is no SMS provider
+// configured). Any 6-digit code is accepted, and the resulting
+// "session" is just a volunteerId written to localStorage with no
+// server-side verification, so it does not prevent a client from
+// setting an arbitrary volunteerId and acting as any other volunteer.
+// A future phase should replace this with real session-based auth
+// backed by the already-modeled VolunteerSession Prisma table.
 export default function VolunteerLogin() {
   const router = useRouter();
   const [phone, setPhone] = useState('');
@@ -24,6 +32,7 @@ export default function VolunteerLogin() {
     }
     setLoading(true);
     setError('');
+    // Simulated OTP send — demo mode, no SMS provider configured.
     setTimeout(() => {
       setShowOtp(true);
       setLoading(false);
@@ -43,8 +52,11 @@ export default function VolunteerLogin() {
       const response = await axios.get(`${API}/volunteers`);
       const vols = response.data.data || response.data;
       const volunteer = vols.find((v: { phone: string; id: number; name: string }) => v.phone === `+91${phone}`);
-      
+
       if (volunteer) {
+        // Demo-mode "session": no server-side verification of this OTP
+        // or of the volunteerId that gets stored. See KNOWN LIMITATION
+        // note above.
         localStorage.setItem('volunteerId', volunteer.id.toString());
         localStorage.setItem('volunteerName', volunteer.name);
         router.push('/volunteer/home');
@@ -74,6 +86,14 @@ export default function VolunteerLogin() {
           <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
             Login to access your dashboard
           </p>
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full mt-4"
+            style={{ background: 'rgba(212, 160, 23, 0.12)', border: '1px solid rgba(212, 160, 23, 0.35)' }}
+          >
+            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--accent-gold)' }}>
+              ⚠️ Demo Mode — OTP delivery is simulated, any 6-digit code will work
+            </span>
+          </div>
         </div>
 
         {!showOtp ? (

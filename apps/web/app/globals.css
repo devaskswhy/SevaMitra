@@ -82,6 +82,24 @@
 
   /* ── Transitions ── */
   --ease-sacred: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ── Compatibility aliases ──
+     The admin pages (dashboard/zones/incidents/reports/volunteers/register)
+     and Sidebar/TopBanner were built against a second, never-defined token
+     set. These aliases point them at the same dark palette used by the
+     homepage instead of introducing a competing system. */
+  --bg-primary: var(--bg-base);
+  --bg-secondary: var(--bg-section-alt);
+  --bg-card: var(--card-glass);
+  --bg-sidebar: var(--bg-section-alt2);
+  --accent-saffron: var(--saffron);
+  --accent-gold: var(--gold);
+  --accent-deep: var(--marigold);
+  --text-light: var(--text-primary);
+  --border: var(--border-glow);
+  --border-card: var(--border-glow);
+  --success: var(--status-green);
+  --cream-dark: #F5EDD8;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -195,6 +213,66 @@ input:focus, select:focus, textarea:focus {
   background: var(--card-glass-hover);
   border-color: var(--border-glow-hover);
   transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   .card — alias of .glass-card
+   Referenced throughout the admin pages and volunteer mobile flow
+   (dashboard, zones, incidents, reports, volunteers, register,
+   volunteer/*) but never defined; these elements were rendering
+   as unstyled divs. Same visual treatment as .glass-card.
+   ═══════════════════════════════════════════════════════════════ */
+
+.card {
+  background: var(--card-glass);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 300ms var(--ease-sacred);
+}
+
+.card:hover {
+  background: var(--card-glass-hover);
+  border-color: var(--border-glow-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOTUS PATTERN — subtle page background texture
+   Referenced by volunteer/*, dashboard, and reports pages.
+   ═══════════════════════════════════════════════════════════════ */
+
+.lotus-pattern {
+  background-image: radial-gradient(rgba(232, 101, 10, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING BAR — fixed top progress sweep on page mount
+   Uses the existing (previously unused) progress-fill keyframe.
+   ═══════════════════════════════════════════════════════════════ */
+
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--saffron), var(--marigold));
+  animation: progress-fill 1.2s var(--ease-sacred) forwards;
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RANGOLI DIVIDER — decorative section <hr>
+   ═══════════════════════════════════════════════════════════════ */
+
+.rangoli-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glow-hover), transparent);
+  margin: 32px 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
