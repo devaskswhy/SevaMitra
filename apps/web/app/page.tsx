@@ -10,6 +10,9 @@ import axios from 'axios';
 import StickyHeader from '@/components/StickyHeader';
 import WaterRipple from '@/components/WaterRipple';
 import dynamic from 'next/dynamic';
+import Button from '@/components/ui/Button';
+import Badge, { severityToBadge, toneToColorVar } from '@/components/ui/Badge';
+import Card from '@/components/ui/Card';
 
 const MapSection = dynamic(() => import('@/components/MapSection'), { ssr: false });
 import SevaSahayak from '@/components/SevaSahayak';
@@ -140,12 +143,12 @@ function SectionLabel({ number, title }: { number: string; title: string }) {
   return (
     <div
       style={{
-        fontSize: '11px',
+        fontSize: 'var(--text-xs)',
         fontWeight: 600,
         letterSpacing: '0.15em',
         textTransform: 'uppercase',
         color: 'rgba(255,248,238,0.2)',
-        marginBottom: '32px',
+        marginBottom: 'var(--space-8)',
       }}
     >
       — {number} {title}
@@ -203,16 +206,16 @@ function StatCard({
   const display = useCountUp(value, 1200, visible);
 
   return (
-    <div className="glass-card stat-card" style={{ padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ fontSize: '28px', marginBottom: '8px' }}>{icon}</div>
+    <div className="glass-card stat-card" style={{ padding: 'var(--space-7) var(--space-6)', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-2)' }}>{icon}</div>
       <div
         className="stat-number"
         style={{
-          fontSize: '36px',
+          fontSize: 'var(--text-xl)',
           fontWeight: 800,
           color: '#E8650A',
           lineHeight: 1,
-          marginBottom: '8px',
+          marginBottom: 'var(--space-2)',
           fontVariantNumeric: 'tabular-nums',
         }}
       >
@@ -220,7 +223,7 @@ function StatCard({
       </div>
       <div
         style={{
-          fontSize: '13px',
+          fontSize: 'var(--text-sm)',
           color: 'rgba(255,248,238,0.5)',
           fontWeight: 500,
         }}
@@ -253,12 +256,6 @@ function getCapacityGradient(ratio: number): string {
   return 'linear-gradient(90deg, #1DB954, #F5A623)';
 }
 
-function getSeverityConfig(severity: number) {
-  if (severity >= 4) return { color: '#B71C1C', bg: 'rgba(183,28,28,0.15)', label: 'CRITICAL' };
-  if (severity >= 3) return { color: '#E65100', bg: 'rgba(230,81,0,0.15)', label: 'HIGH' };
-  if (severity >= 2) return { color: '#D4A017', bg: 'rgba(212,160,23,0.15)', label: 'MEDIUM' };
-  return { color: '#1DB954', bg: 'rgba(29,185,84,0.15)', label: 'LOW' };
-}
 
 function getZoneIcon(type: string): string {
   const icons: Record<string, string> = {
@@ -461,7 +458,7 @@ function HeroSection() {
           position: 'relative',
           zIndex: 2,
           textAlign: 'center',
-          padding: '0 24px',
+          padding: '0 var(--space-6)',
           maxWidth: '800px',
           animation: 'fade-in-up 1s ease-out',
         }}
@@ -472,15 +469,15 @@ function HeroSection() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '16px',
-            marginBottom: '16px',
+            gap: 'var(--space-4)',
+            marginBottom: 'var(--space-4)',
           }}
         >
-          <span style={{ fontSize: 'clamp(24px, 4vw, 40px)', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
-          <span style={{ width: 'clamp(40px, 8vw, 80px)', height: '2px', background: 'linear-gradient(90deg, transparent, rgba(232,101,10,0.5))' }} />
+          <span style={{ fontSize: 'var(--text-xl)', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+          <span style={{ width: 'var(--text-display)', height: '2px', background: 'linear-gradient(90deg, transparent, rgba(232,101,10,0.5))' }} />
           <h1
             style={{
-              fontSize: 'clamp(40px, 7vw, 80px)',
+              fontSize: 'var(--text-display)',
               fontFamily: 'var(--font-heading)',
               color: '#FFF8EE',
               lineHeight: 1.1,
@@ -491,30 +488,32 @@ function HeroSection() {
           >
             || सेवा ही पूजा है ||
           </h1>
-          <span style={{ width: 'clamp(40px, 8vw, 80px)', height: '2px', background: 'linear-gradient(90deg, rgba(232,101,10,0.5), transparent)' }} />
-          <span style={{ fontSize: 'clamp(24px, 4vw, 40px)', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
+          <span style={{ width: 'var(--text-display)', height: '2px', background: 'linear-gradient(90deg, rgba(232,101,10,0.5), transparent)' }} />
+          <span style={{ fontSize: 'var(--text-xl)', color: '#E8650A', opacity: 0.7, fontFamily: 'var(--font-heading)' }}>ॐ</span>
         </div>
         <p
           className="hero-subtitle"
           style={{
-            fontSize: 'clamp(16px, 2.5vw, 22px)',
+            fontSize: 'var(--text-lg)',
             color: 'rgba(255,248,238,0.7)',
-            marginBottom: '40px',
+            marginBottom: 'var(--space-10)',
             lineHeight: 1.5,
             fontWeight: 300,
           }}
         >
           SevaMitra — Mahakumbh 2025 Volunteer Intelligence Platform
         </p>
-        <button
-          className="btn-sacred btn-sacred-primary hero-cta"
-          style={{ fontSize: '16px', padding: '16px 36px', borderRadius: '12px' }}
+        <Button
+          variant="primary"
+          size="lg"
+          className="hero-cta"
+          style={{ borderRadius: '12px' }}
           onClick={() => {
             document.getElementById('stats')?.scrollIntoView({ behavior: 'smooth' });
           }}
         >
           Explore Operations ↓
-        </button>
+        </Button>
       </div>
 
       {/* ── Image dot indicators ── */}
@@ -525,7 +524,7 @@ function HeroSection() {
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
-          gap: '6px',
+          gap: 'var(--space-2)',
           zIndex: 3,
         }}
       >
@@ -940,9 +939,9 @@ export default function Home() {
             background: 'rgba(17, 34, 17, 0.95)',
             border: '1px solid rgba(29,185,84,0.5)',
             color: '#D6FFE0',
-            padding: '12px 16px',
+            padding: 'var(--space-3) var(--space-4)',
             borderRadius: '12px',
-            fontSize: '13px',
+            fontSize: 'var(--text-sm)',
             fontWeight: 600,
             boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
             maxWidth: '360px',
@@ -960,7 +959,7 @@ export default function Home() {
       {/* ═════════════════════════════════════════════════════════
          STATS SECTION
          ═════════════════════════════════════════════════════════ */}
-      <section id="stats" style={{ minHeight: '100vh', width: '100%', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#100600', padding: '60px 24px' }}>
+      <section id="stats" style={{ minHeight: '100vh', width: '100%', position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#100600', padding: 'var(--space-16) var(--space-6)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             <SectionWave />
             <div className="stats-chapter-label">
@@ -970,9 +969,9 @@ export default function Home() {
               className="stats-heading"
               style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 4vw, 42px)',
+                fontSize: 'var(--text-2xl)',
                 color: '#FFF8EE',
-                marginBottom: '48px',
+                marginBottom: 'var(--space-12)',
               }}
             >
               Real-Time Operations
@@ -982,7 +981,7 @@ export default function Home() {
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '20px',
+                gap: 'var(--space-5)',
               }}
             >
               <StatCard label="Active Volunteers" value={stats.totalActiveVolunteers} icon="👥" visible={true} />
@@ -992,13 +991,13 @@ export default function Home() {
             </div>
 
             {/* Quick Allocation Panel */}
-            <div className="glass-card" style={{ marginTop: '40px', padding: '28px' }}>
-              <h3 style={{ color: '#FFF8EE', fontSize: '18px', fontFamily: 'var(--font-body)', fontWeight: 600, marginBottom: '16px' }}>
+            <div className="glass-card" style={{ marginTop: 'var(--space-10)', padding: 'var(--space-7)' }}>
+              <h3 style={{ color: '#FFF8EE', fontSize: 'var(--text-md)', fontFamily: 'var(--font-body)', fontWeight: 600, marginBottom: 'var(--space-4)' }}>
                 ⚡ Quick Volunteer Allocation
               </h3>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
                 <div style={{ flex: '1 1 300px' }}>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'rgba(255,248,238,0.4)', marginBottom: '6px', fontWeight: 500 }}>
+                  <label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'rgba(255,248,238,0.4)', marginBottom: 'var(--space-2)', fontWeight: 500 }}>
                     Select Task
                   </label>
                   <select
@@ -1012,55 +1011,50 @@ export default function Home() {
                       border: '1px solid rgba(232,101,10,0.2)',
                       borderRadius: '10px',
                       color: '#FFF8EE',
-                      padding: '0 12px',
-                      fontSize: '14px',
+                      padding: '0 var(--space-3)',
+                      fontSize: 'var(--text-sm)',
                     }}
                   >
-                    <option value="" style={{ background: '#1C0A00' }}>Choose a task...</option>
+                    <option value="" style={{ background: 'var(--bg-elevated)' }}>Choose a task...</option>
                     {currentTasks.map((task) => (
-                      <option key={task.id} value={task.id} style={{ background: '#1C0A00' }}>{task.title}</option>
+                      <option key={task.id} value={task.id} style={{ background: 'var(--bg-elevated)' }}>{task.title}</option>
                     ))}
                   </select>
                 </div>
-                <button
+                <Button
                   onClick={handleFindBestVolunteers}
                   disabled={!selectedTask}
-                  className="btn-sacred btn-sacred-primary"
-                  style={{
-                    opacity: selectedTask ? 1 : 0.4,
-                    cursor: selectedTask ? 'pointer' : 'not-allowed',
-                    whiteSpace: 'nowrap',
-                  }}
+                  style={{ whiteSpace: 'nowrap' }}
                 >
                   Find Best Volunteers
-                </button>
+                </Button>
               </div>
 
               {recommendations.length > 0 && (
-                <div style={{ marginTop: '20px' }}>
-                  <h4 style={{ color: 'rgba(255,248,238,0.6)', fontSize: '13px', fontWeight: 600, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <div style={{ marginTop: 'var(--space-5)' }}>
+                  <h4 style={{ color: 'rgba(255,248,238,0.6)', fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--space-3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Top Recommendations
                     {recommendations.some((r) => r.offline) && (
-                      <span style={{ marginLeft: '8px', color: '#F5A623', textTransform: 'none', letterSpacing: 'normal', fontSize: '11px' }}>
+                      <span style={{ marginLeft: 'var(--space-2)', color: '#F5A623', textTransform: 'none', letterSpacing: 'normal', fontSize: 'var(--text-xs)' }}>
                         (using offline estimate — API unreachable)
                       </span>
                     )}
                   </h4>
-                  <div style={{ display: 'grid', gap: '8px' }}>
+                  <div style={{ display: 'grid', gap: 'var(--space-2)' }}>
                     {recommendations.map((rec) => (
-                      <div
+                      <Card
                         key={rec.volunteerId}
-                        className="glass-card"
-                        style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}
+                        padding="sm"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-2)' }}
                       >
-                        <span style={{ fontWeight: 600, fontSize: '14px' }}>{rec.name}</span>
-                        <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'rgba(255,248,238,0.5)' }}>
-                          <span>Skill: <b style={{ color: '#D4A017' }}>{rec.skillMatch}%</b></span>
-                          <span>Avail: <b style={{ color: '#1DB954' }}>{rec.availability}%</b></span>
-                          <span>Proximity: <b style={{ color: '#FFF8EE' }}>{rec.proximity}%</b></span>
+                        <span style={{ fontWeight: 600, fontSize: 'var(--text-sm)' }}>{rec.name}</span>
+                        <div style={{ display: 'flex', gap: 'var(--space-4)', fontSize: 'var(--text-xs)', color: 'rgba(255,248,238,0.5)' }}>
+                          <span>Skill: <b style={{ color: 'var(--gold)' }}>{rec.skillMatch}%</b></span>
+                          <span>Avail: <b style={{ color: 'var(--status-green)' }}>{rec.availability}%</b></span>
+                          <span>Proximity: <b style={{ color: 'var(--text-primary)' }}>{rec.proximity}%</b></span>
                         </div>
-                        <span style={{ fontWeight: 700, fontSize: '16px', color: '#E8650A' }}>{rec.score}%</span>
-                      </div>
+                        <span style={{ fontWeight: 700, fontSize: 'var(--text-base)', color: 'var(--saffron)' }}>{rec.score}%</span>
+                      </Card>
                     ))}
                   </div>
                 </div>
@@ -1073,7 +1067,7 @@ export default function Home() {
          ZONES SECTION
          ═════════════════════════════════════════════════════════ */}
       {/* FIXED: section visibility */}
-      <section id="zones" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: '100px 24px' }}>
+      <section id="zones" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: 'var(--space-24) var(--space-6)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <SectionWave />
           <div>
@@ -1081,9 +1075,9 @@ export default function Home() {
             <h2
               style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 4vw, 42px)',
+                fontSize: 'var(--text-2xl)',
                 color: '#FFF8EE',
-                marginBottom: '48px',
+                marginBottom: 'var(--space-12)',
               }}
             >
               Zone Status Overview
@@ -1093,7 +1087,7 @@ export default function Home() {
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: '20px',
+                gap: 'var(--space-5)',
               }}
             >
               {currentZones.map((zone) => {
@@ -1101,20 +1095,20 @@ export default function Home() {
                 const pct = Math.min(ratio * 100, 100);
 
                 return (
-                  <div key={zone.id} className="glass-card" style={{ padding: '24px', overflow: 'hidden' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                  <div key={zone.id} className="glass-card" style={{ padding: 'var(--space-6)', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)' }}>
                       <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '20px' }}>{getZoneIcon(zone.type)}</span>
-                          <h3 style={{ fontSize: '16px', fontWeight: 600, fontFamily: 'var(--font-body)', color: '#FFF8EE' }}>{zone.name}</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
+                          <span style={{ fontSize: 'var(--text-md)' }}>{getZoneIcon(zone.type)}</span>
+                          <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 600, fontFamily: 'var(--font-body)', color: '#FFF8EE' }}>{zone.name}</h3>
                         </div>
-                        <span style={{ fontSize: '12px', color: 'rgba(255,248,238,0.35)' }}>{zone.type}</span>
+                        <span style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,248,238,0.35)' }}>{zone.type}</span>
                       </div>
                       <span
                         style={{
-                          padding: '3px 10px',
+                          padding: 'var(--space-1) var(--space-3)',
                           borderRadius: '20px',
-                          fontSize: '10px',
+                          fontSize: 'var(--text-xs)',
                           fontWeight: 700,
                           color: '#fff',
                           background: zone.priority === 'HIGH' ? '#B71C1C' : zone.priority === 'MEDIUM' ? '#E65100' : '#1DB954',
@@ -1125,8 +1119,8 @@ export default function Home() {
                     </div>
 
                     {/* Capacity */}
-                    <div style={{ marginBottom: '6px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '6px' }}>
+                    <div style={{ marginBottom: 'var(--space-2)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-xs)', marginBottom: 'var(--space-2)' }}>
                         <span style={{ color: 'rgba(255,248,238,0.4)' }}>Capacity</span>
                         <span style={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
                           {zone.currentLoad.toLocaleString()} / {zone.maxCapacity.toLocaleString()}
@@ -1143,8 +1137,8 @@ export default function Home() {
                           }}
                         />
                       </div>
-                      <div style={{ textAlign: 'right', marginTop: '4px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: ratio > 0.8 ? '#E8650A' : ratio > 0.5 ? '#F5A623' : '#1DB954' }}>
+                      <div style={{ textAlign: 'right', marginTop: 'var(--space-1)' }}>
+                        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: ratio > 0.8 ? '#E8650A' : ratio > 0.5 ? '#F5A623' : '#1DB954' }}>
                           {pct.toFixed(1)}%
                         </span>
                       </div>
@@ -1168,16 +1162,16 @@ export default function Home() {
           position: 'relative',
           zIndex: 2,
           background: '#100600',
-          padding: '80px 24px 48px',
+          padding: 'var(--space-20) var(--space-6) var(--space-12)',
         }}
       >
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <p
             style={{
               color: 'rgba(255,248,238,0.4)',
-              fontSize: '12px',
+              fontSize: 'var(--text-xs)',
               letterSpacing: '0.15em',
-              marginBottom: '8px',
+              marginBottom: 'var(--space-2)',
             }}
           >
             — 03 ZONE MAP
@@ -1185,9 +1179,9 @@ export default function Home() {
           <h2
             style={{
               color: '#FFF8EE',
-              fontSize: 'clamp(28px, 4vw, 42px)',
+              fontSize: 'var(--text-2xl)',
               fontWeight: '500',
-              marginBottom: '8px',
+              marginBottom: 'var(--space-2)',
             }}
           >
             Mahakumbh Zone Intelligence
@@ -1195,8 +1189,8 @@ export default function Home() {
           <p
             style={{
               color: 'rgba(255,248,238,0.5)',
-              marginBottom: '32px',
-              fontSize: '15px',
+              marginBottom: 'var(--space-8)',
+              fontSize: 'var(--text-md)',
             }}
           >
             Live density monitoring across all 12 sectors
@@ -1209,7 +1203,7 @@ export default function Home() {
          INCIDENTS SECTION
          ═════════════════════════════════════════════════════════ */}
       {/* FIXED: section visibility */}
-      <section id="incidents" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: '100px 24px' }}>
+      <section id="incidents" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: 'var(--space-24) var(--space-6)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <SectionWave />
           <div>
@@ -1217,9 +1211,9 @@ export default function Home() {
             <h2
               style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 4vw, 42px)',
+                fontSize: 'var(--text-2xl)',
                 color: '#FFF8EE',
-                marginBottom: '48px',
+                marginBottom: 'var(--space-12)',
               }}
             >
               Incident Tracker
@@ -1227,45 +1221,34 @@ export default function Home() {
 
             {/* Active Incidents */}
             {unresolvedIncidents.length > 0 && (
-              <div style={{ marginBottom: '48px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'rgba(255,248,238,0.5)', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <div style={{ marginBottom: 'var(--space-12)' }}>
+                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'rgba(255,248,238,0.5)', marginBottom: 'var(--space-5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Active ({unresolvedIncidents.length})
                 </h3>
-                <div style={{ display: 'grid', gap: '16px' }}>
+                <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
                   {unresolvedIncidents.map((incident) => {
-                    const sev = getSeverityConfig(incident.severity);
+                    const sev = severityToBadge(incident.severity);
                     const isDeploying = deployingIncidentIds.includes(incident.id);
                     const isHighlighted = highlightedIncidentIds.includes(incident.id);
                     return (
-                      <div
+                      <Card
                         key={incident.id}
-                        className="glass-card"
+                        padding="md"
                         style={{
-                          padding: '24px',
-                          borderLeft: `4px solid ${sev.color}`,
+                          borderLeft: `4px solid ${toneToColorVar(sev.tone)}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           flexWrap: 'wrap',
-                          gap: '16px',
+                          gap: 'var(--space-4)',
                           animation: isHighlighted ? 'sacred-pulse 1.25s ease-in-out 3' : 'none',
                         }}
                       >
                         <div style={{ flex: '1 1 300px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                            <span
-                              style={{
-                                padding: '3px 10px',
-                                borderRadius: '6px',
-                                fontSize: '10px',
-                                fontWeight: 700,
-                                color: sev.color,
-                                background: sev.bg,
-                                letterSpacing: '0.05em',
-                              }}
-                            >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                            <Badge tone={sev.tone} style={{ borderRadius: '6px', fontWeight: 700 }}>
                               {sev.label}
-                            </span>
+                            </Badge>
                             {incident.severity >= 5 && (
                               <span
                                 style={{
@@ -1278,26 +1261,25 @@ export default function Home() {
                                 }}
                               />
                             )}
-                            <span style={{ fontWeight: 600, fontSize: '15px' }}>{incident.type}</span>
+                            <span style={{ fontWeight: 600, fontSize: 'var(--text-md)' }}>{incident.type}</span>
                           </div>
-                          <p style={{ color: 'rgba(255,248,238,0.55)', fontSize: '13px', lineHeight: 1.5 }}>
+                          <p style={{ color: 'rgba(255,248,238,0.55)', fontSize: 'var(--text-sm)', lineHeight: 1.5 }}>
                             {incident.description}
                           </p>
                           {incident.reportedBy && (
-                            <p style={{ color: 'rgba(255,248,238,0.25)', fontSize: '11px', marginTop: '6px' }}>
+                            <p style={{ color: 'rgba(255,248,238,0.25)', fontSize: 'var(--text-xs)', marginTop: 'var(--space-2)' }}>
                               Reported by: {incident.reportedBy}
                             </p>
                           )}
                         </div>
-                        <button
+                        <Button
                           onClick={() => handleDeployVolunteers(incident.id)}
                           disabled={isDeploying}
-                          className="btn-sacred btn-sacred-primary"
-                          style={{ whiteSpace: 'nowrap', fontSize: '13px', padding: '10px 20px', minWidth: '140px', opacity: isDeploying ? 0.75 : 1 }}
+                          style={{ whiteSpace: 'nowrap', minWidth: '140px' }}
                         >
                           {isDeploying ? '⏳ Deploying...' : '🔥 Deploy'}
-                        </button>
-                      </div>
+                        </Button>
+                      </Card>
                     );
                   })}
                 </div>
@@ -1305,8 +1287,8 @@ export default function Home() {
             )}
 
             {unresolvedIncidents.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(255,248,238,0.3)' }}>
-                <p style={{ fontSize: '40px', marginBottom: '12px' }}>✅</p>
+              <div style={{ textAlign: 'center', padding: 'var(--space-16) 0', color: 'rgba(255,248,238,0.3)' }}>
+                <p style={{ fontSize: 'var(--text-display)', marginBottom: 'var(--space-3)' }}>✅</p>
                 <p>No active incidents</p>
               </div>
             )}
@@ -1314,10 +1296,10 @@ export default function Home() {
             {/* Resolved Incidents */}
             {resolvedIncidents.length > 0 && (
               <div>
-                <h3 style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'rgba(255,248,238,0.3)', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'rgba(255,248,238,0.3)', marginBottom: 'var(--space-5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Resolved ({resolvedIncidents.length})
                 </h3>
-                <div style={{ display: 'grid', gap: '12px' }}>
+                <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
                   {resolvedIncidents.map((incident) => {
                     const resolverName = incident.volunteersDeployed?.[0]?.name || 'Unassigned';
                     const resolvedIn = getResolvedDurationLabel(incident);
@@ -1326,26 +1308,26 @@ export default function Home() {
                       key={incident.id}
                       className="glass-card"
                       style={{
-                        padding: '16px 20px',
+                        padding: 'var(--space-4) var(--space-5)',
                         borderLeft: '4px solid #1DB954',
                         opacity: 0.75,
                         display: 'flex',
                         alignItems: 'flex-start',
                         justifyContent: 'space-between',
-                        gap: '12px',
+                        gap: 'var(--space-3)',
                       }}
                     >
                       <div>
-                        <p style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>{incident.type}</p>
-                        <p style={{ fontSize: '12px', color: 'rgba(255,248,238,0.45)', marginBottom: '8px' }}>{incident.description}</p>
-                        <p style={{ fontSize: '11px', color: 'rgba(255,248,238,0.35)' }}>
+                        <p style={{ fontWeight: 600, fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>{incident.type}</p>
+                        <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,248,238,0.45)', marginBottom: 'var(--space-2)' }}>{incident.description}</p>
+                        <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,248,238,0.35)' }}>
                           Resolved by: <span style={{ color: '#E7FFE9' }}>{resolverName}</span>
                         </p>
-                        <p style={{ fontSize: '11px', color: 'rgba(255,248,238,0.35)' }}>
+                        <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,248,238,0.35)' }}>
                           Resolved in: <span style={{ color: '#E7FFE9' }}>{resolvedIn}</span>
                         </p>
                       </div>
-                      <span style={{ fontSize: '10px', fontWeight: 600, color: '#1DB954', padding: '2px 8px', borderRadius: '4px', background: 'rgba(29,185,84,0.15)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: '#1DB954', padding: 'var(--space-1) var(--space-2)', borderRadius: '4px', background: 'rgba(29,185,84,0.15)', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
                         ✅ RESOLVED
                       </span>
                     </div>
@@ -1363,15 +1345,15 @@ export default function Home() {
          ═════════════════════════════════════════════════════════ */}
       <section id="chatbot" style={{
         minHeight: '100vh', width: '100%', position: 'relative',
-        zIndex: 2, background: '#0D0500', padding: '80px 24px 48px'
+        zIndex: 2, background: '#0D0500', padding: 'var(--space-20) var(--space-6) var(--space-12)'
       }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <p style={{ color: 'rgba(255,248,238,0.4)', fontSize: '12px',
-            letterSpacing: '0.15em', marginBottom: '8px' }}>— 04 AI ASSISTANT</p>
-          <h2 style={{ color: '#FFF8EE', fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: '500', marginBottom: '8px' }}>SevaSahayak</h2>
-          <p style={{ color: 'rgba(255,248,238,0.5)', marginBottom: '32px',
-            fontSize: '15px' }}>
+          <p style={{ color: 'rgba(255,248,238,0.4)', fontSize: 'var(--text-xs)',
+            letterSpacing: '0.15em', marginBottom: 'var(--space-2)' }}>— 04 AI ASSISTANT</p>
+          <h2 style={{ color: '#FFF8EE', fontSize: 'var(--text-2xl)',
+            fontWeight: '500', marginBottom: 'var(--space-2)' }}>SevaSahayak</h2>
+          <p style={{ color: 'rgba(255,248,238,0.5)', marginBottom: 'var(--space-8)',
+            fontSize: 'var(--text-md)' }}>
             AI guide for pilgrims and volunteers — Shahi Snaan schedules, 
             crowd levels, zone assignments
           </p>
@@ -1387,7 +1369,7 @@ export default function Home() {
          VOLUNTEERS SECTION
          ═════════════════════════════════════════════════════════ */}
       {/* FIXED: section visibility */}
-      <section id="volunteers" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#100600', padding: '100px 24px' }}>
+      <section id="volunteers" style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#100600', padding: 'var(--space-24) var(--space-6)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <SectionWave />
           <div>
@@ -1395,16 +1377,16 @@ export default function Home() {
             <h2
               style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 4vw, 42px)',
+                fontSize: 'var(--text-2xl)',
                 color: '#FFF8EE',
-                marginBottom: '32px',
+                marginBottom: 'var(--space-8)',
               }}
             >
               Volunteer Directory
             </h2>
 
             {/* Search filter */}
-            <div style={{ marginBottom: '28px', maxWidth: '400px' }}>
+            <div style={{ marginBottom: 'var(--space-7)', maxWidth: '400px' }}>
               <input
                 type="text"
                 placeholder="Filter by name or email..."
@@ -1414,12 +1396,12 @@ export default function Home() {
                   width: '100%',
                   height: '42px',
                   minHeight: '42px',
-                  padding: '0 16px',
+                  padding: '0 var(--space-4)',
                   borderRadius: '10px',
                   border: '1px solid rgba(232, 101, 10, 0.15)',
                   background: 'rgba(255,255,255,0.04)',
                   color: '#FFF8EE',
-                  fontSize: '13px',
+                  fontSize: 'var(--text-sm)',
                 }}
               />
             </div>
@@ -1440,11 +1422,11 @@ export default function Home() {
                 <tbody>
                   {filteredVolunteers.map((v) => (
                     <tr key={v.id}>
-                      <td style={{ fontWeight: 600, fontSize: '14px' }}>{v.name}</td>
-                      <td style={{ color: 'rgba(255,248,238,0.5)', fontSize: '13px' }}>{v.email}</td>
-                      <td style={{ color: 'rgba(255,248,238,0.5)', fontSize: '13px' }}>{v.phone}</td>
+                      <td style={{ fontWeight: 600, fontSize: 'var(--text-sm)' }}>{v.name}</td>
+                      <td style={{ color: 'rgba(255,248,238,0.5)', fontSize: 'var(--text-sm)' }}>{v.email}</td>
+                      <td style={{ color: 'rgba(255,248,238,0.5)', fontSize: 'var(--text-sm)' }}>{v.phone}</td>
                       <td>
-                        <span style={{ padding: '3px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 500, background: 'rgba(232,101,10,0.12)', color: '#E8650A' }}>
+                        <span style={{ padding: 'var(--space-1) var(--space-3)', borderRadius: '6px', fontSize: 'var(--text-xs)', fontWeight: 500, background: 'rgba(232,101,10,0.12)', color: '#E8650A' }}>
                           {v.skills.length > 20 ? v.skills.substring(0, 20) + '...' : v.skills}
                         </span>
                       </td>
@@ -1456,9 +1438,9 @@ export default function Home() {
                       <td>
                         <span
                           style={{
-                            padding: '3px 10px',
+                            padding: 'var(--space-1) var(--space-3)',
                             borderRadius: '6px',
-                            fontSize: '10px',
+                            fontSize: 'var(--text-xs)',
                             fontWeight: 700,
                             color: '#fff',
                             background: v.status === 'ACTIVE' ? '#1DB954' : '#B71C1C',
@@ -1473,7 +1455,7 @@ export default function Home() {
               </table>
 
               {filteredVolunteers.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,248,238,0.3)', fontSize: '14px' }}>
+                <div style={{ textAlign: 'center', padding: 'var(--space-10)', color: 'rgba(255,248,238,0.3)', fontSize: 'var(--text-sm)' }}>
                   No volunteers found.
                 </div>
               )}
@@ -1486,51 +1468,51 @@ export default function Home() {
          LIVE ACTIVITY FEED (Bottom section)
          ═════════════════════════════════════════════════════════ */}
       {/* FIXED: section visibility */}
-      <section style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: '80px 24px 120px' }}>
+      <section style={{ minHeight: '400px', width: '100%', position: 'relative', zIndex: 2, opacity: 1, visibility: 'visible', display: 'block', background: '#0D0500', padding: 'var(--space-20) var(--space-6) var(--space-32)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <SectionWave />
           <SectionLabel number="05" title="LIVE FEED" />
           <h2
             style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 4vw, 42px)',
+              fontSize: 'var(--text-2xl)',
               color: '#FFF8EE',
-              marginBottom: '32px',
+              marginBottom: 'var(--space-8)',
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
+              gap: 'var(--space-3)',
             }}
           >
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1DB954', animation: 'sacred-pulse 2s ease-in-out infinite' }} />
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#E8650A', fontFamily: 'var(--font-body)' }}>LIVE</span>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E8650A', fontFamily: 'var(--font-body)' }}>LIVE</span>
             </span>
             Activity Feed
           </h2>
 
-          <div className="glass-card" style={{ padding: '24px', maxHeight: '500px', overflowY: 'auto' }}>
+          <div className="glass-card" style={{ padding: 'var(--space-6)', maxHeight: '500px', overflowY: 'auto' }}>
             {activities.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(255,248,238,0.3)' }}>
-                <p style={{ fontSize: '32px', marginBottom: '12px' }}>📡</p>
-                <p style={{ fontSize: '14px' }}>Waiting for live updates...</p>
-                <p style={{ fontSize: '12px', marginTop: '6px', color: 'rgba(255,248,238,0.2)' }}>Connected to Socket.io</p>
+              <div style={{ textAlign: 'center', padding: 'var(--space-16) 0', color: 'rgba(255,248,238,0.3)' }}>
+                <p style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-3)' }}>📡</p>
+                <p style={{ fontSize: 'var(--text-sm)' }}>Waiting for live updates...</p>
+                <p style={{ fontSize: 'var(--text-xs)', marginTop: 'var(--space-2)', color: 'rgba(255,248,238,0.2)' }}>Connected to Socket.io</p>
               </div>
             ) : (
-              <div style={{ display: 'grid', gap: '8px' }}>
+              <div style={{ display: 'grid', gap: 'var(--space-2)' }}>
                 {activities.map((activity) => (
                   <div
                     key={activity.id}
                     style={{
-                      padding: '10px 16px',
+                      padding: 'var(--space-3) var(--space-4)',
                       borderRadius: '8px',
                       borderLeft: `3px solid ${activity.type === 'warning' ? '#E65100' : activity.type === 'success' ? '#1DB954' : '#1565C0'}`,
                       background: activity.type === 'warning' ? 'rgba(230,81,0,0.06)' : activity.type === 'success' ? 'rgba(29,185,84,0.06)' : 'rgba(21,101,192,0.06)',
                     }}
                   >
-                    <p style={{ fontSize: '13px', fontWeight: 500, color: activity.type === 'warning' ? '#E65100' : activity.type === 'success' ? '#1DB954' : '#4FC3F7' }}>
+                    <p style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: activity.type === 'warning' ? '#E65100' : activity.type === 'success' ? '#1DB954' : '#4FC3F7' }}>
                       {activity.message}
                     </p>
-                    <p style={{ fontSize: '11px', color: 'rgba(255,248,238,0.2)', marginTop: '2px' }}>
+                    <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,248,238,0.2)', marginTop: 'var(--space-1)' }}>
                       {new Date(activity.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                     </p>
                   </div>

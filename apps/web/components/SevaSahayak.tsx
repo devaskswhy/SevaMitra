@@ -91,7 +91,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
       display: 'flex',
       flexDirection: 'column',
       height: isInline ? '600px' : '520px',
-      background: isInline ? 'transparent' : '#1C0A00',
+      background: isInline ? 'transparent' : 'var(--bg-elevated)',
       borderRadius: isInline ? '0' : '20px',
       border: isInline ? 'none' : '1px solid rgba(232,101,10,0.2)',
       overflow: 'hidden',

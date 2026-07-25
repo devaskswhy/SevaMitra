@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge, { priorityToBadge } from '@/components/ui/Badge';
 import axios from 'axios';
 
 const API = process.env.NEXT_PUBLIC_API_URL
@@ -41,14 +44,6 @@ export default function ZonesPage() {
     fetchZones();
   }, []);
 
-  const getPriorityStyle = (priority: string) => {
-    switch (priority) {
-      case 'HIGH': return { background: '#B71C1C', color: '#fff' };
-      case 'MEDIUM': return { background: '#E65100', color: '#fff' };
-      default: return { background: '#2E7D32', color: '#fff' };
-    }
-  };
-
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
@@ -58,16 +53,12 @@ export default function ZonesPage() {
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Zones</h1>
 
           {error && (
-            <div className="card rounded-lg p-6 mb-6 text-center">
+            <Card padding="md" className="text-center mb-6">
               <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load zones.</p>
-              <button
-                onClick={fetchZones}
-                className="px-5 py-2 rounded-lg font-semibold"
-                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
-              >
+              <Button onClick={fetchZones} size="sm">
                 Retry
-              </button>
-            </div>
+              </Button>
+            </Card>
           )}
 
           {!error && loading && (
@@ -83,46 +74,38 @@ export default function ZonesPage() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {zones.map((zone) => {
-              const priorityStyle = getPriorityStyle(zone.priority);
-              return (
-                <div key={zone.id} className="card rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{zone.name}</h3>
-                      <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{zone.type}</p>
-                    </div>
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold" style={priorityStyle}>
-                      {zone.priority}
+            {zones.map((zone) => (
+              <Card key={zone.id} padding="md">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{zone.name}</h3>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{zone.type}</p>
+                  </div>
+                  <Badge tone={priorityToBadge(zone.priority).tone} variant="solid">
+                    {zone.priority}
+                  </Badge>
+                </div>
+
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span style={{ color: 'var(--text-muted)' }}>Capacity</span>
+                    <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      {zone.currentLoad} / {zone.maxCapacity}
                     </span>
                   </div>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span style={{ color: 'var(--text-muted)' }}>Capacity</span>
-                      <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-                        {zone.currentLoad} / {zone.maxCapacity}
-                      </span>
-                    </div>
-                    <div className="w-full rounded-full h-2" style={{ background: 'var(--bg-secondary)' }}>
-                      <div
-                        className="h-2 rounded-full"
-                        style={{ width: `${(zone.currentLoad / zone.maxCapacity) * 100}%`, background: 'linear-gradient(90deg, #FF6B00, #FFD700)' }}
-                      ></div>
-                    </div>
+                  <div className="w-full rounded-full h-2" style={{ background: 'var(--bg-secondary)' }}>
+                    <div
+                      className="h-2 rounded-full"
+                      style={{ width: `${(zone.currentLoad / zone.maxCapacity) * 100}%`, background: 'linear-gradient(90deg, var(--saffron), var(--gold))' }}
+                    ></div>
                   </div>
-
-                  <button className="w-full mt-4 px-4 py-2 rounded-lg transition-all hover:shadow-lg" style={{
-                    background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
-                    color: '#fff',
-                    border: 'none',
-                    fontWeight: '600'
-                  }}>
-                    Manage Zone
-                  </button>
                 </div>
-              );
-            })}
+
+                <Button className="w-full mt-4">
+                  Manage Zone
+                </Button>
+              </Card>
+            ))}
           </div>
         </div>
       </div>

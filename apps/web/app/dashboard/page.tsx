@@ -8,6 +8,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 import TopBanner from '@/components/TopBanner';
 import Sidebar from '@/components/Sidebar';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge, { severityToBadge, priorityToBadge } from '@/components/ui/Badge';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -304,16 +307,9 @@ export default function Dashboard() {
 
   const getCapacityColor = (zone: Zone) => {
     const ratio = zone.currentLoad / zone.maxCapacity;
-    if (ratio > 0.8) return '#B71C1C';
-    if (ratio > 0.5) return '#E65100';
-    return '#2E7D32';
-  };
-
-  const getSeverityBadge = (severity: number) => {
-    if (severity >= 4) return { bg: '#B71C1C', color: '#fff', label: 'CRITICAL' };
-    if (severity >= 3) return { bg: '#E65100', color: '#fff', label: 'HIGH' };
-    if (severity >= 2) return { bg: '#E65100', color: '#fff', label: 'MEDIUM' };
-    return { bg: '#2E7D32', color: '#fff', label: 'LOW' };
+    if (ratio > 0.8) return 'var(--status-red)';
+    if (ratio > 0.5) return 'var(--status-amber)';
+    return 'var(--status-green)';
   };
 
   if (loading) {
@@ -395,12 +391,12 @@ export default function Dashboard() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {zones.map((zone) => (
-                  <div key={zone.id} className="card p-4 hover:border-orange-400 transition-all overflow-hidden">
+                  <Card key={zone.id} padding="sm" className="hover:border-orange-400 overflow-hidden">
                     <div className="flex justify-between items-start mb-3">
                       <div className="min-w-0 flex-1 mr-2">
                         <div className="flex items-center gap-2 mb-1 min-w-0">
                           <span className="text-xl flex-shrink-0">{getZoneIcon(zone.type)}</span>
-                          <h3 className="font-semibold truncate" style={{ color: 'var(--text-primary)', fontSize: '14px' }}>{zone.name}</h3>
+                          <h3 className="font-semibold truncate" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)' }}>{zone.name}</h3>
                         </div>
                         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{zone.type}</p>
                       </div>
@@ -414,19 +410,17 @@ export default function Dashboard() {
                       <div className="w-full rounded-full h-2" style={{ background: 'var(--bg-secondary)' }}>
                         <div className="h-2 rounded-full" style={{
                           width: `${(zone.currentLoad / zone.maxCapacity) * 100}%`,
-                          background: 'linear-gradient(90deg, #FF6B00, #FFD700)'
+                          background: 'linear-gradient(90deg, var(--saffron), var(--gold))'
                         }} />
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm items-center">
                         <span style={{ color: 'var(--text-muted)' }}>Priority</span>
-                        <span className="font-medium px-2 py-0.5 rounded text-xs text-white" style={{
-                          background: zone.priority === 'HIGH' ? '#B71C1C' : zone.priority === 'MEDIUM' ? '#E65100' : '#2E7D32'
-                        }}>
+                        <Badge tone={priorityToBadge(zone.priority).tone} variant="solid">
                           {zone.priority}
-                        </span>
+                        </Badge>
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             </div>
@@ -441,30 +435,22 @@ export default function Dashboard() {
                   <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>No active incidents</p>
                 ) : (
                   incidents.filter(i => !i.resolvedAt).map((incident) => {
-                    const badge = getSeverityBadge(incident.severity);
+                    const badge = severityToBadge(incident.severity);
                     return (
-                      <div key={incident.id} className="card p-4 flex items-center justify-between">
+                      <Card key={incident.id} padding="sm" className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <span className="px-3 py-1 rounded text-sm font-bold" style={{ background: badge.bg, color: badge.color }}>
+                            <Badge tone={badge.tone} variant="solid" style={{ fontWeight: 700 }}>
                               {badge.label}
-                            </span>
+                            </Badge>
                             <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{incident.type}</span>
                           </div>
                           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{incident.description}</p>
                         </div>
-                        <button
-                          onClick={() => handleDeployVolunteers(incident.id)}
-                          className="ml-4 px-6 py-3 rounded-lg font-medium transition-all hover:shadow-lg flex items-center gap-2"
-                          style={{
-                            background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
-                            color: '#fff',
-                            border: 'none'
-                          }}
-                        >
+                        <Button onClick={() => handleDeployVolunteers(incident.id)} className="ml-4">
                           🔥 Deploy Volunteers
-                        </button>
-                      </div>
+                        </Button>
+                      </Card>
                     );
                   })
                 )}
@@ -478,7 +464,7 @@ export default function Dashboard() {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>Select Task</label>
+                  <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>Select Task</label>
                   <select
                     value={selectedTask || ''}
                     onChange={(e) => setSelectedTask(Number(e.target.value))}
@@ -496,24 +482,20 @@ export default function Dashboard() {
                     ))}
                   </select>
                 </div>
-                <button
+                <Button
                   onClick={handleFindBestVolunteers}
                   disabled={!selectedTask}
-                  className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
-                    color: '#fff',
-                    border: 'none'
-                  }}
+                  size="lg"
+                  className="w-full"
                 >
                   Find Best Volunteers
-                </button>
+                </Button>
                 {recommendations.length > 0 && (
                   <div className="space-y-2 mt-4">
                     <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                       Top 5 Recommendations
                       {recommendations.some((r) => r.offline) && (
-                        <span style={{ marginLeft: '8px', color: 'var(--accent-deep)', fontSize: '12px', fontWeight: 400 }}>
+                        <span style={{ marginLeft: 'var(--space-2)', color: 'var(--accent-deep)', fontSize: 'var(--text-xs)', fontWeight: 400 }}>
                           (using offline estimate — API unreachable)
                         </span>
                       )}
@@ -550,7 +532,7 @@ export default function Dashboard() {
           <div className="card p-6 h-fit">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#2E7D32' }} />
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--status-green)' }} />
                 <span className="text-sm font-bold" style={{ color: 'var(--accent-saffron)' }}>LIVE</span>
               </div>
               Activity Feed
@@ -568,12 +550,12 @@ export default function Dashboard() {
                     key={activity.id}
                     className="pl-4 py-2 rounded-r transition-all"
                     style={{
-                      borderLeft: `4px solid ${activity.type === 'warning' ? '#E65100' : activity.type === 'success' ? '#2E7D32' : '#1565C0'}`,
-                      background: activity.type === 'warning' ? 'rgba(230, 81, 0, 0.08)' : activity.type === 'success' ? 'rgba(46, 125, 50, 0.08)' : 'rgba(21, 101, 192, 0.08)'
+                      borderLeft: `4px solid ${activity.type === 'warning' ? 'var(--status-amber)' : activity.type === 'success' ? 'var(--status-green)' : 'var(--status-info)'}`,
+                      background: activity.type === 'warning' ? 'var(--warning-tint)' : activity.type === 'success' ? 'var(--success-tint)' : 'var(--info-tint)'
                     }}
                   >
                     <p className="text-sm font-medium" style={{
-                      color: activity.type === 'warning' ? '#E65100' : activity.type === 'success' ? '#2E7D32' : '#1565C0'
+                      color: activity.type === 'warning' ? 'var(--status-amber)' : activity.type === 'success' ? 'var(--status-green)' : 'var(--status-info)'
                     }}>
                       {activity.message}
                     </p>
@@ -629,7 +611,7 @@ function MetricCard({ title, value, color, icon }: { title: string; value: numbe
           <span className="text-4xl font-bold" style={{ color }}>{value}</span>
         </div>
       </div>
-      <h3 className="font-medium" style={{ color: 'var(--text-secondary)', fontSize: '18px' }}>{title}</h3>
+      <h3 className="font-medium" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-md)' }}>{title}</h3>
     </div>
   );
 }

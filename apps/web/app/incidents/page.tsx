@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge, { severityToBadge, toneToColorVar } from '@/components/ui/Badge';
 import axios from 'axios';
 
 const API = process.env.NEXT_PUBLIC_API_URL
@@ -41,12 +44,6 @@ export default function IncidentsPage() {
     fetchIncidents();
   }, []);
 
-  const getSeverityStyle = (severity: number) => {
-    if (severity >= 4) return { background: '#B71C1C', color: '#fff' };
-    if (severity >= 3) return { background: '#E65100', color: '#fff' };
-    return { background: '#D4A017', color: '#fff' };
-  };
-
   const unresolved = incidents.filter((i) => !i.resolvedAt);
   const resolved = incidents.filter((i) => i.resolvedAt);
 
@@ -59,16 +56,12 @@ export default function IncidentsPage() {
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Incident Management</h1>
 
           {error && (
-            <div className="card rounded-lg p-6 mb-6 text-center">
+            <Card padding="md" className="text-center mb-6">
               <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load incidents.</p>
-              <button
-                onClick={fetchIncidents}
-                className="px-5 py-2 rounded-lg font-semibold"
-                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
-              >
+              <Button onClick={fetchIncidents} size="sm">
                 Retry
-              </button>
-            </div>
+              </Button>
+            </Card>
           )}
 
           {!error && loading && (
@@ -86,18 +79,18 @@ export default function IncidentsPage() {
             </h2>
             <div className="space-y-4">
               {unresolved.map((incident) => {
-                const sevStyle = getSeverityStyle(incident.severity);
+                const sev = severityToBadge(incident.severity);
                 return (
-                  <div key={incident.id} className="card rounded-lg p-6" style={{ borderLeft: '4px solid #B71C1C' }}>
+                  <Card key={incident.id} padding="md" style={{ borderLeft: `4px solid ${toneToColorVar(sev.tone)}` }}>
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{incident.type}</h3>
-                      <span className="px-3 py-1 rounded text-xs font-semibold" style={sevStyle}>
+                      <Badge tone={sev.tone} variant="solid">
                         Severity {incident.severity}
-                      </span>
+                      </Badge>
                     </div>
                     <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>{incident.description}</p>
                     <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Reported by: {incident.reportedBy}</p>
-                  </div>
+                  </Card>
                 );
               })}
             </div>
@@ -110,15 +103,15 @@ export default function IncidentsPage() {
             </h2>
             <div className="space-y-4">
               {resolved.map((incident) => (
-                <div key={incident.id} className="card rounded-lg p-6 opacity-75" style={{ borderLeft: '4px solid #2E7D32' }}>
+                <Card key={incident.id} padding="md" className="opacity-75" style={{ borderLeft: '4px solid var(--status-green)' }}>
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-semibold" style={{ color: 'var(--text-secondary)' }}>{incident.type}</h3>
-                    <span className="px-3 py-1 rounded text-xs font-semibold text-white" style={{ background: '#2E7D32' }}>
+                    <Badge tone="success" variant="solid">
                       Resolved
-                    </span>
+                    </Badge>
                   </div>
                   <p className="mb-3" style={{ color: 'var(--text-muted)' }}>{incident.description}</p>
-                </div>
+                </Card>
               ))}
             </div>
           </div>

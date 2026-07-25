@@ -71,13 +71,13 @@ export default function VolunteerLogin() {
   };
 
   return (
-    <div className="min-h-screen lotus-pattern flex items-center justify-center p-4" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen lotus-pattern flex items-center justify-center p-4" style={{ background: 'var(--bg-base)' }}>
       <div className="loading-bar"></div>
       <div className="om-watermark">ॐ</div>
       
       <div className="card p-8 w-full max-w-md" style={{ maxWidth: '480px' }}>
         <div className="text-center mb-8">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)' }}>
+          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))' }}>
             <span className="text-5xl">🙏</span>
           </div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
@@ -88,9 +88,9 @@ export default function VolunteerLogin() {
           </p>
           <div
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full mt-4"
-            style={{ background: 'rgba(212, 160, 23, 0.12)', border: '1px solid rgba(212, 160, 23, 0.35)' }}
+            style={{ background: 'var(--gold-tint)', border: '1px solid var(--border-glow-hover)' }}
           >
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--accent-gold)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--gold)' }}>
               ⚠️ Demo Mode — OTP delivery is simulated, any 6-digit code will work
             </span>
           </div>
@@ -99,11 +99,11 @@ export default function VolunteerLogin() {
         {!showOtp ? (
           <form onSubmit={handleSendOtp} className="space-y-6">
             <div>
-              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
+              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
                 Phone Number
               </label>
               <div className="flex">
-                <span className="inline-flex items-center px-4 rounded-l-lg" style={{ background: 'var(--bg-sidebar)', border: '1px solid var(--border)', color: 'var(--accent-gold)' }}>
+                <span className="inline-flex items-center px-4 rounded-l-lg" style={{ background: 'var(--bg-section-alt2)', border: '1px solid var(--border-glow)', color: 'var(--gold)' }}>
                   +91
                 </span>
                 <input
@@ -115,8 +115,8 @@ export default function VolunteerLogin() {
                   maxLength={10}
                   inputMode="numeric"
                   style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border)',
+                    background: 'var(--bg-section-alt)',
+                    border: '1px solid var(--border-glow)',
                     color: 'var(--text-primary)'
                   }}
                 />
@@ -124,7 +124,7 @@ export default function VolunteerLogin() {
             </div>
 
             {error && (
-              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(183, 28, 28, 0.08)', border: '1px solid #B71C1C', color: '#B71C1C' }}>
+              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
                 ❌ {error}
               </div>
             )}
@@ -134,10 +134,10 @@ export default function VolunteerLogin() {
               disabled={loading}
               className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
-                color: '#fff',
+                background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
+                color: 'var(--text-inverse)',
                 border: 'none',
-                fontSize: '18px'
+                fontSize: 'var(--text-md)'
               }}
             >
               {loading ? 'Sending OTP...' : 'Send OTP'}
@@ -146,7 +146,7 @@ export default function VolunteerLogin() {
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-6">
             <div>
-              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
+              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
                 Enter OTP
               </label>
               <input
@@ -158,8 +158,8 @@ export default function VolunteerLogin() {
                 maxLength={6}
                 inputMode="numeric"
                 style={{
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border)',
+                  background: 'var(--bg-section-alt)',
+                  border: '1px solid var(--border-glow)',
                   color: 'var(--text-primary)',
                   letterSpacing: '0.5em'
                 }}
@@ -170,7 +170,7 @@ export default function VolunteerLogin() {
             </div>
 
             {error && (
-              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(183, 28, 28, 0.08)', border: '1px solid #B71C1C', color: '#B71C1C' }}>
+              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
                 ❌ {error}
               </div>
             )}
@@ -180,10 +180,10 @@ export default function VolunteerLogin() {
               disabled={loading}
               className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
-                color: '#fff',
+                background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
+                color: 'var(--text-inverse)',
                 border: 'none',
-                fontSize: '18px'
+                fontSize: 'var(--text-md)'
               }}
             >
               {loading ? 'Verifying...' : 'Verify & Login'}
@@ -198,8 +198,8 @@ export default function VolunteerLogin() {
               }}
               className="w-full px-6 py-4 rounded-lg font-medium transition-all"
               style={{
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border)',
+                background: 'var(--bg-section-alt)',
+                border: '1px solid var(--border-glow)',
                 color: 'var(--text-primary)'
               }}
             >
@@ -211,7 +211,7 @@ export default function VolunteerLogin() {
         <div className="mt-8 text-center">
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             New volunteer?{' '}
-            <a href="/register" className="font-bold hover:underline" style={{ color: 'var(--accent-saffron)' }}>
+            <a href="/register" className="font-bold hover:underline" style={{ color: 'var(--saffron)' }}>
               Register here
             </a>
           </p>

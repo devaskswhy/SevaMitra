@@ -26,7 +26,7 @@ export default function TopBanner() {
       left: 0,
       right: 0,
       zIndex: 100,
-      background: 'linear-gradient(135deg, #1C0A00 0%, #3D1A00 100%)',
+      background: 'linear-gradient(135deg, var(--bg-elevated) 0%, #3D1A00 100%)',
       borderBottom: '2px solid var(--accent-gold)',
       height: '56px'
     }}>

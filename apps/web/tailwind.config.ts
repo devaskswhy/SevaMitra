@@ -9,16 +9,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        saffron: "#E8650A",
-        gold: "#D4A017",
-        marigold: "#F5A623",
+        // Single source of truth is app/globals.css :root — these
+        // reference the same CSS custom properties rather than
+        // duplicating hex values, so the palette can't drift out of
+        // sync between Tailwind utilities and inline `var(--x)` usage.
+        saffron: "var(--saffron)",
+        gold: "var(--gold)",
+        marigold: "var(--marigold)",
         cream: {
-          DEFAULT: "#FFF8EE",
-          dark: "#F5EDD8",
+          DEFAULT: "var(--cream)",
+          dark: "var(--cream-dark)",
         },
-        "deep-brown": "#1C0A00",
-        "sacred-red": "#8B1A1A",
-        "night-blue": "#0D1B2A",
+        "deep-brown": "var(--deep-brown)",
+        "sacred-red": "var(--sacred-red)",
+        "night-blue": "var(--night-blue)",
+        status: {
+          green: "var(--status-green)",
+          amber: "var(--status-amber)",
+          red: "var(--status-red)",
+        },
 
         background: "var(--bg-primary)",
         foreground: "var(--text-primary)",

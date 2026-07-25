@@ -90,17 +90,17 @@ export default function IncidentReport() {
   ];
 
   return (
-    <div className="min-h-screen lotus-pattern" style={{ background: '#0D0A1A' }}>
+    <div className="min-h-screen lotus-pattern" style={{ background: 'var(--bg-base)' }}>
       <div className="loading-bar"></div>
       <div className="om-watermark">ॐ</div>
       
       {/* Header */}
-      <div className="p-6" style={{ background: 'linear-gradient(135deg, #FF6B00, #FFD700)', color: '#0D0A1A' }}>
+      <div className="p-6" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))', color: 'var(--bg-base)' }}>
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
             className="p-3 rounded-lg transition-colors"
-            style={{ background: 'rgba(13, 10, 26, 0.2)' }}
+            style={{ background: 'var(--overlay-dark)' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -114,17 +114,17 @@ export default function IncidentReport() {
       <div className="p-4 pb-24">
         {success ? (
           <div className="card p-8 text-center">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(76, 175, 80, 0.1)' }}>
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--success-tint)' }}>
               <span className="text-4xl">✓</span>
             </div>
-            <h2 className="text-2xl font-bold mb-2" style={{ color: '#4CAF50', fontFamily: 'var(--font-body)' }}>Report Submitted</h2>
-            <p style={{ color: '#C4B49A' }}>Thank you for reporting. Redirecting to home...</p>
+            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--status-green)', fontFamily: 'var(--font-body)' }}>Report Submitted</h2>
+            <p style={{ color: 'var(--text-secondary)' }}>Thank you for reporting. Redirecting to home...</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Severity Selector */}
             <div className="card p-6">
-              <label className="block mb-4" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Severity Level</label>
+              <label className="block mb-4" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Severity Level</label>
               <div className="grid grid-cols-5 gap-2">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <button
@@ -143,13 +143,13 @@ export default function IncidentReport() {
                     style={{
                       background: severity === level
                         ? level <= 2
-                          ? '#4CAF50'
+                          ? 'var(--status-green)'
                           : level === 3
-                          ? '#FF9800'
-                          : '#F44336'
-                        : '#1A1228',
-                      color: severity === level ? '#F5F0E8' : '#C4B49A',
-                      border: '1px solid rgba(255, 165, 0, 0.3)'
+                          ? 'var(--status-amber)'
+                          : 'var(--status-red)'
+                        : 'var(--bg-section-alt)',
+                      color: severity === level ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      border: '1px solid var(--border-glow-hover)'
                     }}
                   >
                     {level}
@@ -167,16 +167,16 @@ export default function IncidentReport() {
 
             {/* Zone Selector */}
             <div className="card p-6">
-              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Location / Zone</label>
+              <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Location / Zone</label>
               <select
                 value={zoneId}
                 onChange={(e) => setZoneId(e.target.value)}
                 style={{
                   width: '100%',
-                  background: '#1A1228',
-                  border: '1px solid rgba(255, 165, 0, 0.3)',
+                  background: 'var(--bg-section-alt)',
+                  border: '1px solid var(--border-glow-hover)',
                   borderRadius: '8px',
-                  color: '#F5F0E8'
+                  color: 'var(--text-primary)'
                 }}
                 required
               >
@@ -191,16 +191,16 @@ export default function IncidentReport() {
 
             {/* Incident Type */}
             <div className="card p-6">
-              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Incident Type</label>
+              <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Incident Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
                 style={{
                   width: '100%',
-                  background: '#1A1228',
-                  border: '1px solid rgba(255, 165, 0, 0.3)',
+                  background: 'var(--bg-section-alt)',
+                  border: '1px solid var(--border-glow-hover)',
                   borderRadius: '8px',
-                  color: '#F5F0E8'
+                  color: 'var(--text-primary)'
                 }}
                 required
               >
@@ -215,24 +215,24 @@ export default function IncidentReport() {
 
             {/* Description */}
             <div className="card p-6">
-              <label className="block mb-3" style={{ color: '#F5F0E8', fontSize: '16px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Description</label>
+              <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe what happened..."
                 className="w-full min-h-32 resize-none"
                 style={{
-                  background: '#1A1228',
-                  border: '1px solid rgba(255, 165, 0, 0.3)',
+                  background: 'var(--bg-section-alt)',
+                  border: '1px solid var(--border-glow-hover)',
                   borderRadius: '8px',
-                  color: '#F5F0E8'
+                  color: 'var(--text-primary)'
                 }}
                 required
               />
             </div>
 
             {error && (
-              <div className="px-4 py-3 rounded-xl flex items-center gap-2" style={{ background: 'rgba(244, 67, 54, 0.1)', border: '1px solid #F44336', color: '#F44336' }}>
+              <div className="px-4 py-3 rounded-xl flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
                 ❌ {error}
               </div>
             )}
@@ -242,10 +242,10 @@ export default function IncidentReport() {
               disabled={submitting}
               className="w-full px-6 py-4 rounded-xl font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                background: 'linear-gradient(135deg, #FF6B00, #FFD700)',
-                color: '#0D0A1A',
+                background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
+                color: 'var(--bg-base)',
                 fontFamily: 'var(--font-body)',
-                fontSize: '18px'
+                fontSize: 'var(--text-md)'
               }}
             >
               {submitting ? 'Submitting...' : 'Submit Report'}
@@ -255,33 +255,33 @@ export default function IncidentReport() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 px-6 py-4" style={{ background: '#211835', borderTop: '1px solid rgba(255, 165, 0, 0.3)' }}>
+      <div className="fixed bottom-0 left-0 right-0 px-6 py-4" style={{ background: 'var(--bg-section-alt2)', borderTop: '1px solid var(--border-glow-hover)' }}>
         <div className="flex justify-around">
           <button
             onClick={() => router.push('/volunteer/home')}
             className="flex flex-col items-center transition-colors"
-            style={{ color: '#C4B49A' }}
+            style={{ color: 'var(--text-secondary)' }}
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
-            <span className="text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Home</span>
+            <span className="text-xs mt-1" style={{ fontFamily: 'var(--font-body)' }}>Home</span>
           </button>
-          <button className="flex flex-col items-center" style={{ color: '#FFD700' }}>
+          <button className="flex flex-col items-center" style={{ color: 'var(--gold)' }}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span className="text-xs mt-1 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>Report</span>
+            <span className="text-xs mt-1 font-medium" style={{ fontFamily: 'var(--font-body)' }}>Report</span>
           </button>
           <button
             onClick={() => router.push('/volunteer/profile')}
             className="flex flex-col items-center transition-colors"
-            style={{ color: '#C4B49A' }}
+            style={{ color: 'var(--text-secondary)' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span className="text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Profile</span>
+            <span className="text-xs mt-1" style={{ fontFamily: 'var(--font-body)' }}>Profile</span>
           </button>
         </div>
       </div>
