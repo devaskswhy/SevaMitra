@@ -536,6 +536,8 @@ function HeroSection() {
             style={{
               width: activeIdx === i ? '24px' : '8px',
               height: '8px',
+              minHeight: '8px',
+              minWidth: 'unset',
               borderRadius: activeIdx === i ? '4px' : '50%',
               background: activeIdx === i ? '#E8650A' : 'rgba(255,248,238,0.3)',
               border: 'none',
