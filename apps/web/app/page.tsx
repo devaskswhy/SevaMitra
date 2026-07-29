@@ -590,6 +590,18 @@ export default function Home() {
     return () => window.clearTimeout(timeout);
   }, [toastMessage]);
 
+  // #stats is pinned by ScrollTrigger below, which measures and locks its
+  // height once at setup time. The "Top Recommendations" list renders
+  // inside it after a later API response, growing the section's real
+  // content height — without a refresh, ScrollTrigger's pinned box stays
+  // at the original (shorter) size and clips the new cards. Refresh on
+  // the next frame after the DOM has actually grown.
+  useEffect(() => {
+    if (recommendations.length === 0) return;
+    const raf = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => cancelAnimationFrame(raf);
+  }, [recommendations]);
+
   // Lenis smooth scroll + GSAP ScrollTrigger
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
