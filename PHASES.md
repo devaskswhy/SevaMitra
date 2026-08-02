@@ -9,44 +9,23 @@ left. Each phase is still a **self-contained prompt** — copy the whole
 "Prompt for Claude Code" block into a fresh session to execute that phase
 in isolation.
 
-## 🔴 Read this first — the live deploy is currently broken
+## ✅ Phase 3 is done — the live deploy works again
 
-While re-auditing for this rewrite, I drove the actual production site
-(`https://seva-mitra-wheat.vercel.app`) with a browser and captured real
-network traffic. **Every data-fetching page is broken in production right
-now:**
-
-```
-GET https://sevamitra-1.onrender.com/api/volunteers  → 400
-GET https://sevamitra-1.onrender.com/api/zones       → 400
-GET https://sevamitra-1.onrender.com/api/incidents   → 400
-GET https://sevamitra-1.onrender.com/api/tasks       → 400
-GET https://sevamitra-1.onrender.com/api/assignments → 400
-GET https://sevamitra-1.onrender.com/api/shifts      → 400
-Body on every one: {"success":false,"error":"Database error: P2021"}
-```
-
-Prisma error `P2021` means **the table does not exist in the connected
-database.** The Express server itself is healthy (`/health` returns `200
-ok`) — this isn't a code bug, it's that the production Postgres database
-(whatever `DATABASE_URL` Render's environment currently points at) was
-never migrated/seeded, or points at an empty database. The homepage
-*looks* fine when you land on it because `apps/web/app/page.tsx` has a
-hardcoded `FALLBACK_*` data path that silently masks total API failure —
-but click into `/dashboard`, `/zones`, `/incidents`, `/reports`,
-`/volunteers`, or try to register, and it's all dead. **This is the
-single highest-leverage fix available and is Phase 3, item 1, below** —
-higher priority than any visual work, because no amount of design polish
-matters if a recruiter clicks past the homepage and hits an empty app.
-
-Separately, production also throws real React hydration errors (minified
-`#425`/`#418`/`#423`) on every page that renders `components/TopBanner.tsx`
-— confirmed on `/register` and `/volunteers`, and by inspection of the
-component, present on `/dashboard`, `/zones`, `/incidents`, `/reports` too
-(anywhere `<TopBanner />` is used). Root cause: `TopBanner.tsx` seeds a
-live clock with `useState(new Date())`, so the server-rendered timestamp
-and the client's first-paint timestamp differ, and React discards the
-server HTML for that subtree. Also covered in Phase 3.
+Both bugs described in the original version of this section are fixed
+and verified live: the production Postgres (Neon, via Render) had no
+schema at all (`P2021` on every data endpoint) — `prisma db push` +
+`db seed` were run against it directly, and all six previously-400ing
+endpoints (`/api/volunteers`, `/zones`, `/incidents`, `/tasks`,
+`/assignments`, `/shifts`) now return 200 with real seeded data,
+re-confirmed with a fresh headless-browser pass over `/dashboard`,
+`/zones`, `/incidents`, `/reports`, `/volunteers`, `/register`. The
+`TopBanner.tsx` clock hydration mismatch (`useState(new Date())` causing
+minified React errors `#425`/`#418`/`#423`) is also fixed — the clock now
+seeds as `null` and only sets a real value client-side post-mount,
+verified against a local production build with zero hydration errors on
+every previously-affected page. The schema+seed push was run directly
+against the production Neon database (not a git commit, no code
+change); the TopBanner fix is commit `a568d4b`.
 
 ## Status
 
@@ -54,8 +33,8 @@ server HTML for that subtree. Also covered in Phase 3.
 |---|---|---|
 | 1 | Bug/glitch fix pass | ✅ Done — `940b8c3` / `48ed272` |
 | 2 | Design system consolidation | ✅ Done — `bc5c1b4` / `69831a2` |
-| 3 | **Restore production + close what Phase 1/2 didn't reach** | ⬅ Do this next |
-| 4 | Authentication foundation (Google OAuth via NextAuth.js) | Pending |
+| 3 | Restore production + close what Phase 1/2 didn't reach | ✅ Done — Neon schema+seed push / `a568d4b` |
+| 4 | **Authentication foundation (Google OAuth via NextAuth.js)** | ⬅ Do this next |
 | 5 | Reframe landing page into login + build the floating feature hub | Pending |
 | 6 | Finish primitive rollout + signature motion polish | Pending |
 | 7 | New feature depth (shift scheduling admin UI) | Pending |
@@ -125,79 +104,22 @@ element (small, icon-driven, easy to forget a size override on).
 
 ---
 
-## Phase 3 — Restore Production + Close What Phase 1/2 Didn't Reach
+## Phase 3 (done) — Restore Production + Close What Phase 1/2 Didn't Reach
 
-**Goal:** the live deploy actually works end-to-end again, and the two
-concrete bugs found while re-auditing for this rewrite are fixed. This is
-a short, urgent phase — do it before any more visual work, since visual
-polish on a database-less app is wasted effort.
-
-### Prompt for Claude Code
-
-```
-Two confirmed, verified bugs need fixing in the SevaMitra repo. Do NOT
-redesign anything or touch the design system/primitives from Phase 2 —
-this is a correctness-only pass, same spirit as Phase 1.
-
-1. PRODUCTION DATABASE HAS NO SCHEMA: I drove the live site
-   (https://seva-mitra-wheat.vercel.app) with a browser and captured the
-   actual network traffic. The frontend calls
-   https://sevamitra-1.onrender.com/api/* (this is the real production
-   API host — NOT the Railway URL that appears in some local .env files,
-   which is stale/decommissioned). Every data endpoint
-   (/api/volunteers, /api/zones, /api/incidents, /api/tasks,
-   /api/assignments, /api/shifts) returns HTTP 400 with body
-   {"success":false,"error":"Database error: P2021"}. Prisma code P2021
-   means the table doesn't exist in the connected database — the
-   production Postgres has never been migrated/seeded, or DATABASE_URL
-   on Render points somewhere empty. The API server itself is healthy
-   (GET /health returns 200) so this is purely a data-layer problem.
-
-   Fix: run `npx prisma db push --schema=prisma/schema.prisma` followed
-   by `npx prisma db seed --schema=prisma/schema.prisma` against
-   whatever DATABASE_URL Render's production environment actually has
-   configured. This requires the real production DATABASE_URL as a
-   credential I don't have and you shouldn't guess — if you (the person
-   running this session) have it, supply it as a one-off shell
-   environment variable when running those two commands (never write it
-   to any file, never commit it, don't put it in apps/api/.env). If you
-   don't have Render dashboard/env access in this session, stop after
-   confirming the diagnosis above and tell me exactly what command needs
-   to be run and by whom — don't guess at credentials or try alternate
-   database hosts.
-
-   Once schema+seed are applied, re-verify by re-driving the live site
-   the same way this bug was found (a headless-browser network capture
-   of /dashboard, /zones, /incidents, /reports, /volunteers, /register —
-   confirm all six show 200s with real data, not 400s).
-
-2. TOPBANNER HYDRATION MISMATCH: apps/web/components/TopBanner.tsx seeds
-   a live clock with `useState(new Date())` and renders it immediately.
-   Because this evaluates once during SSR (at server-render time) and
-   again during client hydration (a moment later), the timestamps
-   mismatch and React throws a hydration error, discarding and
-   re-rendering that subtree. Confirmed via production console: minified
-   React errors #425/#418/#423 fire on every page that renders
-   <TopBanner /> (verified on /register and /volunteers; by code
-   inspection this also affects /dashboard, /zones, /incidents,
-   /reports, since they all use the same component). Fix by not
-   rendering the live clock value until after mount — e.g. seed the
-   state as `null`, set the real Date in a useEffect that only runs
-   client-side, and render a static placeholder (or nothing) until then.
-
-ACCEPTANCE CRITERIA:
-- Live production /dashboard, /zones, /incidents, /reports, /volunteers
-  all render real seeded data, not empty states or fallback data.
-- Browser console on every page listed above shows zero React hydration
-  errors.
-- No change to any file under apps/web/components/ui/ or any Phase 2
-  token in globals.css/tailwind.config.ts.
-
-DO NOT in this phase: touch visual design, add features, or change any
-API route's business logic. If the production DATABASE_URL isn't
-available to you, do item 2 and clearly report item 1's status rather
-than skipping the whole phase.
-```
+Fixed both bugs found while re-auditing for the previous rewrite of this
+file. (1) The production Postgres (Neon, reached via Render's
+`DATABASE_URL`) had no schema applied at all — every data endpoint threw
+Prisma `P2021` ("table does not exist"). Fixed by running `npx prisma db
+push` + `npx prisma db seed` directly against the real production
+database once its credential was supplied. Re-verified with a fresh
+headless-browser pass: all of `/dashboard`, `/zones`, `/incidents`,
+`/reports`, `/volunteers`, `/register` now load real seeded data with
+zero API failures. (2) `apps/web/components/TopBanner.tsx` seeded its
+live clock with `useState(new Date())`, mismatching the SSR and
+client-hydration timestamps and throwing React hydration errors
+(`#425`/`#418`/`#423`) on every page rendering it. Fixed by seeding the
+clock as `null` and only setting a real value in a client-only
+`useEffect`. See commit `a568d4b`.
 
 ---
 
