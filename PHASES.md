@@ -287,13 +287,49 @@ current homepage (`apps/web/app/page.tsx`) into a marketing/about +
 Google-login page — keeping its hero image slideshow and cinematic
 identity, removing the live operational sections — and add a new,
 authenticated landing experience (`/hub`) where every existing feature is
-reached by clicking a floating icon instead of a sidebar link, styled in
-SevaMitra's own dark saffron/gold/deep-brown language (reference:
-mobbin.com's marketing page for the *composition* — icons scattered
-around central content with gentle idle motion — not its light, minimal
-visual style; elevate the pattern into the existing cinematic identity,
-don't copy the look). Assume Phase 4's NextAuth/Google infrastructure is
-in place.
+reached by clicking a floating preview tile instead of a sidebar link.
+
+**Concrete visual reference:** `https://portfolio-niti-kanoongo.vercel.app/`
+— specifically its hero and "I don't just prototype ideas..." section.
+This is a much closer match to SevaMitra's actual palette than the
+mobbin.com reference used in earlier drafts of this phase (that one was
+a light theme; this one is dark-to-saffron, essentially SevaMitra's own
+colors already). Four concrete patterns to port over, adapted rather than
+copied:
+1. **Background** — a deep-black-to-saffron/orange diagonal or radial
+   gradient (their black→`#FF6B00`-ish transition maps almost exactly
+   onto SevaMitra's existing `--bg-base`→`--saffron` pairing), not a flat
+   single color.
+2. **Floating tiles are real content previews, not generic icons** — on
+   the reference site, each floating card is an actual miniature
+   screenshot of one of that person's projects, tilted at a slightly
+   different angle (roughly -6° to +6°, not aligned to a grid), scattered
+   organically around central text. SevaMitra's hub tiles should follow
+   this exact idea: each tile is a small stylized preview of the actual
+   destination page's content (e.g. the dashboard tile shows a tiny
+   glimpse of stat cards, the map tile shows a hint of the zone map, the
+   incidents tile shows a hint of the incident list) — not a flat icon +
+   label. Reuse Phase 2's `Card` primitive as the tile's base and layer
+   the miniature preview inside it.
+3. **Bold mixed-weight display typography** for the hub's central
+   welcome moment — a large bold statement (use `--text-display`) with
+   one phrase set in a contrasting accent treatment. The reference uses
+   an italic handwritten script for emphasis; SevaMitra already has an
+   equivalent cultural parallel available — `--font-heading` (Tiro
+   Devanagari Sanskrit) is already used for the Om mark and Hindi phrase
+   elsewhere in the app, so use that as the accent treatment here instead
+   of importing a new script font.
+4. **Dark stat-tile treatment** — the reference's "900+ / 30+ / AWS /
+   Selected" 2x2 grid (bold oversized number, small label below, dark
+   near-black rounded card) is worth reusing for a small "at a glance"
+   stat row on the hub itself (e.g. Active Volunteers / Open Incidents,
+   pulled from the same dashboard stats endpoint) — it reinforces visual
+   continuity between the hub and the dashboard it links to.
+
+Elevate these patterns into SevaMitra's existing dark saffron/gold/
+deep-brown identity and Phase 2's token system — don't import the
+reference's fonts or literal colors, match the *composition and craft*.
+Assume Phase 4's NextAuth/Google infrastructure is in place.
 
 **This phase must not lose any existing capability.** page.tsx today has
 several live sections beyond the hero — each one's fate is spelled out
@@ -372,21 +408,46 @@ each exactly as follows — do not improvise a different disposition:
 
 PART B — BUILD THE FLOATING FEATURE HUB (apps/web/app/hub/page.tsx, new)
 
-A new authenticated route. After Google sign-in redirects here, show:
+A new authenticated route styled after
+https://portfolio-niti-kanoongo.vercel.app/'s hero/"real load, real data,
+real users" section (see the Goal section above for the specific patterns
+to port). After Google sign-in redirects here, show:
+- A full-bleed deep-black-to-saffron gradient background (not the flat
+  --bg-base the rest of the app uses — this page is the one deliberate
+  exception, matching the reference's black-to-orange hero treatment).
 - A central welcome moment using the signed-in user's Google profile name
-  (via useSession()) — e.g. "Namaste, {name} 🙏" — in the existing
-  Om-watermark/saffron-gold visual language.
-- Floating tiles for each feature page — Dashboard (/dashboard), Zone Map
-  (/map), Incidents (/incidents), Volunteers (/volunteers), Reports
-  (/reports), Register Volunteer (/register). Each tile is an icon +
-  short label; position them scattered around the central content (not a
-  rigid grid — vary position/rotation slightly like the mobbin.com
-  reference), each with its own subtle continuous idle float/bob
-  animation, staggered so they don't all move in sync, using Phase 2's
-  motion tokens (--duration-slow, --ease-sacred). Clicking a tile
-  navigates to its route. This is the app's primary post-login
+  (via useSession()), set in bold --text-display type with the person's
+  name or one key phrase rendered in --font-heading (Tiro Devanagari) as
+  the accent treatment, echoing the reference's bold-sans + italic-script
+  mix — e.g. "Namaste, {name}" in --font-body bold, "🙏 सेवा के लिए तैयार"
+  or similar in --font-heading beneath it.
+- A small 2-4 tile "at a glance" stat row (dark near-black rounded cards,
+  bold oversized number + small label, matching the reference's
+  900+/30+/AWS/Selected grid) pulling from the same stats the dashboard
+  already shows (e.g. Active Volunteers, Open Incidents) — GET the data
+  from the existing endpoints, don't duplicate calculation logic.
+- Floating PREVIEW tiles for each feature page — Dashboard (/dashboard),
+  Zone Map (/map), Incidents (/incidents), Volunteers (/volunteers),
+  Reports (/reports), Register Volunteer (/register). Each tile is NOT a
+  flat icon + label — build it as a small Card containing a miniature,
+  simplified visual preview of that page's actual content (e.g. the
+  dashboard tile shows tiny stat-card shapes, the map tile shows a
+  simplified zone-dot pattern, the incidents tile shows a hint of a
+  severity badge list) plus a label. Scatter them around the central
+  content at varied positions AND varied rotation (roughly -6deg to
+  +6deg per tile, not uniform), not a grid — match the reference's
+  organic scatter. Give each tile its own subtle continuous idle
+  float/rotate-settle animation, staggered so they don't move in sync,
+  using Phase 2's motion tokens (--duration-slow, --ease-sacred); on
+  hover, a tile should lift slightly and straighten toward 0deg rotation
+  before navigating on click. This is the app's primary post-login
   navigation — deliberately not a sidebar or a button grid.
 - SevaSahayak does NOT get a tile — see Part C, it's persistent instead.
+- Any button on this page (nav, CTA) should use Phase 2's Button
+  component with a fully rounded/pill border-radius variant, matching the
+  reference's pill-shaped nav and CTA buttons — if Button doesn't
+  currently support a pill shape, add a `shape="pill"` prop rather than
+  overriding border-radius inline per usage.
 
 PART C — MAKE SEVASAHAYAK GLOBAL
 
@@ -413,12 +474,18 @@ ACCEPTANCE CRITERIA:
 - / shows the reframed landing page: hero slideshow + about copy + a
   working "Sign in with Google" control. No live operational data is
   visible pre-login.
-- Signing in redirects to /hub, showing the floating tiles + the
-  Om-watermark welcome moment + the persistent SevaSahayak widget.
-- Every tile navigates correctly, and every destination feature page
-  still does everything it did before this phase — specifically confirm
-  /incidents now has a working Deploy button with toast feedback (it
-  didn't before), /map renders the interactive Leaflet map (it's new
+- Signing in redirects to /hub, showing: the black-to-saffron gradient
+  background, the bold display-type welcome moment, the "at a glance"
+  stat tiles, the floating preview tiles, and the persistent SevaSahayak
+  widget.
+- Hub tiles are genuine content previews (a recognizable miniature of
+  each destination page), not flat icon+label tiles — spot check this
+  visually, it's the whole point of the reference.
+- Tiles are scattered at varied positions/rotation, not aligned to a
+  grid, and every tile navigates correctly; every destination feature
+  page still does everything it did before this phase — specifically
+  confirm /incidents now has a working Deploy button with toast feedback
+  (it didn't before), /map renders the interactive Leaflet map (it's new
   here), and /dashboard's stats + Quick Volunteer Allocation panel still
   work.
 - Visiting any gated route while signed out redirects to /.
@@ -481,8 +548,10 @@ everything else up to that bar.
 3. HUB TILE POLISH: Phase 5 made the /hub floating tiles functionally
    correct but not necessarily polished — add hover glow, a staggered
    entrance animation on first mount (tiles floating/settling into
-   position rather than appearing instantly), and confirm the idle
-   bob animation feels intentional rather than distracting at rest.
+   position and rotation rather than appearing instantly, matching
+   https://portfolio-niti-kanoongo.vercel.app/'s tilted-scatter reference
+   from Phase 5), and confirm the idle bob/rotate animation feels
+   intentional rather than distracting at rest.
 
 4. VOLUNTEER MOBILE FLOW: this is the highest-stakes UX in the app
    (older, possibly first-time smartphone users, in bright outdoor
