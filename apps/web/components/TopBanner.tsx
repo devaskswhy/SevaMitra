@@ -3,9 +3,15 @@
 import { useState, useEffect } from 'react';
 
 export default function TopBanner() {
-  const [time, setTime] = useState(new Date());
+  // Seeded as null rather than `new Date()` — evaluating the clock at
+  // module-render time meant the SSR timestamp and the client's first
+  // hydration pass never matched, causing a React hydration error on
+  // every page that renders this component. Only set a real value once
+  // mounted client-side.
+  const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setTime(new Date());
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -44,7 +50,7 @@ export default function TopBanner() {
       <div className="flex items-center gap-2 flex-shrink-0">
         <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#4CAF50' }} />
         <span className="font-semibold text-xs md:text-base hidden sm:inline-block" style={{ color: 'var(--text-light)', fontFamily: 'var(--font-body)' }}>
-          {formatTime(time)}
+          {time ? formatTime(time) : '--:--:--'}
         </span>
       </div>
     </div>
