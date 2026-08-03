@@ -101,6 +101,7 @@ export default function IncidentReport() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
+            aria-label="Go back"
             className="p-3 rounded-lg transition-colors"
             style={{ background: 'var(--overlay-dark)' }}
           >
@@ -129,13 +130,15 @@ export default function IncidentReport() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Severity Selector */}
             <Card padding="md">
-              <label className="block mb-4" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Severity Level</label>
-              <div className="grid grid-cols-5 gap-2">
+              <label id="severity-level-label" className="block mb-4" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Severity Level</label>
+              <div className="grid grid-cols-5 gap-2" role="group" aria-labelledby="severity-level-label">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <button
                     key={level}
                     type="button"
                     onClick={() => setSeverity(level)}
+                    aria-pressed={severity === level}
+                    aria-label={`Severity level ${level}`}
                     className={`aspect-square rounded-xl font-bold text-2xl transition-all ${
                       severity === level
                         ? level <= 2
@@ -172,8 +175,9 @@ export default function IncidentReport() {
 
             {/* Zone Selector */}
             <Card padding="md">
-              <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Location / Zone</label>
+              <label htmlFor="zone" className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Location / Zone</label>
               <select
+                id="zone"
                 value={zoneId}
                 onChange={(e) => setZoneId(e.target.value)}
                 style={{
@@ -196,8 +200,9 @@ export default function IncidentReport() {
 
             {/* Incident Type */}
             <Card padding="md">
-              <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Incident Type</label>
+              <label htmlFor="incident-type" className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Incident Type</label>
               <select
+                id="incident-type"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
                 style={{
@@ -220,8 +225,9 @@ export default function IncidentReport() {
 
             {/* Description */}
             <Card padding="md">
-              <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Description</label>
+              <label htmlFor="description" className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Description</label>
               <textarea
+                id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe what happened..."
@@ -237,7 +243,7 @@ export default function IncidentReport() {
             </Card>
 
             {error && (
-              <div className="px-4 py-3 rounded-xl flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
+              <div role="alert" className="px-4 py-3 rounded-xl flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
                 ❌ {error}
               </div>
             )}
@@ -255,14 +261,14 @@ export default function IncidentReport() {
           <button
             onClick={() => router.push('/volunteer/home')}
             className="flex flex-col items-center transition-colors"
-            style={{ color: 'var(--text-secondary)' }}
+            style={{ color: 'var(--text-secondary)', minWidth: 'var(--tap-target)' }}
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
             <span className="text-xs mt-1" style={{ fontFamily: 'var(--font-body)' }}>Home</span>
           </button>
-          <button className="flex flex-col items-center" style={{ color: 'var(--gold)' }}>
+          <button className="flex flex-col items-center" style={{ color: 'var(--gold)', minWidth: 'var(--tap-target)' }} aria-current="page">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -271,7 +277,7 @@ export default function IncidentReport() {
           <button
             onClick={() => router.push('/volunteer/profile')}
             className="flex flex-col items-center transition-colors"
-            style={{ color: 'var(--text-secondary)' }}
+            style={{ color: 'var(--text-secondary)', minWidth: 'var(--tap-target)' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

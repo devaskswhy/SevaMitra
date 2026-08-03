@@ -101,7 +101,7 @@ export default function VolunteerLogin() {
         {!showOtp ? (
           <form key="phone" onSubmit={handleSendOtp} className="space-y-6" style={{ animation: 'fade-in-up 0.4s var(--ease-sacred)' }}>
             <div>
-              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
+              <label htmlFor="phone" className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
                 Phone Number
               </label>
               <div className="flex">
@@ -109,6 +109,7 @@ export default function VolunteerLogin() {
                   +91
                 </span>
                 <input
+                  id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
@@ -126,7 +127,7 @@ export default function VolunteerLogin() {
             </div>
 
             {error && (
-              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
+              <div role="alert" className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
                 ❌ {error}
               </div>
             )}
@@ -138,10 +139,11 @@ export default function VolunteerLogin() {
         ) : (
           <form key="otp" onSubmit={handleVerifyOtp} className="space-y-6" style={{ animation: 'fade-in-up 0.4s var(--ease-sacred)' }}>
             <div>
-              <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
+              <label htmlFor="otp" className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
                 Enter OTP
               </label>
               <input
+                id="otp"
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -162,7 +164,7 @@ export default function VolunteerLogin() {
             </div>
 
             {error && (
-              <div className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
+              <div role="alert" className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
                 ❌ {error}
               </div>
             )}

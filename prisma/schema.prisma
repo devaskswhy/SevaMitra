@@ -81,6 +81,10 @@ model Assignment {
   @@index([taskId])
   @@index([shiftId])
   @@index([createdAt])
+  // Serves the double-booking conflict check (POST /api/assignments) and
+  // the allocation engine's availability/workload scoring — both filter
+  // on exactly this pair (a volunteer's still-active assignments).
+  @@index([volunteerId, checkOutTime])
 }
 
 model Incident {
@@ -99,6 +103,7 @@ model Incident {
   @@index([zoneId])
   @@index([severity])
   @@index([type])
+  @@index([status])
   @@index([resolvedAt])
   @@index([createdAt])
 }

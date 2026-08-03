@@ -228,7 +228,7 @@ export default function HubPage() {
               ...tile.desktopPos,
             }}
           >
-            <div style={{ animation: `hub-tile-float 6s var(--ease-sacred) infinite`, animationDelay: `${tile.delay}s` }}>
+            <div className="hub-tile-bob" style={{ animationDelay: `${tile.delay}s` }}>
               <Card padding="sm">
                 <tile.Preview />
                 <p style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)' }}>

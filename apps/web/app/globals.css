@@ -11,6 +11,12 @@
   background-color: var(--bg-elevated) !important;
   color: #E8650A !important;
   border-color: rgba(232, 101, 10, 0.3) !important;
+  /* Leaflet's default 30x30 zoom buttons fall under this app's 48px
+     touch-target floor — widen the tap area without changing the +/-
+     glyph's own font size. */
+  width: var(--tap-target) !important;
+  height: var(--tap-target) !important;
+  line-height: var(--tap-target) !important;
 }
 .leaflet-bar a:hover {
   background-color: #2A1200 !important;
@@ -502,6 +508,19 @@ input:focus, select:focus, textarea:focus {
 @keyframes hub-tile-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+}
+
+.hub-tile-bob {
+  animation: hub-tile-float 6s var(--ease-sacred) infinite;
+}
+
+/* The hub's idle bob is this app's first continuous ambient animation —
+   disable it for users who've asked for reduced motion instead of
+   running it indefinitely regardless of that preference. */
+@media (prefers-reduced-motion: reduce) {
+  .hub-tile-bob {
+    animation: none;
+  }
 }
 
 /* Each tile's per-instance scatter rotation is set via inline style

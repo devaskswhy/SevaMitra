@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { signIn } from 'next-auth/react';
+import Image from 'next/image';
 import { initScroll } from '@/lib/scroll';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -79,7 +80,7 @@ function SectionLabel({ number, title }: { number: string; title: string }) {
         fontWeight: 600,
         letterSpacing: '0.15em',
         textTransform: 'uppercase',
-        color: 'rgba(255,248,238,0.2)',
+        color: 'rgba(255,248,238,0.55)',
         marginBottom: 'var(--space-8)',
       }}
     >
@@ -184,18 +185,15 @@ function HeroSection() {
         }}
       >
         {HERO_IMAGES.map((src, i) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             key={src}
             src={src}
             alt=""
             aria-hidden="true"
+            fill
+            priority={i === 0}
+            sizes="100vw"
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
               objectFit: 'cover',
               opacity: activeIdx === i ? 0.7 : 0,
               transition: 'opacity 2s ease',
@@ -292,23 +290,40 @@ function HeroSection() {
         }}
       >
         {HERO_IMAGES.map((_, i) => (
+          // The visual dot stays small (8-24px) by design — the button
+          // itself is a full 48x48 tap target with the dot centered
+          // inside it, so the compact carousel look doesn't force a
+          // tiny hit area (the exact regression class fixed once before
+          // on this same dot row, 69831a2).
           <button
             key={i}
             onClick={() => setActiveIdx(i)}
             aria-label={`Show image ${i + 1}`}
             style={{
-              width: activeIdx === i ? '24px' : '8px',
-              height: '8px',
-              minHeight: '8px',
-              minWidth: 'unset',
-              borderRadius: activeIdx === i ? '4px' : '50%',
-              background: activeIdx === i ? '#E8650A' : 'rgba(255,248,238,0.3)',
+              width: '48px',
+              height: '48px',
+              minWidth: '48px',
+              minHeight: '48px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
               border: 'none',
               padding: 0,
               cursor: 'pointer',
-              transition: 'width 0.3s ease, background 0.3s ease, border-radius 0.3s ease',
             }}
-          />
+          >
+            <span
+              style={{
+                display: 'block',
+                width: activeIdx === i ? '24px' : '8px',
+                height: '8px',
+                borderRadius: activeIdx === i ? '4px' : '50%',
+                background: activeIdx === i ? '#E8650A' : 'rgba(255,248,238,0.3)',
+                transition: 'width 0.3s ease, background 0.3s ease, border-radius 0.3s ease',
+              }}
+            />
+          </button>
         ))}
       </div>
     </section>

@@ -31,8 +31,6 @@ const tiroDevanagari = Tiro_Devanagari_Sanskrit({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: "#0D0500",
 };
 

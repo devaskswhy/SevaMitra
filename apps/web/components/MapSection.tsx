@@ -230,7 +230,7 @@ export default function MapSection() {
         ))}
         <span
           style={{
-            color: 'rgba(255,248,238,0.3)',
+            color: 'rgba(255,248,238,0.55)',
             fontSize: '13px',
             marginLeft: 'auto',
           }}

@@ -106,8 +106,9 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
-                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Full Name</label>
+                <label htmlFor="name" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Full Name</label>
                 <input
+                  id="name"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -121,8 +122,9 @@ export default function RegisterPage() {
 
               {/* Email */}
               <div>
-                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Email</label>
+                <label htmlFor="email" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Email</label>
                 <input
+                  id="email"
                   type="email"
                   name="email"
                   value={formData.email}
@@ -136,8 +138,9 @@ export default function RegisterPage() {
 
               {/* Phone */}
               <div>
-                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Phone Number</label>
+                <label htmlFor="phone" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Phone Number</label>
                 <input
+                  id="phone"
                   type="tel"
                   name="phone"
                   value={formData.phone}
@@ -152,8 +155,9 @@ export default function RegisterPage() {
               {/* Age + Gender */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Age</label>
+                  <label htmlFor="age" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Age</label>
                   <input
+                    id="age"
                     type="number"
                     name="age"
                     value={formData.age}
@@ -167,8 +171,9 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Gender</label>
+                  <label htmlFor="gender" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Gender</label>
                   <select
+                    id="gender"
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
@@ -186,8 +191,9 @@ export default function RegisterPage() {
 
               {/* Home State */}
               <div>
-                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Home State</label>
+                <label htmlFor="homeState" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Home State</label>
                 <select
+                  id="homeState"
                   name="homeState"
                   value={formData.homeState}
                   onChange={handleChange}
@@ -207,8 +213,9 @@ export default function RegisterPage() {
 
               {/* Aadhaar */}
               <div>
-                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Aadhaar Number</label>
+                <label htmlFor="aadhaarNumber" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}>Aadhaar Number</label>
                 <input
+                  id="aadhaarNumber"
                   type="text"
                   name="aadhaarNumber"
                   value={formData.aadhaarNumber}
@@ -246,7 +253,7 @@ export default function RegisterPage() {
 
               {/* Message */}
               {message && (
-                <div className="p-4 rounded-lg" style={{
+                <div role="alert" className="p-4 rounded-lg" style={{
                   background: message.includes('✅') ? 'rgba(46, 125, 50, 0.1)' : 'rgba(183, 28, 28, 0.1)',
                   color: message.includes('✅') ? '#2E7D32' : '#B71C1C',
                   border: `1px solid ${message.includes('✅') ? '#2E7D32' : '#B71C1C'}`

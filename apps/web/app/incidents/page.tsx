@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { io } from 'socket.io-client';
 import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
 import Button from '@/components/ui/Button';
@@ -9,6 +8,14 @@ import Card from '@/components/ui/Card';
 import Badge, { severityToBadge, toneToColorVar } from '@/components/ui/Badge';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
+import { useSocket, SocketStatus } from '@/lib/socket';
+
+const SOCKET_STATUS_META: Record<SocketStatus, { color: string; label: string }> = {
+  connected: { color: 'var(--status-green)', label: 'LIVE' },
+  connecting: { color: 'var(--text-muted)', label: 'CONNECTING...' },
+  reconnecting: { color: 'var(--status-amber)', label: 'RECONNECTING...' },
+  disconnected: { color: 'var(--status-red)', label: 'OFFLINE' },
+};
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -108,37 +115,36 @@ export default function IncidentsPage() {
 
   // Real-time incident lifecycle events — same socket contract page.tsx
   // used to handle (this page is now the only place that does).
-  useEffect(() => {
-    const socketUrl = process.env.NEXT_PUBLIC_API_URL
-      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, '')
-      : 'http://localhost:4000';
-    const socketInstance = io(socketUrl);
+  const socketStatus = useSocket(
+    (socket) => {
+      socket.on('assignment:updated', () => fetchIncidents());
+      socket.on('incident:reported', () => fetchIncidents());
 
-    socketInstance.on('assignment:updated', () => fetchIncidents());
-    socketInstance.on('incident:reported', () => fetchIncidents());
+      socket.on('incident:deployed', (incident: Incident) => {
+        setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
+        const volunteerName = incident.volunteersDeployed?.[0]?.name || 'Volunteer';
+        setToastMessage(`✅ Deployed! ${volunteerName} assigned.`);
+      });
 
-    socketInstance.on('incident:deployed', (incident: Incident) => {
-      setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
-      const volunteerName = incident.volunteersDeployed?.[0]?.name || 'Volunteer';
-      setToastMessage(`✅ Deployed! ${volunteerName} assigned.`);
-    });
+      socket.on('incident:resolved', (incident: Incident) => {
+        setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
+      });
 
-    socketInstance.on('incident:resolved', (incident: Incident) => {
-      setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
-    });
-
-    socketInstance.on('incident:new', (incident: Incident) => {
-      setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
-      setHighlightedIncidentIds((prev) => (prev.includes(incident.id) ? prev : [incident.id, ...prev]));
-      window.setTimeout(() => {
-        setHighlightedIncidentIds((prev) => prev.filter((id) => id !== incident.id));
-      }, 4500);
-    });
-
-    return () => {
-      socketInstance.disconnect();
-    };
-  }, [fetchIncidents]);
+      socket.on('incident:new', (incident: Incident) => {
+        setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
+        setHighlightedIncidentIds((prev) => (prev.includes(incident.id) ? prev : [incident.id, ...prev]));
+        window.setTimeout(() => {
+          setHighlightedIncidentIds((prev) => prev.filter((id) => id !== incident.id));
+        }, 4500);
+      });
+    },
+    // Reconnected after a real drop — refetch instead of trusting
+    // whatever incident events happened to arrive during the outage.
+    () => {
+      fetchIncidents();
+      setToastMessage('🔄 Reconnected — refreshed incident data.');
+    }
+  );
 
   const handleDeployVolunteers = async (incidentId: number) => {
     setDeployingIncidentIds((prev) => (prev.includes(incidentId) ? prev : [...prev, incidentId]));
@@ -194,7 +200,18 @@ export default function IncidentsPage() {
       )}
       <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
         <div className="p-8">
-          <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Incident Management</h1>
+          <div className="flex items-center gap-3 mb-6">
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Incident Management</h1>
+            <div className="flex items-center gap-2">
+              <span
+                className={`w-2 h-2 rounded-full ${socketStatus !== 'disconnected' ? 'animate-pulse' : ''}`}
+                style={{ background: SOCKET_STATUS_META[socketStatus].color }}
+              />
+              <span className="text-xs font-bold" style={{ color: SOCKET_STATUS_META[socketStatus].color }}>
+                {SOCKET_STATUS_META[socketStatus].label}
+              </span>
+            </div>
+          </div>
 
           {error && (
             <Card padding="md" className="text-center mb-6">
@@ -289,7 +306,7 @@ export default function IncidentsPage() {
                 const resolverName = incident.volunteersDeployed?.[0]?.name || 'Unassigned';
                 const resolvedIn = getResolvedDurationLabel(incident);
                 return (
-                  <Card key={incident.id} padding="md" className="opacity-75" style={{ borderLeft: '4px solid var(--status-green)' }}>
+                  <Card key={incident.id} padding="md" style={{ borderLeft: '4px solid var(--status-green)' }}>
                     <div className="flex justify-between items-start gap-3 flex-wrap">
                       <div>
                         <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>{incident.type}</h3>

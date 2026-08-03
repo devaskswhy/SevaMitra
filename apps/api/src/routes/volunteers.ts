@@ -6,18 +6,13 @@ import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 const router = Router();
 
 // GET all volunteers
+// Deliberately no `include` here — every list-view consumer (volunteer
+// tables, leaderboards, the shift-assignment picker, hub stats) only
+// renders scalar fields. The full assignments->task->shift graph is
+// reserved for the :id detail route below.
 router.get("/", async (_req: Request, res: Response) => {
   try {
-    const volunteers = await prisma.volunteer.findMany({
-      include: {
-        assignments: {
-          include: {
-            task: true,
-            shift: true,
-          },
-        },
-      },
-    });
+    const volunteers = await prisma.volunteer.findMany();
     sendSuccess(res, volunteers);
   } catch (error) {
     sendPrismaError(res, error);

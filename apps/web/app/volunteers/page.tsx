@@ -67,6 +67,7 @@ export default function VolunteersPage() {
           <div className="mb-6">
             <input
               type="text"
+              aria-label="Search volunteers by name or email"
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -113,7 +114,7 @@ export default function VolunteersPage() {
                     <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{v.email}</td>
                     <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{v.phone}</td>
                     <td className="px-6 py-4 text-sm">
-                      <Badge tone="saffron">
+                      <Badge tone="saffron" title={v.skills}>
                         {v.skills.substring(0, 20)}...
                       </Badge>
                     </td>

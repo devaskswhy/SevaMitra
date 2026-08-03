@@ -318,10 +318,11 @@ export default function ShiftsPage() {
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="New Shift">
         <form onSubmit={handleCreateShift} className="space-y-4">
           <div>
-            <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
+            <label htmlFor="shift-start" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
               Start Time
             </label>
             <input
+              id="shift-start"
               type="datetime-local"
               value={newStart}
               onChange={(e) => setNewStart(e.target.value)}
@@ -331,10 +332,11 @@ export default function ShiftsPage() {
             />
           </div>
           <div>
-            <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
+            <label htmlFor="shift-end" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
               End Time
             </label>
             <input
+              id="shift-end"
               type="datetime-local"
               value={newEnd}
               onChange={(e) => setNewEnd(e.target.value)}
@@ -344,7 +346,7 @@ export default function ShiftsPage() {
             />
           </div>
           {createError && (
-            <p style={{ color: 'var(--status-red)', fontSize: 'var(--text-sm)' }}>{createError}</p>
+            <p role="alert" style={{ color: 'var(--status-red)', fontSize: 'var(--text-sm)' }}>{createError}</p>
           )}
           <Button type="submit" disabled={createSubmitting} className="w-full">
             {createSubmitting ? 'Creating...' : 'Create Shift'}
@@ -360,10 +362,11 @@ export default function ShiftsPage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
+            <label htmlFor="assign-task" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
               Task
             </label>
             <select
+              id="assign-task"
               value={assignTaskId}
               onChange={(e) => {
                 setAssignTaskId(e.target.value ? Number(e.target.value) : '');
@@ -422,7 +425,7 @@ export default function ShiftsPage() {
                         )}
                       </div>
                       {conflict && (
-                        <p className="mt-2 text-xs" style={{ color: 'var(--status-red)' }}>
+                        <p role="alert" className="mt-2 text-xs" style={{ color: 'var(--status-red)' }}>
                           ⚠ Already assigned to &quot;{conflict.conflicts[0].taskTitle}&quot; overlapping this time
                           ({formatShiftTime(conflict.conflicts[0].startTime)}–{formatShiftTime(conflict.conflicts[0].endTime)})
                         </p>
@@ -433,11 +436,12 @@ export default function ShiftsPage() {
               </div>
 
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: 'var(--space-4)' }}>
-                <label className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
+                <label htmlFor="manual-volunteer" className="block mb-2" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
                   Or assign manually
                 </label>
                 <div className="flex gap-2">
                   <select
+                    id="manual-volunteer"
                     value={manualVolunteerId}
                     onChange={(e) => setManualVolunteerId(e.target.value ? Number(e.target.value) : '')}
                     className="flex-1 px-4 py-2 rounded-lg focus:outline-none"
@@ -458,7 +462,7 @@ export default function ShiftsPage() {
                 </div>
                 {conflictInfo && conflictInfo.volunteerId === manualVolunteerId && (
                   <div className="mt-2">
-                    <p className="text-xs mb-2" style={{ color: 'var(--status-red)' }}>
+                    <p role="alert" className="text-xs mb-2" style={{ color: 'var(--status-red)' }}>
                       ⚠ Already assigned to &quot;{conflictInfo.conflicts[0].taskTitle}&quot; overlapping this time
                       ({formatShiftTime(conflictInfo.conflicts[0].startTime)}–{formatShiftTime(conflictInfo.conflicts[0].endTime)})
                     </p>
@@ -471,8 +475,8 @@ export default function ShiftsPage() {
             </>
           )}
 
-          {assignError && <p style={{ color: 'var(--status-red)', fontSize: 'var(--text-sm)' }}>{assignError}</p>}
-          {assignSuccess && <p style={{ color: 'var(--status-green)', fontSize: 'var(--text-sm)' }}>✓ {assignSuccess}</p>}
+          {assignError && <p role="alert" style={{ color: 'var(--status-red)', fontSize: 'var(--text-sm)' }}>{assignError}</p>}
+          {assignSuccess && <p role="status" style={{ color: 'var(--status-green)', fontSize: 'var(--text-sm)' }}>✓ {assignSuccess}</p>}
         </div>
       </Modal>
     </div>

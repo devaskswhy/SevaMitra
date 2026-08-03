@@ -2,9 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
 
 import TopBanner from '@/components/TopBanner';
 import Sidebar from '@/components/Sidebar';
@@ -12,6 +11,19 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { severityToBadge, priorityToBadge } from '@/components/ui/Badge';
 import { useStaggerReveal } from '@/lib/scroll';
+import { useSocket, SocketStatus } from '@/lib/socket';
+
+// Recharts is a heavy dependency (previously the single largest chunk of
+// this route's initial JS) — code-split it out the same way MapSection
+// is split on /map, instead of bundling it into every dashboard load.
+const ZoneCapacityChart = dynamic(() => import('@/components/ZoneCapacityChart'), { ssr: false });
+
+const SOCKET_STATUS_META: Record<SocketStatus, { color: string; label: string }> = {
+  connected: { color: 'var(--status-green)', label: 'LIVE' },
+  connecting: { color: 'var(--text-muted)', label: 'CONNECTING...' },
+  reconnecting: { color: 'var(--status-amber)', label: 'RECONNECTING...' },
+  disconnected: { color: 'var(--status-red)', label: 'OFFLINE' },
+};
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -101,9 +113,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-    const cleanup = initSocket();
-    return cleanup;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
@@ -148,43 +157,41 @@ export default function Dashboard() {
     }
   };
 
-  const initSocket = () => {
-    const socketUrl = process.env.NEXT_PUBLIC_API_URL
-      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, '')
-      : 'http://localhost:4000';
-    const socketInstance = io(socketUrl);
+  const socketStatus = useSocket(
+    (socket) => {
+      socket.on('activity', (data: Activity) => {
+        setActivities((prev) => [
+          { ...data, id: data.id || Date.now().toString() },
+          ...prev.slice(0, 49),
+        ]);
+      });
 
-    socketInstance.on('connect', () => {
-      console.log('Connected to socket');
-    });
+      socket.on('assignment:updated', (data: string) => {
+        setActivities((prev) => [
+          { id: Date.now().toString(), message: `Assignment updated: ${data}`, timestamp: new Date(), type: 'info' },
+          ...prev.slice(0, 49),
+        ]);
+        fetchData();
+      });
 
-    socketInstance.on('activity', (data: Activity) => {
-      setActivities((prev) => [
-        { ...data, id: data.id || Date.now().toString() },
-        ...prev.slice(0, 49),
-      ]);
-    });
-
-    socketInstance.on('assignment:updated', (data: string) => {
-      setActivities((prev) => [
-        { id: Date.now().toString(), message: `Assignment updated: ${data}`, timestamp: new Date(), type: 'info' },
-        ...prev.slice(0, 49),
-      ]);
+      socket.on('incident:reported', (data: string) => {
+        setActivities((prev) => [
+          { id: Date.now().toString(), message: `Incident reported: ${data}`, timestamp: new Date(), type: 'warning' },
+          ...prev.slice(0, 49),
+        ]);
+        fetchData();
+      });
+    },
+    () => {
+      // Reconnected after a real drop — catch up on whatever was missed
+      // while offline instead of leaving stale data on screen.
       fetchData();
-    });
-
-    socketInstance.on('incident:reported', (data: string) => {
       setActivities((prev) => [
-        { id: Date.now().toString(), message: `Incident reported: ${data}`, timestamp: new Date(), type: 'warning' },
+        { id: Date.now().toString(), message: 'Reconnected — refreshed live data', timestamp: new Date(), type: 'success' },
         ...prev.slice(0, 49),
       ]);
-      fetchData();
-    });
-
-    return () => {
-      socketInstance.disconnect();
-    };
-  };
+    }
+  );
 
   // Pick a shift to score allocation against — there is no shift selector
   // UI here, so default to the nearest upcoming shift (or the first known
@@ -359,7 +366,12 @@ export default function Dashboard() {
           <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
             Sacred Moments
           </h2>
-          <div className="flex gap-4 overflow-x-auto pb-4">
+          <div
+            className="flex gap-4 overflow-x-auto pb-4"
+            role="region"
+            aria-label="Sacred Moments gallery, scroll horizontally"
+            tabIndex={0}
+          >
             {[
               { src: '/im1.webp', alt: 'Triveni Sangam Aerial View', caption: 'Crowds at the sacred confluence' },
               { src: '/im2.webp', alt: 'Evening Aarti', caption: 'Devotional ceremonies at ghats' },
@@ -468,8 +480,9 @@ export default function Dashboard() {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>Select Task</label>
+                  <label htmlFor="select-task" className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>Select Task</label>
                   <select
+                    id="select-task"
                     value={selectedTask || ''}
                     onChange={(e) => setSelectedTask(Number(e.target.value))}
                     style={{
@@ -536,8 +549,13 @@ export default function Dashboard() {
           <div className="card p-6 h-fit">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--status-green)' }} />
-                <span className="text-sm font-bold" style={{ color: 'var(--accent-saffron)' }}>LIVE</span>
+                <span
+                  className={`w-2 h-2 rounded-full ${socketStatus !== 'disconnected' ? 'animate-pulse' : ''}`}
+                  style={{ background: SOCKET_STATUS_META[socketStatus].color }}
+                />
+                <span className="text-sm font-bold" style={{ color: SOCKET_STATUS_META[socketStatus].color }}>
+                  {SOCKET_STATUS_META[socketStatus].label}
+                </span>
               </div>
               Activity Feed
             </h2>
@@ -581,24 +599,7 @@ export default function Dashboard() {
             <span style={{ color: 'var(--accent-gold)' }}>●</span> Zone Capacity Overview
           </h2>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={zones.map(z => ({
-                name: z.name,
-                current: z.currentLoad,
-                max: z.maxCapacity,
-                percentage: Math.round((z.currentLoad / z.maxCapacity) * 100)
-              }))}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="name" stroke="var(--text-secondary)" />
-                <YAxis stroke="var(--text-secondary)" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-                  itemStyle={{ color: 'var(--text-primary)' }}
-                />
-                <Bar dataKey="current" fill="var(--accent-saffron)" name="Current Load" />
-                <Bar dataKey="max" fill="var(--accent-gold)" name="Max Capacity" />
-              </BarChart>
-            </ResponsiveContainer>
+            <ZoneCapacityChart zones={zones} />
           </div>
         </div>
       </div>

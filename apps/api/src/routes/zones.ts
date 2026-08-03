@@ -5,14 +5,12 @@ import { sendSuccess, sendPrismaError, sendError } from "../lib/apiResponse";
 const router = Router();
 
 // GET all zones
+// No `include` here — list-view consumers (zones table, dashboard,
+// reports, the map/report zone dropdowns) only render Zone's own scalar
+// fields; the full tasks/incidents graph is reserved for :id detail.
 router.get("/", async (_req: Request, res: Response) => {
   try {
-    const zones = await prisma.zone.findMany({
-      include: {
-        tasks: true,
-        incidents: true,
-      },
-    });
+    const zones = await prisma.zone.findMany();
     sendSuccess(res, zones);
   } catch (error) {
     sendPrismaError(res, error);

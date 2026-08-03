@@ -45,6 +45,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -180,10 +181,14 @@ export default function SevaSahayak({ isInline = false }: Props) {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
           placeholder={role === 'pilgrim' ? 'Ask about Mahakumbh...' : 'Ask about your assignment...'}
           style={{
             flex: 1, padding: '10px 14px', borderRadius: '20px', fontSize: '14px',
-            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(232,101,10,0.2)',
+            background: 'rgba(255,255,255,0.06)',
+            border: `1px solid ${inputFocused ? 'var(--saffron)' : 'rgba(232,101,10,0.2)'}`,
+            boxShadow: inputFocused ? '0 0 0 3px rgba(232, 101, 10, 0.35)' : 'none',
             color: '#FFF8EE', outline: 'none', fontFamily: 'inherit',
           }}
         />
