@@ -37,8 +37,8 @@ change); the TopBanner fix is commit `a568d4b`.
 | 4 | Authentication foundation (Google OAuth via NextAuth.js) | ✅ Done — `9294b86` |
 | 5 | Reframe landing page into login + build the floating feature hub | ✅ Done — `9d26127` |
 | 6 | Finish primitive rollout + signature motion polish | ✅ Done — `b152978` |
-| 7 | **New feature depth (shift scheduling admin UI)** | ⬅ Do this next |
-| 8 | Performance & real-time robustness | Pending |
+| 7 | New feature depth (shift scheduling admin UI) | ✅ Done — `45ac8ed` |
+| 8 | **Performance & real-time robustness** | ⬅ Do this next |
 | 9 | Accessibility hardening (full audit) | Pending |
 | 10 | Resume-readiness (README, tests, CI, case study) | Pending |
 | 11 | Final QA + deploy | Pending |
@@ -217,63 +217,42 @@ Phase 8 item 3's job, not this phase's.
 
 ---
 
-## Phase 7 — New Feature Depth: Shift Scheduling Admin UI
+## Phase 7 (done) — New Feature Depth: Shift Scheduling Admin UI
 
-**Goal:** add genuinely relevant depth that isn't already present, fit to
-the existing data model. The live zone map now exists (Phase 5). The
-incident auto-deploy/resolve/socket system already covers real-time ops
-depth. Real authentication is now done (Phases 4-5). The one clearly
-underserved area left, backed by existing-but-unused infra, is **shift
-scheduling** — the `Shift` model has full CRUD (`apps/api/src/routes/
-shifts.ts`, added in Phase 1) but zero admin UI to manage shifts exists.
+Added `apps/web/app/shifts/page.tsx`: a coordinator-facing shift list
+(Card/Button/Badge/Modal primitives, same TopBanner/Sidebar chrome as
+the other feature pages) showing each shift's per-task capacity
+breakdown (assigned vs. task min/max as a colored badge), a "+ New
+Shift" Modal (start/end time), and an "Assign Volunteer" Modal that
+selects a task, calls `POST /api/allocation/recommendations` for live
+scored suggestions, and falls back to a manual active-volunteer picker.
 
-### Prompt for Claude Code
+Added real server-side double-booking enforcement to `POST /api/
+assignments`: blocks assigning a volunteer into a time-overlapping
+shift they haven't checked out of yet, returning `409` with structured
+conflict details, unless the caller passes `force: true`. The assign
+Modal surfaces this as a named warning with the primary "Assign" action
+swapping to an explicit "Assign Anyway" override — verified via curl
+(block → 409 → force → 201) and in a real browser (screenshot showing
+the warning + override render correctly).
 
-```
-Assume Phases 1-6 have run: the app has a login+hub structure, all
-feature pages use the shared design system, and apps/api/src/routes/
-shifts.ts already has full CRUD (GET list, GET by id, POST, PUT, DELETE,
-plus GET /upcoming). What's missing is any admin-facing UI to actually
-manage shifts, and any volunteer-facing view of "shifts I'm assigned to"
-beyond apps/web/app/volunteer/home/page.tsx's single "next assignment"
-card.
+Extended `volunteer/home/page.tsx` with a "More Upcoming Shifts" list
+(via `GET /api/shifts/upcoming` cross-referenced against the
+volunteer's own assignments) beyond the single next assignment. Wired
+the new page into `/hub`'s floating tiles (bottom-center, no collision
+with neighbors), `Sidebar.tsx`'s nav, and `middleware.ts`'s auth
+matcher. `prisma/seed.ts` needed no changes — its existing 10
+shifts/20 tasks/~30 assignments were already enough to demonstrate the
+feature once reseeded.
 
-1. Add a coordinator-facing shift management page,
-   apps/web/app/shifts/page.tsx, using the Phase 2 Card/Button/Badge/
-   Modal primitives and the same TopBanner/Sidebar chrome as the other
-   feature pages, that lists shifts, shows how many volunteers are
-   assigned per shift relative to task minVolunteers/maxVolunteers, and
-   allows creating a new shift (start/end time) and assigning volunteers
-   to it — reuse POST /api/allocation/recommendations to suggest who to
-   assign, and use the Modal component for the assignment picker. Add
-   this page as a new tile on the /hub floating navigation (Phase 5),
-   and to the middleware's protected-route matcher.
-
-2. Surface shift capacity conflicts: the allocation engine's
-   calculateAvailabilityScore already detects time-overlapping
-   assignments for scoring purposes. Surface this as a visible hard
-   validation warning when a coordinator tries to double-book a
-   volunteer across overlapping shifts, not just a lower recommendation
-   score.
-
-3. On the volunteer side, extend apps/web/app/volunteer/home/page.tsx to
-   show more than just the single next assignment — a short list of the
-   volunteer's upcoming shifts, using GET /api/shifts/upcoming filtered
-   to their own assignments.
-
-ACCEPTANCE CRITERIA:
-- A coordinator can create a shift, see it in a list, and assign
-  volunteers to it through the new UI.
-- Double-booking a volunteer across overlapping shifts is prevented or
-  clearly warned against.
-- The new page is reachable from /hub and protected by the same auth
-  gate as the other feature pages.
-- prisma/seed.ts produces enough shifts/assignments that this feature is
-  demonstrable out of the box.
-
-DO NOT in this phase: build a full drag-and-drop calendar (a list/table
-view is sufficient), or touch authentication/the volunteer OTP flow.
-```
+**A live-data hazard found during verification, not a code bug:**
+`apps/api/.env` is pointed at the production Neon database, not local
+Postgres — `npm run dev` in `apps/api` connects straight to production
+by default. All local testing for this phase used an explicit
+`DATABASE_URL` override (confirmed via Prisma's own datasource log line
+each time) and reseeded only the local Docker container; production was
+never touched. Worth fixing `apps/api/.env` if a safer local default is
+wanted. See commit `45ac8ed`.
 
 ---
 
