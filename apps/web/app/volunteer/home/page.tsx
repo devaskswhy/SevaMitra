@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -37,6 +39,7 @@ export default function VolunteerHome() {
   const [nextAssignment, setNextAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkInLoading, setCheckInLoading] = useState(false);
+  const [actionSuccess, setActionSuccess] = useState<'checkin' | 'checkout' | null>(null);
 
   useEffect(() => {
     const volunteerId = localStorage.getItem('volunteerId');
@@ -80,7 +83,9 @@ export default function VolunteerHome() {
     setCheckInLoading(true);
     try {
       await axios.post(`${API}/assignments/${nextAssignment.id}/check-in`);
-      fetchData();
+      await fetchData();
+      setActionSuccess('checkin');
+      setTimeout(() => setActionSuccess(null), 1800);
     } catch (error) {
       console.error('Failed to check in:', error);
     } finally {
@@ -93,7 +98,9 @@ export default function VolunteerHome() {
     setCheckInLoading(true);
     try {
       await axios.post(`${API}/assignments/${currentAssignment.id}/check-out`);
-      fetchData();
+      await fetchData();
+      setActionSuccess('checkout');
+      setTimeout(() => setActionSuccess(null), 1800);
     } catch (error) {
       console.error('Failed to check out:', error);
     } finally {
@@ -144,8 +151,22 @@ export default function VolunteerHome() {
 
       {/* Main Content */}
       <div className="px-4 -mt-16 pb-24">
+        {actionSuccess && (
+          <div className="text-center py-4 mb-4">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 checkmark-pop"
+              style={{ background: 'var(--success-tint)' }}
+            >
+              <span className="text-3xl">✓</span>
+            </div>
+            <p className="font-bold" style={{ color: 'var(--status-green)', fontFamily: 'var(--font-body)' }}>
+              {actionSuccess === 'checkin' ? 'Checked In' : 'Checked Out'}
+            </p>
+          </div>
+        )}
+
         {/* Current Assignment Card */}
-        <div className="card p-6 mb-4">
+        <Card padding="md" className="mb-4">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             Current Assignment
@@ -164,18 +185,16 @@ export default function VolunteerHome() {
                 </div>
               </div>
               
-              <button
+              <Button
                 onClick={handleCheckOut}
                 disabled={checkInLoading}
-                className="w-full px-6 py-4 rounded-xl font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: 'linear-gradient(135deg, var(--status-red), var(--status-amber))',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-body)'
-                }}
+                variant="danger"
+                size="lg"
+                className="w-full"
+                style={{ fontFamily: 'var(--font-body)' }}
               >
                 {checkInLoading ? 'Processing...' : 'Check Out'}
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="text-center py-8">
@@ -185,10 +204,10 @@ export default function VolunteerHome() {
               <p style={{ color: 'var(--text-secondary)' }}>No active assignment</p>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Next Shift Card */}
-        <div className="card p-6 mb-4">
+        <Card padding="md" className="mb-4">
           <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Next Shift</h2>
           
           {nextAssignment ? (
@@ -209,18 +228,15 @@ export default function VolunteerHome() {
               </div>
               
               {!currentAssignment && (
-                <button
+                <Button
                   onClick={handleCheckIn}
                   disabled={checkInLoading}
-                  className="w-full px-6 py-4 rounded-xl font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
-                    color: 'var(--bg-base)',
-                    fontFamily: 'var(--font-body)'
-                  }}
+                  size="lg"
+                  className="w-full"
+                  style={{ fontFamily: 'var(--font-body)' }}
                 >
                   {checkInLoading ? 'Processing...' : 'Check In Now'}
-                </button>
+                </Button>
               )}
             </div>
           ) : (
@@ -231,7 +247,7 @@ export default function VolunteerHome() {
               <p style={{ color: 'var(--text-secondary)' }}>No upcoming shifts</p>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">

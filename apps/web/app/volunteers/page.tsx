@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
 import axios from 'axios';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Badge, { statusToBadge } from '@/components/ui/Badge';
+import { useStaggerReveal } from '@/lib/scroll';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -49,6 +53,8 @@ export default function VolunteersPage() {
       v.email.toLowerCase().includes(search.toLowerCase())
   );
 
+  useStaggerReveal('.volunteer-row', !loading && !error && filtered.length > 0);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
@@ -74,27 +80,21 @@ export default function VolunteersPage() {
           </div>
 
           {error && (
-            <div className="card rounded-lg p-6 mb-6 text-center">
+            <Card padding="md" className="mb-6 text-center">
               <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load volunteers.</p>
-              <button
-                onClick={fetchVolunteers}
-                className="px-5 py-2 rounded-lg font-semibold"
-                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
-              >
-                Retry
-              </button>
-            </div>
+              <Button onClick={fetchVolunteers}>Retry</Button>
+            </Card>
           )}
 
           {!error && loading && (
-            <div className="card rounded-lg p-8 text-center" style={{ color: 'var(--text-muted)' }}>
+            <Card padding="lg" className="text-center" style={{ color: 'var(--text-muted)' }}>
               Loading volunteers...
-            </div>
+            </Card>
           )}
 
           {/* Volunteers Table */}
           {!error && !loading && (
-          <div className="card rounded-lg overflow-hidden">
+          <Card padding="none" className="overflow-hidden">
             <table className="w-full">
               <thead style={{ background: 'var(--bg-secondary)' }}>
                 <tr>
@@ -108,28 +108,26 @@ export default function VolunteersPage() {
               </thead>
               <tbody>
                 {filtered.map((v, index) => (
-                  <tr key={v.id} style={{ background: index % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
+                  <tr key={v.id} className="volunteer-row" style={{ background: index % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
                     <td className="px-6 py-4 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{v.name}</td>
                     <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{v.email}</td>
                     <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{v.phone}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="px-2 py-1 rounded text-xs font-medium" style={{ background: 'rgba(255, 107, 0, 0.12)', color: 'var(--accent-saffron)' }}>
+                      <Badge tone="saffron">
                         {v.skills.substring(0, 20)}...
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--accent-gold)' }}>{v.reliabilityScore}%</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="px-2 py-1 rounded text-xs font-semibold text-white" style={{
-                        background: v.status === 'ACTIVE' ? '#2E7D32' : '#B71C1C'
-                      }}>
+                      <Badge tone={statusToBadge(v.status).tone} variant="solid">
                         {v.status}
-                      </span>
+                      </Badge>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
           )}
 
           {!error && !loading && filtered.length === 0 && (

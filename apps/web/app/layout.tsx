@@ -4,6 +4,7 @@ import "./globals.css";
 import Loader from "@/components/Loader";
 import AuthProvider from "@/components/AuthProvider";
 import GlobalChatWidget from "@/components/GlobalChatWidget";
+import PageTransition from "@/components/ui/PageTransition";
 
 /* ═══════════════════════════════════════════════════════════════
    GOOGLE FONTS — Sacred Typography System
@@ -77,7 +78,7 @@ export default function RootLayout({
       >
         <Loader />
         <AuthProvider>
-          {children}
+          <PageTransition>{children}</PageTransition>
           <GlobalChatWidget />
         </AuthProvider>
       </body>

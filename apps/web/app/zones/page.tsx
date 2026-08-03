@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { priorityToBadge } from '@/components/ui/Badge';
 import axios from 'axios';
+import { useStaggerReveal } from '@/lib/scroll';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -44,6 +45,8 @@ export default function ZonesPage() {
     fetchZones();
   }, []);
 
+  useStaggerReveal('.zone-card', !loading && !error && zones.length > 0);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
@@ -75,7 +78,7 @@ export default function ZonesPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {zones.map((zone) => (
-              <Card key={zone.id} padding="md">
+              <Card key={zone.id} padding="md" className="zone-card">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{zone.name}</h3>

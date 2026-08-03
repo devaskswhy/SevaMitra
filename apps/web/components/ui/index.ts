@@ -1,5 +1,4 @@
 // components/ui/index.ts — Sacred UI Component Barrel Export
-export { default as SacredHeader } from './SacredHeader';
 export { default as ZoneCard } from './ZoneCard';
 export { default as VolunteerBadge } from './VolunteerBadge';
 export { default as IncidentCard } from './IncidentCard';

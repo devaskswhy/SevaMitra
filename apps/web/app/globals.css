@@ -482,6 +482,19 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
+/* Shared success-checkmark pop, used by the volunteer mobile flow's
+   report-submitted and check-in/check-out confirmation states so both
+   read as the same quality of "done" moment. */
+@keyframes checkmark-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.checkmark-pop {
+  animation: checkmark-pop 0.5s var(--ease-sacred) forwards;
+}
+
 /* Hub floating-tile idle motion (apps/web/app/hub/page.tsx). Rotation is
    applied separately per-tile via inline transform (each tile has its own
    fixed scatter angle) — this keyframe only handles the ambient bob, so
@@ -501,6 +514,10 @@ input:focus, select:focus, textarea:focus {
 
 .hub-tile:hover {
   transform: rotate(0deg) translateY(-8px) scale(1.04) !important;
+}
+
+.hub-tile:hover .card {
+  box-shadow: 0 16px 48px rgba(232, 101, 10, 0.4), 0 0 0 1px rgba(232, 101, 10, 0.3);
 }
 
 @keyframes dot-bounce {

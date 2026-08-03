@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
+import { gsap } from 'gsap';
 import Card from '@/components/ui/Card';
 
 const API = process.env.NEXT_PUBLIC_API_URL
@@ -127,6 +128,38 @@ export default function HubPage() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // Tiles float/settle into their scattered resting position+rotation on
+  // first mount, staggered per tile — instead of just appearing already
+  // in place. Mobile skips this (stacked grid, no scatter to settle into).
+  useEffect(() => {
+    if (isMobile) return;
+    const els = gsap.utils.toArray<HTMLElement>('.hub-tile');
+    if (els.length === 0) return;
+
+    const tween = gsap.fromTo(
+      els,
+      {
+        opacity: 0,
+        scale: 0.5,
+        y: 50,
+        rotation: (i: number) => TILES[i].rotation * 3,
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        rotation: (i: number) => TILES[i].rotation,
+        duration: 0.9,
+        ease: 'back.out(1.4)',
+        stagger: 0.15,
+      }
+    );
+
+    return () => {
+      tween.kill();
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     const fetchStats = async () => {

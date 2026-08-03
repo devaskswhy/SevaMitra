@@ -11,6 +11,7 @@ import Sidebar from '@/components/Sidebar';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { severityToBadge, priorityToBadge } from '@/components/ui/Badge';
+import { useStaggerReveal } from '@/lib/scroll';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -305,6 +306,9 @@ export default function Dashboard() {
     }
   };
 
+  useStaggerReveal('.metric-card', !loading);
+  useStaggerReveal('.zone-status-card', !loading);
+
   const getCapacityColor = (zone: Zone) => {
     const ratio = zone.currentLoad / zone.maxCapacity;
     if (ratio > 0.8) return 'var(--status-red)';
@@ -391,7 +395,7 @@ export default function Dashboard() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {zones.map((zone) => (
-                  <Card key={zone.id} padding="sm" className="hover:border-orange-400 overflow-hidden">
+                  <Card key={zone.id} padding="sm" className="hover:border-orange-400 overflow-hidden zone-status-card">
                     <div className="flex justify-between items-start mb-3">
                       <div className="min-w-0 flex-1 mr-2">
                         <div className="flex items-center gap-2 mb-1 min-w-0">
@@ -604,7 +608,7 @@ export default function Dashboard() {
 
 function MetricCard({ title, value, color, icon }: { title: string; value: number; color: string; icon: string }) {
   return (
-    <div className="card p-6 hover:shadow-xl transition-all">
+    <div className="card p-6 hover:shadow-xl transition-all metric-card">
       <div className="flex items-center justify-between mb-4">
         <span className="text-4xl">{icon}</span>
         <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>

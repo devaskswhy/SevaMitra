@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -75,7 +77,7 @@ export default function VolunteerLogin() {
       <div className="loading-bar"></div>
       <div className="om-watermark">ॐ</div>
       
-      <div className="card p-8 w-full max-w-md" style={{ maxWidth: '480px' }}>
+      <Card padding="lg" className="w-full max-w-md" style={{ maxWidth: '480px' }}>
         <div className="text-center mb-8">
           <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))' }}>
             <span className="text-5xl">🙏</span>
@@ -97,7 +99,7 @@ export default function VolunteerLogin() {
         </div>
 
         {!showOtp ? (
-          <form onSubmit={handleSendOtp} className="space-y-6">
+          <form key="phone" onSubmit={handleSendOtp} className="space-y-6" style={{ animation: 'fade-in-up 0.4s var(--ease-sacred)' }}>
             <div>
               <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
                 Phone Number
@@ -129,22 +131,12 @@ export default function VolunteerLogin() {
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
-                color: 'var(--text-inverse)',
-                border: 'none',
-                fontSize: 'var(--text-md)'
-              }}
-            >
+            <Button type="submit" disabled={loading} size="lg" className="w-full">
               {loading ? 'Sending OTP...' : 'Send OTP'}
-            </button>
+            </Button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} className="space-y-6">
+          <form key="otp" onSubmit={handleVerifyOtp} className="space-y-6" style={{ animation: 'fade-in-up 0.4s var(--ease-sacred)' }}>
             <div>
               <label className="block mb-2" style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)' }}>
                 Enter OTP
@@ -175,36 +167,23 @@ export default function VolunteerLogin() {
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
-                color: 'var(--text-inverse)',
-                border: 'none',
-                fontSize: 'var(--text-md)'
-              }}
-            >
+            <Button type="submit" disabled={loading} size="lg" className="w-full">
               {loading ? 'Verifying...' : 'Verify & Login'}
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="lg"
+              className="w-full"
               onClick={() => {
                 setShowOtp(false);
                 setOtp('');
                 setError('');
               }}
-              className="w-full px-6 py-4 rounded-lg font-medium transition-all"
-              style={{
-                background: 'var(--bg-section-alt)',
-                border: '1px solid var(--border-glow)',
-                color: 'var(--text-primary)'
-              }}
             >
               Change Phone Number
-            </button>
+            </Button>
           </form>
         )}
 
@@ -216,7 +195,7 @@ export default function VolunteerLogin() {
             </a>
           </p>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

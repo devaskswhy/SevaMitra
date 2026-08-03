@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { severityToBadge, toneToColorVar } from '@/components/ui/Badge';
 import axios from 'axios';
+import { useStaggerReveal } from '@/lib/scroll';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -164,6 +165,8 @@ export default function IncidentsPage() {
   const unresolved = incidents.filter((i) => !i.resolvedAt);
   const resolved = incidents.filter((i) => i.resolvedAt);
 
+  useStaggerReveal('.incident-card', !loading && !error && unresolved.length > 0);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <TopBanner />
@@ -228,6 +231,7 @@ export default function IncidentsPage() {
                     <Card
                       key={incident.id}
                       padding="md"
+                      className="incident-card"
                       style={{
                         borderLeft: `4px solid ${toneToColorVar(sev.tone)}`,
                         display: 'flex',

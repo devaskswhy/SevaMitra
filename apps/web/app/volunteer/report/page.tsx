@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -113,17 +115,20 @@ export default function IncidentReport() {
       {/* Main Content */}
       <div className="p-4 pb-24">
         {success ? (
-          <div className="card p-8 text-center">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--success-tint)' }}>
+          <Card padding="lg" className="text-center">
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 checkmark-pop"
+              style={{ background: 'var(--success-tint)' }}
+            >
               <span className="text-4xl">✓</span>
             </div>
             <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--status-green)', fontFamily: 'var(--font-body)' }}>Report Submitted</h2>
             <p style={{ color: 'var(--text-secondary)' }}>Thank you for reporting. Redirecting to home...</p>
-          </div>
+          </Card>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Severity Selector */}
-            <div className="card p-6">
+            <Card padding="md">
               <label className="block mb-4" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Severity Level</label>
               <div className="grid grid-cols-5 gap-2">
                 {[1, 2, 3, 4, 5].map((level) => (
@@ -163,10 +168,10 @@ export default function IncidentReport() {
                   {severity <= 2 ? 'LOW' : severity === 3 ? 'MEDIUM' : severity === 4 ? 'HIGH' : 'CRITICAL'}
                 </span>
               </div>
-            </div>
+            </Card>
 
             {/* Zone Selector */}
-            <div className="card p-6">
+            <Card padding="md">
               <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Location / Zone</label>
               <select
                 value={zoneId}
@@ -187,10 +192,10 @@ export default function IncidentReport() {
                   </option>
                 ))}
               </select>
-            </div>
+            </Card>
 
             {/* Incident Type */}
-            <div className="card p-6">
+            <Card padding="md">
               <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Incident Type</label>
               <select
                 value={type}
@@ -211,10 +216,10 @@ export default function IncidentReport() {
                   </option>
                 ))}
               </select>
-            </div>
+            </Card>
 
             {/* Description */}
-            <div className="card p-6">
+            <Card padding="md">
               <label className="block mb-3" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-base)', fontFamily: 'var(--font-body)', fontWeight: '600' }}>Description</label>
               <textarea
                 value={description}
@@ -229,7 +234,7 @@ export default function IncidentReport() {
                 }}
                 required
               />
-            </div>
+            </Card>
 
             {error && (
               <div className="px-4 py-3 rounded-xl flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
@@ -237,19 +242,9 @@ export default function IncidentReport() {
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full px-6 py-4 rounded-xl font-bold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
-                color: 'var(--bg-base)',
-                fontFamily: 'var(--font-body)',
-                fontSize: 'var(--text-md)'
-              }}
-            >
+            <Button type="submit" disabled={submitting} size="lg" className="w-full" style={{ fontFamily: 'var(--font-body)' }}>
               {submitting ? 'Submitting...' : 'Submit Report'}
-            </button>
+            </Button>
           </form>
         )}
       </div>

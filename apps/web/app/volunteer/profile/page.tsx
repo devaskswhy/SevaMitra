@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Badge, { statusToBadge } from '@/components/ui/Badge';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -72,20 +75,12 @@ export default function VolunteerProfile() {
   if (!volunteer) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 lotus-pattern" style={{ background: 'var(--bg-base)' }}>
-        <div className="card p-8 text-center" style={{ maxWidth: '480px' }}>
+        <Card padding="lg" className="text-center" style={{ maxWidth: '480px' }}>
           <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Volunteer data not found</p>
-          <button
-            onClick={() => router.push('/volunteer')}
-            className="px-6 py-4 rounded-lg font-bold transition-all hover:shadow-lg"
-            style={{
-              background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
-              color: 'var(--bg-base)',
-              fontFamily: 'var(--font-body)'
-            }}
-          >
+          <Button onClick={() => router.push('/volunteer')} size="lg" style={{ fontFamily: 'var(--font-body)' }}>
             Back to Login
-          </button>
-        </div>
+          </Button>
+        </Card>
       </div>
     );
   }
@@ -125,7 +120,7 @@ export default function VolunteerProfile() {
       {/* Main Content */}
       <div className="px-4 -mt-16 pb-24">
         {/* Profile Card */}
-        <div className="card p-6 mb-4">
+        <Card padding="md" className="mb-4">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))' }}>
               <span className="text-4xl">👤</span>
@@ -134,11 +129,9 @@ export default function VolunteerProfile() {
               <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>{volunteer.name}</h1>
               <p style={{ color: 'var(--text-secondary)' }}>{volunteer.email}</p>
               <div className="mt-2">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  volunteer.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
-                }`}>
+                <Badge tone={statusToBadge(volunteer.status).tone}>
                   {volunteer.status}
-                </span>
+                </Badge>
               </div>
             </div>
           </div>
@@ -153,10 +146,10 @@ export default function VolunteerProfile() {
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Completed Shifts</p>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Personal Info */}
-        <div className="card p-6 mb-4">
+        <Card padding="md" className="mb-4">
           <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Personal Information</h2>
           <div className="space-y-3">
             <div className="flex justify-between py-2" style={{ borderBottom: '1px solid var(--border-glow)' }}>
@@ -176,49 +169,49 @@ export default function VolunteerProfile() {
               <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{volunteer.homeState}</span>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Skills */}
-        <div className="card p-6 mb-4">
+        <Card padding="md" className="mb-4">
           <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Skills</h2>
           {skillsArray.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {skillsArray.map((skill, index) => (
-                <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ background: 'var(--saffron-tint)', color: 'var(--saffron)' }}>
+                <Badge key={index} tone="saffron">
                   {skill}
-                </span>
+                </Badge>
               ))}
             </div>
           ) : (
             <p style={{ color: 'var(--text-secondary)' }}>No skills listed</p>
           )}
-        </div>
+        </Card>
 
         {/* Languages */}
-        <div className="card p-6 mb-4">
+        <Card padding="md" className="mb-4">
           <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Languages</h2>
           {languagesArray.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {languagesArray.map((lang, index) => (
-                <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ background: 'var(--gold-tint)', color: 'var(--gold)' }}>
+                <Badge key={index} tone="gold">
                   {lang}
-                </span>
+                </Badge>
               ))}
             </div>
           ) : (
             <p style={{ color: 'var(--text-secondary)' }}>No languages listed</p>
           )}
-        </div>
+        </Card>
 
         {/* Certifications */}
-        <div className="card p-6 mb-4">
+        <Card padding="md" className="mb-4">
           <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Certifications</h2>
           {volunteer.certifications ? (
             <p style={{ color: 'var(--text-primary)' }}>{volunteer.certifications}</p>
           ) : (
             <p style={{ color: 'var(--text-secondary)' }}>No certifications listed</p>
           )}
-        </div>
+        </Card>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">

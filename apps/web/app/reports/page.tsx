@@ -3,7 +3,11 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Badge, { statusToBadge } from '@/components/ui/Badge';
 import axios from 'axios';
+import { useStaggerReveal } from '@/lib/scroll';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -86,6 +90,8 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchAll();
   }, []);
+
+  useStaggerReveal('.summary-card', !loading && !error && volunteers.length > 0);
 
   // Computed stats
   const totalVolunteers = volunteers.length;
@@ -175,16 +181,10 @@ export default function ReportsPage() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center lotus-pattern" style={{ background: 'var(--bg-primary)' }}>
-        <div className="card p-8 text-center" style={{ maxWidth: '420px' }}>
+        <Card padding="lg" className="text-center" style={{ maxWidth: '420px' }}>
           <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load report data.</p>
-          <button
-            onClick={fetchAll}
-            className="px-6 py-3 rounded-lg font-semibold"
-            style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
-          >
-            Retry
-          </button>
-        </div>
+          <Button onClick={fetchAll}>Retry</Button>
+        </Card>
       </div>
     );
   }
@@ -205,17 +205,9 @@ export default function ReportsPage() {
                 Event performance overview and volunteer insights
               </p>
             </div>
-            <button
-              onClick={handleExport}
-              className="px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg flex items-center gap-2"
-              style={{
-                background: 'linear-gradient(135deg, #FF6B00, #D4A017)',
-                color: '#fff',
-                border: 'none'
-              }}
-            >
+            <Button onClick={handleExport} className="flex items-center gap-2">
               📥 Export Report
-            </button>
+            </Button>
           </div>
 
           {/* Summary Stats */}
@@ -229,7 +221,7 @@ export default function ReportsPage() {
           <hr className="rangoli-divider" />
 
           {/* Zone Performance Table */}
-          <div className="card p-6 mb-8">
+          <Card padding="md" className="mb-8">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
               <span style={{ color: 'var(--accent-gold)' }}>●</span> Zone Performance
             </h2>
@@ -252,11 +244,9 @@ export default function ReportsPage() {
                       <td className="px-6 py-4 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{zone.name}</td>
                       <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{zone.assignedVolunteers}</td>
                       <td className="px-6 py-4 text-sm">
-                        <span className="px-2 py-1 rounded text-xs font-semibold text-white" style={{
-                          background: zone.incidents > 3 ? '#B71C1C' : '#2E7D32'
-                        }}>
+                        <Badge tone={zone.incidents > 3 ? 'danger' : 'success'} variant="solid">
                           {zone.incidents}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4 text-sm" style={{ color: 'var(--accent-saffron)' }}>{zone.avgResponseTime}</td>
                     </tr>
@@ -267,10 +257,10 @@ export default function ReportsPage() {
             {zonePerformance.length === 0 && (
               <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No zone data available.</div>
             )}
-          </div>
+          </Card>
 
           {/* Volunteer Leaderboard */}
-          <div className="card p-6">
+          <Card padding="md">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
               <span style={{ color: 'var(--accent-saffron)' }}>●</span> Volunteer Leaderboard — Top 10
             </h2>
@@ -313,11 +303,9 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Status */}
-                    <span className="px-2 py-1 rounded text-xs font-semibold text-white" style={{
-                      background: volunteer.status === 'ACTIVE' ? '#2E7D32' : '#B71C1C'
-                    }}>
+                    <Badge tone={statusToBadge(volunteer.status).tone} variant="solid">
                       {volunteer.status}
-                    </span>
+                    </Badge>
 
                     {/* Score */}
                     <div className="text-right">
@@ -333,7 +321,7 @@ export default function ReportsPage() {
             {leaderboard.length === 0 && (
               <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No volunteer data available.</div>
             )}
-          </div>
+          </Card>
         </div>
       </div>
     </div>
@@ -342,7 +330,7 @@ export default function ReportsPage() {
 
 function SummaryCard({ title, value, icon, color }: { title: string; value: string | number; icon: string; color: string }) {
   return (
-    <div className="card p-6 hover:shadow-xl transition-all">
+    <Card padding="md" className="hover:shadow-xl transition-all summary-card">
       <div className="flex items-center justify-between mb-4">
         <span className="text-4xl">{icon}</span>
         <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
@@ -350,7 +338,7 @@ function SummaryCard({ title, value, icon, color }: { title: string; value: stri
         </div>
       </div>
       <h3 className="font-medium" style={{ color: 'var(--text-secondary)', fontSize: '18px' }}>{title}</h3>
-    </div>
+    </Card>
   );
 }
 

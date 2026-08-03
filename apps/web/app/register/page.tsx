@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBanner from '@/components/TopBanner';
 import axios from 'axios';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -100,7 +102,7 @@ export default function RegisterPage() {
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Volunteer Registration</h1>
           <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Join us in serving at the Mahakumbh 2025</p>
 
-          <div className="card rounded-lg p-8">
+          <Card padding="lg">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
@@ -254,16 +256,11 @@ export default function RegisterPage() {
               )}
 
               {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full px-6 py-3 font-semibold rounded-lg transition-all hover:shadow-lg"
-                style={{ background: 'linear-gradient(135deg, #FF6B00, #D4A017)', color: '#fff', border: 'none' }}
-              >
+              <Button type="submit" disabled={loading} className="w-full">
                 {loading ? 'Registering...' : 'Register as Volunteer'}
-              </button>
+              </Button>
             </form>
-          </div>
+          </Card>
         </div>
       </div>
     </div>
