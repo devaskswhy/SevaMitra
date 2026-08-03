@@ -34,9 +34,9 @@ change); the TopBanner fix is commit `a568d4b`.
 | 1 | Bug/glitch fix pass | ✅ Done — `940b8c3` / `48ed272` |
 | 2 | Design system consolidation | ✅ Done — `bc5c1b4` / `69831a2` |
 | 3 | Restore production + close what Phase 1/2 didn't reach | ✅ Done — Neon schema+seed push / `a568d4b` |
-| 4 | **Authentication foundation (Google OAuth via NextAuth.js)** | ⬅ Do this next |
-| 5 | Reframe landing page into login + build the floating feature hub | Pending |
-| 6 | Finish primitive rollout + signature motion polish | Pending |
+| 4 | Authentication foundation (Google OAuth via NextAuth.js) | ✅ Done — `9294b86` |
+| 5 | Reframe landing page into login + build the floating feature hub | ✅ Done — `9d26127` |
+| 6 | **Finish primitive rollout + signature motion polish** | ⬅ Do this next |
 | 7 | New feature depth (shift scheduling admin UI) | Pending |
 | 8 | Performance & real-time robustness | Pending |
 | 9 | Accessibility hardening (full audit) | Pending |
@@ -123,305 +123,57 @@ clock as `null` and only setting a real value in a client-only
 
 ---
 
-## Phase 4 — Authentication Foundation (Google OAuth via NextAuth.js)
+## Phase 4 (done) — Authentication Foundation (Google OAuth via NextAuth.js)
 
-**Goal:** wire up real, working Google sign-in as pure infrastructure —
-no UI redesign, no gating of existing pages yet, nothing about the
-current app's behavior changes. This phase exists so Phase 5 (which
-builds the actual login page and hub UI on top of it) has a working
-`signIn('google')` / `useSession()` to call. Independently shippable and
-testable on its own via NextAuth's default `/api/auth/signin` page.
-
-This applies **only** to the admin/coordinator side of the app. The
-volunteer mobile flow (`/volunteer`, `/volunteer/home`, `/volunteer/
-profile`, `/volunteer/report`) already has its own separate, working
-phone+OTP login for a different persona (volunteers in the field) — do
-not touch it, do not merge the two auth systems, do not make volunteers
-sign in with Google.
-
-### Prompt for Claude Code
-
-```
-SevaMitra currently has zero authentication anywhere on the admin/
-coordinator side — /dashboard, /zones, /incidents, /volunteers, /reports,
-/register are all completely public. Add real Google OAuth using
-NextAuth.js (Auth.js), as pure infrastructure — this phase does NOT
-change any existing page's content, does NOT gate any existing route yet,
-and does NOT touch the separate volunteer OTP login
-(apps/web/app/volunteer/**, which is a different persona and out of
-scope here).
-
-1. Install next-auth in apps/web. Add
-   apps/web/app/api/auth/[...nextauth]/route.ts configuring the Google
-   provider, reading GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET /
-   NEXTAUTH_SECRET / NEXTAUTH_URL from env. None of these exist yet —
-   add them to a new apps/web/.env.example with comments explaining each
-   (GOOGLE_CLIENT_ID/SECRET come from a Google Cloud Console OAuth 2.0
-   Client ID with an authorized redirect URI of
-   <app-url>/api/auth/callback/google; NEXTAUTH_SECRET is any random
-   string, e.g. `openssl rand -base64 32`; NEXTAUTH_URL is the app's own
-   base URL). I will need to create the actual Google Cloud OAuth client
-   myself and supply real values — don't fabricate placeholder
-   credentials that look real.
-
-2. Add a client-side SessionProvider wrapper (new file, e.g.
-   apps/web/components/AuthProvider.tsx, 'use client') and mount it in
-   apps/web/app/layout.tsx around {children}, so useSession() works
-   anywhere in the app. This is an additive wrap only — don't restructure
-   layout.tsx otherwise.
-
-3. Add apps/web/middleware.ts using NextAuth's session-checking helper,
-   but scope its `matcher` to something that matches nothing live yet
-   (e.g. a route that doesn't exist yet, like `/hub/:path*`, with a
-   comment noting Phase 5 will expand this to cover /dashboard, /zones,
-   /incidents, /volunteers, /reports, /register, /map once those are
-   ready to be gated). This phase must not lock anyone out of any
-   currently-public page.
-
-4. Verify manually: visiting /api/auth/signin shows Google as a sign-in
-   option, and completing the flow establishes a session (confirm via a
-   temporary console.log of useSession() somewhere, or NextAuth's
-   session debug endpoint) — remove any temporary debug code before
-   finishing.
-
-ACCEPTANCE CRITERIA:
-- Google sign-in works end-to-end when real OAuth credentials are
-  supplied (confirm with me that you have working credentials before
-  marking this done — if you don't, implement everything correctly and
-  tell me exactly what to configure and where).
-- Every existing page (/, /dashboard, /zones, /incidents, /volunteers,
-  /reports, /register, /volunteer/**) remains exactly as reachable as it
-  was before this phase — nothing is gated yet.
-- No file outside the new auth files, layout.tsx (SessionProvider wrap),
-  package.json (new dependency), and .env.example is modified.
-
-DO NOT in this phase: touch apps/web/app/page.tsx, any page under
-apps/web/app/volunteer/**, any file in apps/api, the Prisma schema, or
-add any visual login UI — that's Phase 5.
-```
+Wired up real Google sign-in as pure infrastructure — no UI redesign, no
+gating, nothing about existing pages changed. Added `app/api/auth/
+[...nextauth]/route.ts` (Google provider, JWT sessions, no Prisma
+adapter), `components/AuthProvider.tsx` (`SessionProvider` wrap in
+`layout.tsx`), and `middleware.ts` scoped to `/hub/:path*` (a route that
+didn't exist yet, so it gated nothing live). `.env.example` documents the
+four new vars. Verified end-to-end against real Google OAuth credentials:
+`/api/auth/providers` lists Google with the correct callback URL, and
+clicking through actually redirects to Google's real consent screen
+showing "Sign in to continue to SevaMitra." Applies only to the
+admin/coordinator side — the volunteer phone+OTP flow was untouched. See
+commit `9294b86`.
 
 ---
 
-## Phase 5 — Reframe Landing Page Into Login + Build the Floating Feature Hub
+## Phase 5 (done) — Reframe Landing Page Into Login + Build the Floating Feature Hub
 
-**Goal:** this is the structural centerpiece of the UI rework. Turn the
-current homepage (`apps/web/app/page.tsx`) into a marketing/about +
-Google-login page — keeping its hero image slideshow and cinematic
-identity, removing the live operational sections — and add a new,
-authenticated landing experience (`/hub`) where every existing feature is
-reached by clicking a floating preview tile instead of a sidebar link.
+Reframed `app/page.tsx` into the login/marketing page — hero slideshow
+kept as-is, a brief About section added, "Sign in with Google" wired via
+`signIn('google', { callbackUrl: '/hub' })`. Every operational section
+that used to live there was relocated, not deleted-and-lost: `#stats`/
+`#zones`/`#volunteers`/`#chatbot`/activity-feed already had real homes on
+`dashboard`/`zones`/`volunteers`/the new global chat widget; `#map` had
+no home anywhere else and was ported to a new `app/map/page.tsx`
+(TopBanner+Sidebar chrome, added to `Sidebar`'s nav); `#incidents`'
+deploy button + toast notifications + real-time Socket.io handling
+didn't exist anywhere else and were ported into `incidents/page.tsx`,
+which previously only had a static list. Added `app/hub/page.tsx` (new)
+— the post-login floating hub, styled after
+`https://portfolio-niti-kanoongo.vercel.app/`: a black-to-saffron
+gradient, a bold welcome moment, live stat tiles, and 6 floating tiles
+that are miniature content previews of their destination page (not
+icons), scattered at varied rotation with idle float + hover-straighten
+motion. SevaSahayak promoted to a global widget
+(`components/GlobalChatWidget.tsx`, mounted in `layout.tsx`).
+`middleware.ts` now gates `/hub`, `/dashboard`, `/zones`, `/incidents`,
+`/volunteers`, `/reports`, `/register`, `/map`, redirecting signed-out
+visits to `/` instead of NextAuth's default sign-in page. `Button`
+gained a `shape="pill"` variant.
 
-**Concrete visual reference:** `https://portfolio-niti-kanoongo.vercel.app/`
-— specifically its hero and "I don't just prototype ideas..." section.
-This is a much closer match to SevaMitra's actual palette than the
-mobbin.com reference used in earlier drafts of this phase (that one was
-a light theme; this one is dark-to-saffron, essentially SevaMitra's own
-colors already). Four concrete patterns to port over, adapted rather than
-copied:
-1. **Background** — a deep-black-to-saffron/orange diagonal or radial
-   gradient (their black→`#FF6B00`-ish transition maps almost exactly
-   onto SevaMitra's existing `--bg-base`→`--saffron` pairing), not a flat
-   single color.
-2. **Floating tiles are real content previews, not generic icons** — on
-   the reference site, each floating card is an actual miniature
-   screenshot of one of that person's projects, tilted at a slightly
-   different angle (roughly -6° to +6°, not aligned to a grid), scattered
-   organically around central text. SevaMitra's hub tiles should follow
-   this exact idea: each tile is a small stylized preview of the actual
-   destination page's content (e.g. the dashboard tile shows a tiny
-   glimpse of stat cards, the map tile shows a hint of the zone map, the
-   incidents tile shows a hint of the incident list) — not a flat icon +
-   label. Reuse Phase 2's `Card` primitive as the tile's base and layer
-   the miniature preview inside it.
-3. **Bold mixed-weight display typography** for the hub's central
-   welcome moment — a large bold statement (use `--text-display`) with
-   one phrase set in a contrasting accent treatment. The reference uses
-   an italic handwritten script for emphasis; SevaMitra already has an
-   equivalent cultural parallel available — `--font-heading` (Tiro
-   Devanagari Sanskrit) is already used for the Om mark and Hindi phrase
-   elsewhere in the app, so use that as the accent treatment here instead
-   of importing a new script font.
-4. **Dark stat-tile treatment** — the reference's "900+ / 30+ / AWS /
-   Selected" 2x2 grid (bold oversized number, small label below, dark
-   near-black rounded card) is worth reusing for a small "at a glance"
-   stat row on the hub itself (e.g. Active Volunteers / Open Incidents,
-   pulled from the same dashboard stats endpoint) — it reinforces visual
-   continuity between the hub and the dashboard it links to.
-
-Elevate these patterns into SevaMitra's existing dark saffron/gold/
-deep-brown identity and Phase 2's token system — don't import the
-reference's fonts or literal colors, match the *composition and craft*.
-Assume Phase 4's NextAuth/Google infrastructure is in place.
-
-**This phase must not lose any existing capability.** page.tsx today has
-several live sections beyond the hero — each one's fate is spelled out
-below. Read it fully before touching anything; two of these need real
-porting work, not just deletion.
-
-### Prompt for Claude Code
-
-```
-Assume Phases 1-4 have run: production is restored, the design system +
-Button/Card/Badge/Modal primitives exist in apps/web/components/ui/, and
-apps/web/app/api/auth/[...nextauth]/route.ts + a SessionProvider in
-layout.tsx already provide working Google sign-in (not yet gating
-anything). Your job in this phase is structural: reframe the landing
-page, relocate its operational content to where it belongs, and build
-the new post-login floating hub. Do not touch apps/api, the Prisma
-schema, the allocation engine, or apps/web/app/volunteer/** (a separate,
-already-working persona/flow — leave it alone).
-
-PART A — REFRAME apps/web/app/page.tsx INTO THE LOGIN/MARKETING PAGE
-
-Keep: the hero section's image carousel/slideshow (HERO_IMAGES crossfade,
-dot indicators), the "|| सेवा ही पूजा है ||" mark, the Om watermark, the
-overall cinematic look. This is exactly the "cool UI and slideshow
-pictures" that should stay. Add a "Sign in with Google" control
-integrated into this same hero (not a separate /login route) using
-next-auth's signIn('google', { callbackUrl: '/hub' }), styled with the
-Phase 2 Button component. The page should otherwise read as an about/
-marketing page for what SevaMitra is — no live stats, no data tables, no
-operational content visible pre-login.
-
-Every other section currently in page.tsx needs to go somewhere. Handle
-each exactly as follows — do not improvise a different disposition:
-
-- #stats (StatCards + "Quick Volunteer Allocation" panel): DELETE from
-  page.tsx. apps/web/app/dashboard/page.tsx already has an equivalent,
-  fully-working version of both (Phase 1 already ported the same
-  handleFindBestVolunteers logic, including the offline-estimate
-  fallback and proximity field, into dashboard/page.tsx) — just confirm
-  dashboard's version still renders correctly after this change; there
-  is nothing here to merge.
-
-- #zones (zone cards grid): DELETE from page.tsx.
-  apps/web/app/zones/page.tsx already fully covers this, including the
-  Phase 2 Badge-based priority pills.
-
-- #map (the interactive Leaflet MapSection/ZoneMap): this is the one
-  section with NO existing home elsewhere. PORT it to a new route,
-  apps/web/app/map/page.tsx, wrapped in the same TopBanner + Sidebar
-  admin chrome that /zones and /incidents already use (match that
-  existing layout pattern, don't invent a new one). This becomes a real,
-  standalone feature page.
-
-- #incidents (incident list, Deploy button, toast notifications, the
-  pulse-highlight animation for new critical incidents, and the
-  socket.on('incident:deployed'/'incident:resolved'/'incident:new')
-  listeners): apps/web/app/incidents/page.tsx currently has only a basic
-  unresolved/resolved list with NO deploy button and NO real-time socket
-  handling at all. PORT the full richer implementation from page.tsx
-  into incidents/page.tsx — this replaces incidents.tsx's current
-  handling, it is not something you can just delete from page.tsx,
-  because nothing else in the app currently has equivalent
-  functionality. Take your time getting this one right; it's the
-  highest-risk item in this phase for actually losing a working feature.
-
-- #volunteers (volunteer table with search): DELETE from page.tsx.
-  apps/web/app/volunteers/page.tsx already covers this.
-
-- #chatbot (the inline SevaSahayak embed section): DELETE this section
-  entirely — superseded by Part C below (SevaSahayak becomes a global
-  persistent widget, not a page section).
-
-- Live activity feed / socket connection indicator: dashboard/page.tsx
-  already has an equivalent "Activity Feed" panel — confirm parity, then
-  delete page.tsx's copy.
-
-PART B — BUILD THE FLOATING FEATURE HUB (apps/web/app/hub/page.tsx, new)
-
-A new authenticated route styled after
-https://portfolio-niti-kanoongo.vercel.app/'s hero/"real load, real data,
-real users" section (see the Goal section above for the specific patterns
-to port). After Google sign-in redirects here, show:
-- A full-bleed deep-black-to-saffron gradient background (not the flat
-  --bg-base the rest of the app uses — this page is the one deliberate
-  exception, matching the reference's black-to-orange hero treatment).
-- A central welcome moment using the signed-in user's Google profile name
-  (via useSession()), set in bold --text-display type with the person's
-  name or one key phrase rendered in --font-heading (Tiro Devanagari) as
-  the accent treatment, echoing the reference's bold-sans + italic-script
-  mix — e.g. "Namaste, {name}" in --font-body bold, "🙏 सेवा के लिए तैयार"
-  or similar in --font-heading beneath it.
-- A small 2-4 tile "at a glance" stat row (dark near-black rounded cards,
-  bold oversized number + small label, matching the reference's
-  900+/30+/AWS/Selected grid) pulling from the same stats the dashboard
-  already shows (e.g. Active Volunteers, Open Incidents) — GET the data
-  from the existing endpoints, don't duplicate calculation logic.
-- Floating PREVIEW tiles for each feature page — Dashboard (/dashboard),
-  Zone Map (/map), Incidents (/incidents), Volunteers (/volunteers),
-  Reports (/reports), Register Volunteer (/register). Each tile is NOT a
-  flat icon + label — build it as a small Card containing a miniature,
-  simplified visual preview of that page's actual content (e.g. the
-  dashboard tile shows tiny stat-card shapes, the map tile shows a
-  simplified zone-dot pattern, the incidents tile shows a hint of a
-  severity badge list) plus a label. Scatter them around the central
-  content at varied positions AND varied rotation (roughly -6deg to
-  +6deg per tile, not uniform), not a grid — match the reference's
-  organic scatter. Give each tile its own subtle continuous idle
-  float/rotate-settle animation, staggered so they don't move in sync,
-  using Phase 2's motion tokens (--duration-slow, --ease-sacred); on
-  hover, a tile should lift slightly and straighten toward 0deg rotation
-  before navigating on click. This is the app's primary post-login
-  navigation — deliberately not a sidebar or a button grid.
-- SevaSahayak does NOT get a tile — see Part C, it's persistent instead.
-- Any button on this page (nav, CTA) should use Phase 2's Button
-  component with a fully rounded/pill border-radius variant, matching the
-  reference's pill-shaped nav and CTA buttons — if Button doesn't
-  currently support a pill shape, add a `shape="pill"` prop rather than
-  overriding border-radius inline per usage.
-
-PART C — MAKE SEVASAHAYAK GLOBAL
-
-apps/web/components/SevaSahayak.tsx's floating-widget usage is currently
-only mounted in page.tsx (`<SevaSahayakFloat isInline={false} />` via
-next/dynamic with ssr:false). Promote it to apps/web/app/layout.tsx
-(follow the same 'use client' + next/dynamic(ssr:false) pattern already
-used in page.tsx) so it's visible and functional on the login page, the
-hub, and every feature page — not tied to any single route. Remove the
-now-redundant per-page mount from page.tsx once it's global. Do not
-change SevaSahayak.tsx's internal behavior (chat logic, Groq API calls)
-at all — this is purely about where it's mounted.
-
-PART D — GATE THE FEATURE ROUTES
-
-Expand apps/web/middleware.ts's matcher (added in Phase 4, currently
-scoped to nothing live) to cover /hub, /dashboard, /zones, /incidents,
-/volunteers, /reports, /register, /map — redirect unauthenticated
-visits to / (the login page). Leave apps/web/app/volunteer/** and every
-apps/api route completely ungated — different, already-working auth
-story, out of scope here.
-
-ACCEPTANCE CRITERIA:
-- / shows the reframed landing page: hero slideshow + about copy + a
-  working "Sign in with Google" control. No live operational data is
-  visible pre-login.
-- Signing in redirects to /hub, showing: the black-to-saffron gradient
-  background, the bold display-type welcome moment, the "at a glance"
-  stat tiles, the floating preview tiles, and the persistent SevaSahayak
-  widget.
-- Hub tiles are genuine content previews (a recognizable miniature of
-  each destination page), not flat icon+label tiles — spot check this
-  visually, it's the whole point of the reference.
-- Tiles are scattered at varied positions/rotation, not aligned to a
-  grid, and every tile navigates correctly; every destination feature
-  page still does everything it did before this phase — specifically
-  confirm /incidents now has a working Deploy button with toast feedback
-  (it didn't before), /map renders the interactive Leaflet map (it's new
-  here), and /dashboard's stats + Quick Volunteer Allocation panel still
-  work.
-- Visiting any gated route while signed out redirects to /.
-- SevaSahayak is visible and functional on the landing page, the hub, and
-  at least two feature pages — confirm it's genuinely global, not
-  duplicated per-page.
-- Nothing under apps/web/app/volunteer/** changed at all.
-
-DO NOT in this phase: touch the Prisma schema, apps/api, the allocation
-engine, or the volunteer OTP flow. Don't attempt full visual polish on
-the hub tiles or the newly-ported /map and /incidents pages yet beyond
-what's needed for them to work correctly and look intentional — Phase 6
-is the dedicated craft/motion pass.
-```
+**A real bug found and fixed during verification:** the hero's
+scroll-linked fade was rendering at its end state (invisible) even at
+scroll position zero. `gsap.registerPlugin(ScrollTrigger)` only ran
+inside the parent `Home()` component's effect, but React mounts child
+effects (`HeroSection`) before parent effects, so the scroll-linked
+timeline could be created before the plugin was registered. Fixed by
+registering at module scope instead — only reproduced because the new
+page is much shorter than the old one, which is worth remembering if
+this pattern gets copied elsewhere. See commit `9d26127`.
 
 ---
 
