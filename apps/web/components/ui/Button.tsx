@@ -4,6 +4,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 
 export type ButtonVariant = 'primary' | 'outline' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonShape = 'default' | 'pill';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual style. Defaults to 'primary'. */
@@ -12,6 +13,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    *  Every size keeps a >=48px tap target (--tap-target) regardless of the
    *  visual density, per the app's older-age-friendly accessibility goal. */
   size?: ButtonSize;
+  /** 'default' keeps .btn-sacred's usual --radius-sm corners. 'pill' fully
+   *  rounds the button — used on the login/hub pages. */
+  shape?: ButtonShape;
 }
 
 const sizeStyles: Record<ButtonSize, React.CSSProperties> = {
@@ -29,7 +33,7 @@ const sizeStyles: Record<ButtonSize, React.CSSProperties> = {
  * look via inline styles.
  */
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = 'primary', size = 'md', className = '', style, disabled, children, ...rest },
+  { variant = 'primary', size = 'md', shape = 'default', className = '', style, disabled, children, ...rest },
   ref
 ) {
   return (
@@ -39,6 +43,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       disabled={disabled}
       style={{
         ...sizeStyles[size],
+        ...(shape === 'pill' ? { borderRadius: '999px' } : {}),
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? 'not-allowed' : 'pointer',
         ...style,

@@ -482,6 +482,27 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
+/* Hub floating-tile idle motion (apps/web/app/hub/page.tsx). Rotation is
+   applied separately per-tile via inline transform (each tile has its own
+   fixed scatter angle) — this keyframe only handles the ambient bob, so
+   it composes with that rotation rather than overriding it. */
+@keyframes hub-tile-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Each tile's per-instance scatter rotation is set via inline style
+   (transform: rotate(...)) on this element; :hover needs to win over that
+   inline value to straighten + lift the tile, hence !important here. */
+.hub-tile {
+  transition: transform var(--duration-base) var(--ease-sacred);
+  cursor: pointer;
+}
+
+.hub-tile:hover {
+  transform: rotate(0deg) translateY(-8px) scale(1.04) !important;
+}
+
 @keyframes dot-bounce {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
   30% { transform: translateY(-4px); opacity: 1; }

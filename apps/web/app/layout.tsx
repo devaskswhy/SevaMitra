@@ -3,6 +3,7 @@ import { Inter, Tiro_Devanagari_Sanskrit } from "next/font/google";
 import "./globals.css";
 import Loader from "@/components/Loader";
 import AuthProvider from "@/components/AuthProvider";
+import GlobalChatWidget from "@/components/GlobalChatWidget";
 
 /* ═══════════════════════════════════════════════════════════════
    GOOGLE FONTS — Sacred Typography System
@@ -75,7 +76,10 @@ export default function RootLayout({
         }}
       >
         <Loader />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+          <GlobalChatWidget />
+        </AuthProvider>
       </body>
     </html>
   );

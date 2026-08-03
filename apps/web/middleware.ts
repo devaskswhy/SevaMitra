@@ -1,11 +1,26 @@
-export { default } from "next-auth/middleware";
+import { withAuth } from "next-auth/middleware";
 
-// Scoped to /hub — a route that doesn't exist yet (Phase 5 adds it) — so
-// this currently gates nothing live. Phase 5 will expand the matcher to
-// cover /dashboard, /zones, /incidents, /volunteers, /reports, /register,
-// /map once those are ready to require sign-in. Does not, and must not,
-// ever match apps/web/app/volunteer/** (separate phone+OTP persona) or
-// any apps/api route.
+// Redirect unauthenticated visits to our own reframed login page (/)
+// instead of NextAuth's default /api/auth/signin page.
+export default withAuth({
+  pages: {
+    signIn: "/",
+  },
+});
+
+// Gates every admin/coordinator feature page added across Phases 3-5.
+// Deliberately does NOT match apps/web/app/volunteer/** (separate
+// phone+OTP persona, its own already-working auth story) or any
+// apps/api route.
 export const config = {
-  matcher: ["/hub/:path*"],
+  matcher: [
+    "/hub/:path*",
+    "/dashboard/:path*",
+    "/zones/:path*",
+    "/incidents/:path*",
+    "/volunteers/:path*",
+    "/reports/:path*",
+    "/register/:path*",
+    "/map/:path*",
+  ],
 };

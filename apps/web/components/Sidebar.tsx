@@ -13,6 +13,7 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', icon: '📊', path: '/dashboard' },
   { label: 'Volunteers', icon: '👥', path: '/volunteers' },
   { label: 'Zones', icon: '📍', path: '/zones' },
+  { label: 'Zone Map', icon: '🗺️', path: '/map' },
   { label: 'Incidents', icon: '⚠️', path: '/incidents' },
   { label: 'Reports', icon: '📈', path: '/reports' },
   { label: 'Register', icon: '📝', path: '/register' },
