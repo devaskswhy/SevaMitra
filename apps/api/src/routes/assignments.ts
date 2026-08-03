@@ -52,7 +52,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 // POST create new assignment
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { volunteerId, taskId, shiftId } = req.body;
+    const { volunteerId, taskId, shiftId, force } = req.body;
 
     // Check for duplicate assignment
     const existing = await prisma.assignment.findUnique({
@@ -68,6 +68,47 @@ router.post("/", async (req: Request, res: Response) => {
     if (existing) {
       sendError(res, "Volunteer already assigned to this task in this shift", 409);
       return;
+    }
+
+    // Hard validation: block double-booking a volunteer across
+    // time-overlapping shifts unless the coordinator explicitly
+    // overrides with force:true. Only assignments the volunteer hasn't
+    // checked out of yet count as live conflicts (matches the
+    // allocation engine's own availability-scoring definition).
+    if (!force) {
+      const targetShift = await prisma.shift.findUnique({ where: { id: shiftId } });
+      if (!targetShift) {
+        sendError(res, "Shift not found", 404);
+        return;
+      }
+
+      const conflicts = await prisma.assignment.findMany({
+        where: {
+          volunteerId,
+          checkOutTime: null,
+          shift: {
+            AND: [
+              { startTime: { lt: targetShift.endTime } },
+              { endTime: { gt: targetShift.startTime } },
+            ],
+          },
+        },
+        include: { shift: true, task: true },
+      });
+
+      if (conflicts.length > 0) {
+        res.status(409).json({
+          success: false,
+          error: "Volunteer has a conflicting assignment in an overlapping shift",
+          conflicts: conflicts.map((c) => ({
+            shiftId: c.shiftId,
+            startTime: c.shift.startTime,
+            endTime: c.shift.endTime,
+            taskTitle: c.task.title,
+          })),
+        });
+        return;
+      }
     }
 
     const assignment = await prisma.assignment.create({

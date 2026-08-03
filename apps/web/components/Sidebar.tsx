@@ -16,6 +16,7 @@ const navItems: NavItem[] = [
   { label: 'Zone Map', icon: '🗺️', path: '/map' },
   { label: 'Incidents', icon: '⚠️', path: '/incidents' },
   { label: 'Reports', icon: '📈', path: '/reports' },
+  { label: 'Shifts', icon: '🗓️', path: '/shifts' },
   { label: 'Register', icon: '📝', path: '/register' },
 ];
 

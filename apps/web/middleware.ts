@@ -22,5 +22,6 @@ export const config = {
     "/reports/:path*",
     "/register/:path*",
     "/map/:path*",
+    "/shifts/:path*",
   ],
 };

@@ -37,6 +37,7 @@ export default function VolunteerHome() {
   const router = useRouter();
   const [currentAssignment, setCurrentAssignment] = useState<Assignment | null>(null);
   const [nextAssignment, setNextAssignment] = useState<Assignment | null>(null);
+  const [upcomingShifts, setUpcomingShifts] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkInLoading, setCheckInLoading] = useState(false);
   const [actionSuccess, setActionSuccess] = useState<'checkin' | 'checkout' | null>(null);
@@ -53,8 +54,14 @@ export default function VolunteerHome() {
   const fetchData = async () => {
     try {
       const volunteerId = localStorage.getItem('volunteerId');
-      const response = await axios.get(`${API}/assignments`);
-      const assignments: Assignment[] = response.data.data || response.data;
+      const [assignmentsRes, upcomingShiftsRes] = await Promise.all([
+        axios.get(`${API}/assignments`),
+        axios.get(`${API}/shifts/upcoming`),
+      ]);
+      const assignments: Assignment[] = assignmentsRes.data.data || assignmentsRes.data;
+      const upcomingShiftIds = new Set(
+        (upcomingShiftsRes.data.data || upcomingShiftsRes.data).map((s: { id: number }) => s.id)
+      );
       const myAssignments = assignments.filter(
         (a) => a.volunteerId === parseInt(volunteerId!)
       );
@@ -63,14 +70,16 @@ export default function VolunteerHome() {
       const current = myAssignments.find((a) => a.checkInTime && !a.checkOutTime);
       setCurrentAssignment(current || null);
 
-      // Next assignment: not yet checked in, shift starts in the future,
-      // soonest first — this is what "Check In Now" acts on.
-      const now = new Date();
+      // Upcoming: not yet checked in, shift is in the server's future-shift
+      // set, soonest first. The very next one drives "Check In Now"; the
+      // rest render as a short list so the volunteer can see more than
+      // just the single next assignment.
       const upcoming = myAssignments
-        .filter((a) => !a.checkInTime && new Date(a.shift.startTime) > now)
+        .filter((a) => !a.checkInTime && upcomingShiftIds.has(a.shift.id))
         .sort((a, b) => new Date(a.shift.startTime).getTime() - new Date(b.shift.startTime).getTime());
 
       setNextAssignment(upcoming[0] || null);
+      setUpcomingShifts(upcoming.slice(1, 5));
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -248,6 +257,30 @@ export default function VolunteerHome() {
             </div>
           )}
         </Card>
+
+        {/* More Upcoming Shifts */}
+        {upcomingShifts.length > 0 && (
+          <Card padding="md" className="mb-4">
+            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>
+              More Upcoming Shifts
+            </h2>
+            <div className="space-y-3">
+              {upcomingShifts.map((a) => (
+                <div key={a.id} className="p-3 rounded-xl" style={{ background: 'var(--bg-section-alt)' }}>
+                  <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
+                    {new Date(a.shift.startTime).toLocaleDateString()}
+                  </div>
+                  <p className="font-medium text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>
+                    {a.task.title} — {a.task.zone.name}
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    {new Date(a.shift.startTime).toLocaleTimeString()} - {new Date(a.shift.endTime).toLocaleTimeString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">

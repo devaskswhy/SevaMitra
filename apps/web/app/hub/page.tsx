@@ -89,6 +89,17 @@ function RegisterPreview() {
   );
 }
 
+function ShiftsPreview() {
+  const blocks = [{ c: '#1DB954', w: '30%' }, { c: '#D4A017', w: '45%' }, { c: '#E8650A', w: '25%' }];
+  return (
+    <div style={{ display: 'flex', gap: '3px', height: '20px' }}>
+      {blocks.map((b, i) => (
+        <div key={i} style={{ width: b.w, borderRadius: '3px', background: `${b.c}33`, border: `1px solid ${b.c}66` }} />
+      ))}
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════
    TILE DATA — position/rotation hand-tuned for an organic scatter
    (desktop only; mobile falls back to a simple stacked grid).
@@ -110,6 +121,7 @@ const TILES: Tile[] = [
   { href: '/volunteers', label: 'Volunteers', rotation: -4, desktopPos: { top: '48%', right: '3%' }, delay: 1.8, Preview: VolunteersPreview },
   { href: '/reports', label: 'Reports', rotation: 3, desktopPos: { bottom: '8%', left: '11%' }, delay: 2.4, Preview: ReportsPreview },
   { href: '/register', label: 'Register', rotation: -6, desktopPos: { bottom: '6%', right: '9%' }, delay: 3, Preview: RegisterPreview },
+  { href: '/shifts', label: 'Shifts', rotation: -3, desktopPos: { bottom: '4%', left: '42%' }, delay: 3.6, Preview: ShiftsPreview },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
