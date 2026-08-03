@@ -38,9 +38,9 @@ change); the TopBanner fix is commit `a568d4b`.
 | 5 | Reframe landing page into login + build the floating feature hub | ✅ Done — `9d26127` |
 | 6 | Finish primitive rollout + signature motion polish | ✅ Done — `b152978` |
 | 7 | New feature depth (shift scheduling admin UI) | ✅ Done — `45ac8ed` |
-| 8 | **Performance & real-time robustness** | ⬅ Do this next |
-| 9 | Accessibility hardening (full audit) | Pending |
-| 10 | Resume-readiness (README, tests, CI, case study) | Pending |
+| 8 | Performance & real-time robustness | ✅ Done — `66bdbf8` |
+| 9 | Accessibility hardening (full audit) | ✅ Done — `66bdbf8` |
+| 10 | **Resume-readiness (README, tests, CI, case study)** | ⬅ Do this next |
 | 11 | Final QA + deploy | Pending |
 
 Also worth knowing going in: an external PR (`copilot/update-incident-
@@ -256,66 +256,68 @@ wanted. See commit `45ac8ed`.
 
 ---
 
-## Phase 8 — Performance & Real-Time Robustness
+## Phase 8 (done) — Performance & Real-Time Robustness
 
-**Goal:** harden what's built, including the incident auto-deploy/socket
-system and the new login+hub structure — don't rebuild either, verify
-they hold up.
+Added a shared `useSocket` hook (`apps/web/lib/socket.ts`) with explicit
+exponential-backoff reconnection, a visible connection-status badge
+(LIVE/RECONNECTING/OFFLINE, distinct from "waiting for updates"), and a
+full refetch specifically on reconnect-after-a-drop. Wired into
+`/dashboard` and `/incidents` — `/map` turned out to use static demo
+data with no socket at all, so there was nothing to instrument there
+despite the original prompt assuming otherwise.
 
-### Prompt for Claude Code
+Trimmed `GET /api/volunteers`/`GET /api/zones` list routes to drop
+unused nested includes (~40% smaller volunteers payload, measured
+directly against real data); left `tasks`/`assignments` routes as-is
+since `shifts/page.tsx` and `volunteer/home/page.tsx` depend on their
+current shape. Added two schema indexes backed by actual query
+patterns: `Assignment(volunteerId, checkOutTime)` (the Phase 7
+double-booking check plus the allocation engine's scoring) and
+`Incident(status)` (queried by the auto-resolve job, previously
+unindexed).
 
-```
-Audit and harden SevaMitra's performance and real-time reliability.
-Assume Phases 1-7 have run. This touches apps/web, apps/api, and
-prisma/schema.prisma but adds no new user-facing features.
+Converted the login hero gallery to `next/image` and dropped
+`next.config.mjs`'s `images.unoptimized: true` (dead config — nothing
+used `next/image` before this). Code-split `/dashboard`'s Recharts
+usage into `components/ZoneCapacityChart.tsx` via
+`next/dynamic(ssr:false)`, matching `/map`'s existing MapSection
+pattern — dropped `/dashboard`'s First Load JS from 284kB to 182kB.
+Redis and NextAuth's session strategy were both already correctly
+configured (no redis dependency, JWT sessions) — confirmed, no changes
+needed. Lighthouse on `/` went 51 → 76 (mobile-emulated, same
+methodology as the Phase 6 baseline). See commit `66bdbf8`.
 
-1. SOCKET.IO RECONNECTION: apps/api/src/index.ts's Socket.io setup
-   (incident:deployed/incident:resolved/incident:new, plus
-   assignment:updated/incident:reported) and the client usage across
-   /dashboard, /incidents, and /map have no reconnection handling, no
-   connection-state UI feedback, and no catch-up on missed events after
-   a drop. Add exponential-backoff reconnection (socket.io-client
-   supports this natively), a visible "reconnecting..." state distinct
-   from "waiting for live updates," and a full data refetch on
-   reconnect.
+---
 
-2. PRISMA QUERY / INDEX AUDIT: check apps/api/src/routes/*.ts for
-   over-fetching — e.g. does GET /api/volunteers include the full
-   assignments graph even on list views that only render summary
-   fields? Add leaner queries for list endpoints, reserve full includes
-   for :id detail routes. Cross-check prisma/schema.prisma's @@index
-   declarations against actual WHERE/ORDER BY usage.
+## Phase 9 (done) — Accessibility Hardening Pass
 
-3. IMAGE OPTIMIZATION: the login page's hero gallery (apps/web/app/
-   page.tsx, kept from before Phase 5) uses raw <img> tags instead of
-   next/image, loading large unoptimized JPEGs at full resolution.
-   Convert to next/image with priority on the first visible image.
+Full-app audit via `@axe-core/playwright` (wcag2a+wcag2aa) across all 14
+routes plus a real bounding-box sweep of every interactive element.
+Found and fixed real, live bugs, not just theoretical gaps: pinch-zoom
+was actually disabled (`layout.tsx`'s viewport export); `Badge`'s solid
+variant failed contrast on 4 of 5 tones (white text on bright
+saffron/gold/success/warning measured as low as 2.4:1), which alone
+was causing violations on `/dashboard`, `/zones`, `/incidents`,
+`/reports`, and `/shifts` simultaneously; the globally-mounted
+SevaSahayak chat input had zero visible focus indicator on every page;
+and the login carousel dots had regressed to an 8×8px tap target again
+(the same class of bug fixed once before, `69831a2`) alongside
+Leaflet's default 30×30 zoom controls and the volunteer mobile bottom
+nav (48px tall but ~35px wide).
 
-4. LIGHTHOUSE PASS: run Lighthouse (mobile + desktop) against /, /hub,
-   and /volunteer/home post-changes, address the top opportunities,
-   record before/after scores. Confirm /map's Leaflet bundle and
-   /dashboard's Recharts are code-split via next/dynamic(ssr:false),
-   matching the pattern page.tsx already used for MapSection.
+Also fixed: critical `select-name`/`button-name` axe violations and
+every unlabeled form input across register, shifts, and the volunteer
+mobile flow via proper `htmlFor`/`id` association; `role="alert"`/
+`role="status"` on form validation and submission feedback so screen
+readers announce it; an `opacity-75` wrapper on incidents' Resolved
+cards that pushed already-modest text under 4.5:1; and a
+`prefers-reduced-motion` fallback for the hub's idle tile bob (this
+app's first continuous ambient animation). The hub tiles themselves
+were already correctly built as real `role="link"` + keyboard-handled
+elements — confirmed, no changes needed there.
 
-5. API RESPONSE CACHING: only relevant if redis remains a real
-   dependency (previously used only by the deleted dead chat route from
-   Phase 1) — check apps/api/package.json first before reintroducing
-   anything.
-
-6. AUTH SESSION PERFORMANCE: confirm NextAuth's session strategy
-   (Phase 4) isn't adding a noticeable delay to every gated page load —
-   JWT session strategy (not database-backed) should be near-instant;
-   verify this is what's configured.
-
-ACCEPTANCE CRITERIA:
-- Socket disconnection is visibly different from "never connected," and
-  reconnection is automatic with backoff.
-- Lighthouse performance score on / (mobile) improves measurably from a
-  documented baseline.
-- GET /api/volunteers list-view payload is measurably smaller than
-  before this phase.
-- No new features or visual changes — this is purely a hardening pass.
-```
+Full write-up in `apps/web/ACCESSIBILITY.md`. Re-verified after every
+fix: 0 axe violations across all 14 routes. See commit `66bdbf8`.
 
 ---
 
