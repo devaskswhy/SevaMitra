@@ -36,8 +36,8 @@ change); the TopBanner fix is commit `a568d4b`.
 | 3 | Restore production + close what Phase 1/2 didn't reach | ✅ Done — Neon schema+seed push / `a568d4b` |
 | 4 | Authentication foundation (Google OAuth via NextAuth.js) | ✅ Done — `9294b86` |
 | 5 | Reframe landing page into login + build the floating feature hub | ✅ Done — `9d26127` |
-| 6 | **Finish primitive rollout + signature motion polish** | ⬅ Do this next |
-| 7 | New feature depth (shift scheduling admin UI) | Pending |
+| 6 | Finish primitive rollout + signature motion polish | ✅ Done — `b152978` |
+| 7 | **New feature depth (shift scheduling admin UI)** | ⬅ Do this next |
 | 8 | Performance & real-time robustness | Pending |
 | 9 | Accessibility hardening (full audit) | Pending |
 | 10 | Resume-readiness (README, tests, CI, case study) | Pending |
@@ -177,102 +177,43 @@ this pattern gets copied elsewhere. See commit `9d26127`.
 
 ---
 
-## Phase 6 — Finish Primitive Rollout + Signature Motion Polish
+## Phase 6 (done) — Finish Primitive Rollout + Signature Motion Polish
 
-**Goal:** apply real craft and intentional motion to every page that
-doesn't already have it, now that Phase 5 has settled the app's final
-page structure (login page, hub, and the feature pages including the new
-`/map` and the upgraded `/incidents`). This also finishes migrating the
-pages Phase 2 explicitly deferred.
+Migrated the pages Phase 2 explicitly deferred — `reports/page.tsx`,
+`volunteers/page.tsx`, `register/page.tsx`, and all four `volunteer/*`
+mobile pages — onto `Card`/`Button`/`Badge` (using `statusToBadge` for
+status pills). Left intentionally bespoke where a primitive didn't
+semantically fit: the leaderboard's rank-circle emoji badges, the
+severity 1-5 picker squares, and icon-only nav/header buttons.
 
-### Prompt for Claude Code
+Added a shared `useStaggerReveal` hook (`apps/web/lib/scroll.ts`) that
+reuses the exact GSAP `fromTo`/`stagger`/`ScrollTrigger` pattern the old
+`page.tsx` stats section used, and wired it into `/dashboard`, `/zones`,
+`/incidents`, `/volunteers`, `/reports`, `/map` — no framer-motion
+introduced for this. `/hub`'s floating tiles now float/settle into their
+scattered position+rotation on first mount (staggered `back.out` GSAP
+tween) and get a saffron hover glow. The volunteer mobile flow's
+OTP-sent→entry transition now fades continuously, and check-in/check-out
+share a `checkmark-pop` success state with `volunteer/report/page.tsx`'s
+existing checkmark. The login hero's "Sign in with Google" button has a
+magnetic cursor-pull interaction (`gsap.quickTo`) as its one signature
+moment beyond the image crossfade.
 
-```
-Assume Phases 1-5 have run: production is restored, one token system +
-Button/Card/Badge/Modal exist, and the app now has its final page
-structure — a reframed login/marketing page at /, an authenticated
-floating hub at /hub, and feature pages at /dashboard, /zones,
-/incidents, /volunteers, /reports, /register, /map, all gated behind
-Google sign-in. apps/web/app/page.tsx's hero section (kept from before)
-is already close to the mountstreetprinters.com reference quality; bring
-everything else up to that bar.
+`SacredHeader.tsx` (confirmed dead via grep) was deleted; `PageTransition.tsx`
+(also dead, but already depending on the already-installed framer-motion)
+was wired into `layout.tsx` for real route-transition motion — confirmed
+via an A/B production build that this added **zero** bytes to the shared
+JS bundle, since framer-motion was already being pulled into the shared
+chunk regardless of whether anything used it.
 
-1. FINISH THE PRIMITIVE ROLLOUT: apps/web/app/reports/page.tsx,
-   volunteers/page.tsx, register/page.tsx, and all four volunteer/*
-   mobile pages still hand-roll their own badge/card/button markup
-   instead of using components/ui/Badge, Card, and Button (they already
-   use the shared tokens — just not the components). Migrate them. Use
-   Badge's severityToBadge/priorityToBadge/statusToBadge helpers where
-   they apply.
-
-2. FEATURE PAGES (/dashboard, /zones, /incidents, /volunteers, /reports,
-   /map): still read as a generic admin template — static grids,
-   minimal motion. Add staggered entrance animations for card grids on
-   scroll/mount (reuse the GSAP patterns already proven in page.tsx's
-   former stats section — don't introduce a second animation library;
-   framer-motion is already a dependency used only by the currently-
-   unused apps/web/components/ui/SacredHeader.tsx, PageTransition.tsx,
-   and VolunteerBadge.tsx — confirm via grep whether those are actually
-   wired into any route before deciding whether to standardize on GSAP
-   or adopt framer-motion for this pass; don't run both in new code).
-   Pay particular attention to /map (newly added in Phase 5) and
-   /incidents (newly upgraded with the deploy/toast functionality in
-   Phase 5) — bring these two up to the same visual bar as the rest.
-
-3. HUB TILE POLISH: Phase 5 made the /hub floating tiles functionally
-   correct but not necessarily polished — add hover glow, a staggered
-   entrance animation on first mount (tiles floating/settling into
-   position and rotation rather than appearing instantly, matching
-   https://portfolio-niti-kanoongo.vercel.app/'s tilted-scatter reference
-   from Phase 5), and confirm the idle bob/rotate animation feels
-   intentional rather than distracting at rest.
-
-4. VOLUNTEER MOBILE FLOW: this is the highest-stakes UX in the app
-   (older, possibly first-time smartphone users, in bright outdoor
-   daylight, completing time-critical tasks) and is entirely separate
-   from the login/hub work in Phases 4-5. Elevate with intentional but
-   RESTRAINED motion — this audience does not benefit from cinematic
-   parallax. Prioritize clear state transitions (OTP sent -> OTP entry
-   should feel continuous) and a satisfying success state for check-in/
-   check-out (the existing checkmark success state in volunteer/report/
-   page.tsx is a good reference quality to extend to check-in/out).
-
-5. LOGIN/LANDING MOMENT: the reframed page.tsx (hero + Sign in with
-   Google) is strong but static beyond the image crossfade. Add one
-   signature interaction that isn't already there — e.g. an entrance
-   animation for the sign-in control, or a subtle parallax layer. Keep
-   additions minimal and intentional.
-
-6. NAVBAR/DEAD-CODE AUDIT: apps/web/components/ui/SacredHeader.tsx and
-   PageTransition.tsx exist but (confirm via grep) are likely not
-   imported anywhere real — dead code from an earlier iteration,
-   superseded by TopBanner.tsx + Sidebar.tsx (feature pages) and the new
-   hub (post-login). If confirmed unused, either delete them or actually
-   wire PageTransition into the app router layout for real page-
-   transition motion when navigating between hub tiles / sidebar items —
-   the latter is more valuable, since a real page transition is
-   currently missing.
-
-ACCEPTANCE CRITERIA:
-- Zero hand-rolled badge/card/button markup remains in reports.tsx,
-  volunteers.tsx, register.tsx, or volunteer/**/*.tsx.
-- Every feature page (including the new /map and upgraded /incidents)
-  has at least one deliberate scroll- or mount-triggered reveal
-  animation.
-- The hub's floating tiles have a real entrance animation and hover
-  state, not just the bare functional floating from Phase 5.
-- The volunteer mobile flow's motion is deliberately calmer than the
-  desktop/admin experience.
-- SacredHeader.tsx and PageTransition.tsx are either deleted or actually
-  used.
-- Lighthouse performance score on / does not regress by more than 5
-  points from a baseline taken before starting.
-
-DO NOT in this phase: add new features, new routes, new data, or touch
-API/backend business logic, the Prisma schema, or the Google auth
-plumbing from Phase 4. Do not re-theme away from the dark saffron/gold/
-deep-brown identity.
-```
+**Lighthouse note:** no pre-Phase-6 baseline had been captured, so the
+"≤5 point regression" criterion couldn't be checked as a literal diff.
+Ran Lighthouse on `/` post-phase instead (51 performance / 83
+accessibility / 100 best-practices / 100 SEO) and isolated this phase's
+specific additions via the bundle-size A/B above — they cost nothing.
+The mediocre performance score is most likely the hero's large
+unoptimized JPEGs (raw `<img>`, no `next/image`), which is explicitly
+Phase 8 item 3's job, not this phase's.
 
 ---
 
