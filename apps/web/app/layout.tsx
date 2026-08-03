@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Tiro_Devanagari_Sanskrit } from "next/font/google";
 import "./globals.css";
 import Loader from "@/components/Loader";
+import AuthProvider from "@/components/AuthProvider";
 
 /* ═══════════════════════════════════════════════════════════════
    GOOGLE FONTS — Sacred Typography System
@@ -74,7 +75,7 @@ export default function RootLayout({
         }}
       >
         <Loader />
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
