@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import Badge, { statusToBadge } from '@/components/ui/Badge';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
+import { DownloadIcon, UsersIcon, CheckCircleIcon, ShieldIcon, StarIcon, MedalIcon, type IconProps } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -128,10 +129,10 @@ export default function ReportsPage() {
     .slice(0, 10);
 
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return { emoji: '🥇', color: '#D4A017', bg: 'rgba(212, 160, 23, 0.1)' };
-    if (rank === 2) return { emoji: '🥈', color: '#78909C', bg: 'rgba(120, 144, 156, 0.1)' };
-    if (rank === 3) return { emoji: '🥉', color: '#8B5E3C', bg: 'rgba(139, 94, 60, 0.1)' };
-    return { emoji: `#${rank}`, color: 'var(--text-muted)', bg: 'rgba(160, 120, 90, 0.05)' };
+    if (rank === 1) return { isMedal: true, color: '#D4A017', bg: 'rgba(212, 160, 23, 0.1)' };
+    if (rank === 2) return { isMedal: true, color: '#78909C', bg: 'rgba(120, 144, 156, 0.1)' };
+    if (rank === 3) return { isMedal: true, color: '#8B5E3C', bg: 'rgba(139, 94, 60, 0.1)' };
+    return { isMedal: false, label: `#${rank}`, color: 'var(--text-muted)', bg: 'rgba(160, 120, 90, 0.05)' };
   };
 
   const toCsvValue = (value: string | number) => {
@@ -206,16 +207,16 @@ export default function ReportsPage() {
               </p>
             </div>
             <Button onClick={handleExport} className="flex items-center gap-2">
-              📥 Export Report
+              <DownloadIcon size={18} /> Export Report
             </Button>
           </div>
 
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <SummaryCard title="Total Volunteers" value={totalVolunteers} icon="👥" color="var(--accent-saffron)" />
-            <SummaryCard title="Shifts Completed" value={totalShiftsCompleted} icon="✅" color="var(--success)" />
-            <SummaryCard title="Incidents Resolved" value={totalIncidentsResolved} icon="🛡️" color="var(--accent-gold)" />
-            <SummaryCard title="Avg Reliability Score" value={`${avgReliability}%`} icon="⭐" color="var(--accent-deep)" />
+            <SummaryCard title="Total Volunteers" value={totalVolunteers} icon={UsersIcon} color="var(--accent-saffron)" />
+            <SummaryCard title="Shifts Completed" value={totalShiftsCompleted} icon={CheckCircleIcon} color="var(--success)" />
+            <SummaryCard title="Incidents Resolved" value={totalIncidentsResolved} icon={ShieldIcon} color="var(--accent-gold)" />
+            <SummaryCard title="Avg Reliability Score" value={`${avgReliability}%`} icon={StarIcon} color="var(--accent-deep)" />
           </div>
 
           <hr className="rangoli-divider" />
@@ -289,7 +290,7 @@ export default function ReportsPage() {
                         fontSize: rank <= 3 ? '20px' : '14px'
                       }}
                     >
-                      {badge.emoji}
+                      {badge.isMedal ? <MedalIcon size={22} /> : badge.label}
                     </div>
 
                     {/* Volunteer Info */}
@@ -328,11 +329,11 @@ export default function ReportsPage() {
   );
 }
 
-function SummaryCard({ title, value, icon, color }: { title: string; value: string | number; icon: string; color: string }) {
+function SummaryCard({ title, value, icon: Icon, color }: { title: string; value: string | number; icon: (props: IconProps) => React.JSX.Element; color: string }) {
   return (
     <Card padding="md" className="hover:shadow-xl transition-all summary-card">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-4xl">{icon}</span>
+        <span style={{ color }}><Icon size={32} /></span>
         <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
           <span className="text-3xl font-bold" style={{ color }}>{value}</span>
         </div>

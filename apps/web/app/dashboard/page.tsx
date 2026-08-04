@@ -12,6 +12,20 @@ import Card from '@/components/ui/Card';
 import Badge, { severityToBadge, priorityToBadge } from '@/components/ui/Badge';
 import { useStaggerReveal } from '@/lib/scroll';
 import { useSocket, SocketStatus } from '@/lib/socket';
+import {
+  UsersIcon,
+  MapPinIcon,
+  AlertTriangleIcon,
+  ClipboardIcon,
+  FlameIcon,
+  RadioIcon,
+  WavesIcon,
+  TentIcon,
+  MedicalIcon,
+  TrafficIcon,
+  DoorIcon,
+  type IconProps,
+} from '@/components/icons';
 
 // Recharts is a heavy dependency (previously the single largest chunk of
 // this route's initial JS) — code-split it out the same way MapSection
@@ -355,10 +369,10 @@ export default function Dashboard() {
 
         {/* Top Metrics Bar */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <MetricCard title="Total Active Volunteers" value={stats.totalActiveVolunteers} color="var(--accent-saffron)" icon="👥" />
-          <MetricCard title="Zones >80% Capacity" value={stats.zonesOverCapacity} color="var(--accent-gold)" icon="📍" />
-          <MetricCard title="Open Incidents" value={stats.openIncidents} color="var(--accent-deep)" icon="⚠️" />
-          <MetricCard title="Pending Assignments" value={stats.pendingAssignments} color="var(--accent-gold)" icon="📋" />
+          <MetricCard title="Total Active Volunteers" value={stats.totalActiveVolunteers} color="var(--accent-saffron)" icon={UsersIcon} />
+          <MetricCard title="Zones >80% Capacity" value={stats.zonesOverCapacity} color="var(--accent-gold)" icon={MapPinIcon} />
+          <MetricCard title="Open Incidents" value={stats.openIncidents} color="var(--accent-deep)" icon={AlertTriangleIcon} />
+          <MetricCard title="Pending Assignments" value={stats.pendingAssignments} color="var(--accent-gold)" icon={ClipboardIcon} />
         </div>
 
         {/* Sacred Moments Image Strip */}
@@ -411,7 +425,9 @@ export default function Dashboard() {
                     <div className="flex justify-between items-start mb-3">
                       <div className="min-w-0 flex-1 mr-2">
                         <div className="flex items-center gap-2 mb-1 min-w-0">
-                          <span className="text-xl flex-shrink-0">{getZoneIcon(zone.type)}</span>
+                          <span className="flex-shrink-0" style={{ color: 'var(--accent-saffron)' }}>
+                            {(() => { const ZoneIcon = getZoneIcon(zone.type); return <ZoneIcon size={18} />; })()}
+                          </span>
                           <h3 className="font-semibold truncate" style={{ color: 'var(--text-primary)', fontSize: 'var(--text-sm)' }}>{zone.name}</h3>
                         </div>
                         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{zone.type}</p>
@@ -463,8 +479,8 @@ export default function Dashboard() {
                           </div>
                           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{incident.description}</p>
                         </div>
-                        <Button onClick={() => handleDeployVolunteers(incident.id)} className="ml-4">
-                          🔥 Deploy Volunteers
+                        <Button onClick={() => handleDeployVolunteers(incident.id)} className="ml-4 flex items-center gap-2">
+                          <FlameIcon size={16} /> Deploy Volunteers
                         </Button>
                       </Card>
                     );
@@ -562,7 +578,7 @@ export default function Dashboard() {
             <div className="space-y-3 h-[600px] overflow-y-auto pr-2">
               {activities.length === 0 ? (
                 <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-                  <p className="text-4xl mb-4">📡</p>
+                  <RadioIcon size={40} className="mx-auto mb-4" />
                   <p>Waiting for live updates...</p>
                   <p className="text-sm mt-2">Connected to Socket.io</p>
                 </div>
@@ -607,11 +623,11 @@ export default function Dashboard() {
   );
 }
 
-function MetricCard({ title, value, color, icon }: { title: string; value: number; color: string; icon: string }) {
+function MetricCard({ title, value, color, icon: Icon }: { title: string; value: number; color: string; icon: (props: IconProps) => React.JSX.Element }) {
   return (
     <div className="card p-6 hover:shadow-xl transition-all metric-card">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-4xl">{icon}</span>
+        <span style={{ color }}><Icon size={32} /></span>
         <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
           <span className="text-4xl font-bold" style={{ color }}>{value}</span>
         </div>
@@ -621,14 +637,14 @@ function MetricCard({ title, value, color, icon }: { title: string; value: numbe
   );
 }
 
-function getZoneIcon(type: string): string {
-  const icons: { [key: string]: string } = {
-    'GHAT': '🏊',
-    'CAMP': '🏕',
-    'MEDICAL': '🏥',
-    'TRAFFIC': '🚦',
-    'ENTRY_EXIT': '🚪',
-    'CROWD_CONTROL': '👥',
+function getZoneIcon(type: string): (props: IconProps) => React.JSX.Element {
+  const icons: { [key: string]: (props: IconProps) => React.JSX.Element } = {
+    'GHAT': WavesIcon,
+    'CAMP': TentIcon,
+    'MEDICAL': MedicalIcon,
+    'TRAFFIC': TrafficIcon,
+    'ENTRY_EXIT': DoorIcon,
+    'CROWD_CONTROL': UsersIcon,
   };
-  return icons[type] || '📍';
+  return icons[type] || MapPinIcon;
 }

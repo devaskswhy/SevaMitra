@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, ReactNode, MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
+import { CloseIcon } from '@/components/icons';
 
 export interface ModalProps {
   open: boolean;
@@ -111,9 +112,10 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
             <button
               onClick={onClose}
               aria-label="Close"
-              style={{ minHeight: 'var(--tap-target)', minWidth: 'var(--tap-target)', fontSize: 'var(--text-md)' }}
+              className="flex items-center justify-center"
+              style={{ minHeight: 'var(--tap-target)', minWidth: 'var(--tap-target)' }}
             >
-              ✕
+              <CloseIcon size={18} />
             </button>
           </div>
         )}

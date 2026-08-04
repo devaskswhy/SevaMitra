@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       : []
 
   if (history.length === 0) {
-    return NextResponse.json({ reply: 'Kshama karein, message khaali hai. 🙏' })
+    return NextResponse.json({ reply: 'Kshama karein, message khaali hai.' })
   }
 
   const systemPrompt = `You are SevaSahayak, a friendly and knowledgeable AI assistant for Mahakumbh 2025 built into SevaMitra volunteer management system. You were created by the SevaMitra team for Mahakumbh 2025. You run on an advanced AI model. Answer ALL questions naturally and conversationally — greetings, casual chat, opinions, anything.
@@ -36,7 +36,7 @@ Key knowledge:
 
 If someone asks which model you are: say you are SevaSahayak, Mahakumbh 2025 AI assistant, without mentioning the underlying model.
 Always be warm, helpful, and use occasional Hindi like Namaste, Kshama karein, Dhanyavaad.
-Keep responses concise — max 4-5 lines.`
+Keep responses concise — max 4-5 lines. Never use emojis.`
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -63,10 +63,10 @@ Keep responses concise — max 4-5 lines.`
       return NextResponse.json({ reply: data.choices[0].message.content })
     } else {
       console.error('Unexpected Groq response:', data)
-      return NextResponse.json({ reply: 'Kshama karein, abhi jawab dene mein asmarth hoon. 🙏' })
+      return NextResponse.json({ reply: 'Kshama karein, abhi jawab dene mein asmarth hoon.' })
     }
   } catch (error) {
     console.error('Groq API error:', error)
-    return NextResponse.json({ reply: 'Kshama karein, kuch takniki samasya hai. 🙏' })
+    return NextResponse.json({ reply: 'Kshama karein, kuch takniki samasya hai.' })
   }
 }

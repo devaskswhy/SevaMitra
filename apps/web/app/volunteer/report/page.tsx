@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import { CheckCircleIcon, XCircleIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -119,9 +120,9 @@ export default function IncidentReport() {
           <Card padding="lg" className="text-center">
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 checkmark-pop"
-              style={{ background: 'var(--success-tint)' }}
+              style={{ background: 'var(--success-tint)', color: 'var(--status-green)' }}
             >
-              <span className="text-4xl">✓</span>
+              <CheckCircleIcon size={40} />
             </div>
             <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--status-green)', fontFamily: 'var(--font-body)' }}>Report Submitted</h2>
             <p style={{ color: 'var(--text-secondary)' }}>Thank you for reporting. Redirecting to home...</p>
@@ -244,7 +245,7 @@ export default function IncidentReport() {
 
             {error && (
               <div role="alert" className="px-4 py-3 rounded-xl flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
-                ❌ {error}
+                <XCircleIcon size={16} className="flex-shrink-0" /> {error}
               </div>
             )}
 

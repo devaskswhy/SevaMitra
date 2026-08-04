@@ -9,6 +9,7 @@ import Badge, { severityToBadge, toneToColorVar } from '@/components/ui/Badge';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
 import { useSocket, SocketStatus } from '@/lib/socket';
+import { CheckCircleIcon, HourglassIcon, FlameIcon } from '@/components/icons';
 
 const SOCKET_STATUS_META: Record<SocketStatus, { color: string; label: string }> = {
   connected: { color: 'var(--status-green)', label: 'LIVE' },
@@ -123,7 +124,7 @@ export default function IncidentsPage() {
       socket.on('incident:deployed', (incident: Incident) => {
         setIncidents((prev) => [incident, ...prev.filter((item) => item.id !== incident.id)]);
         const volunteerName = incident.volunteersDeployed?.[0]?.name || 'Volunteer';
-        setToastMessage(`✅ Deployed! ${volunteerName} assigned.`);
+        setToastMessage(`Deployed! ${volunteerName} assigned.`);
       });
 
       socket.on('incident:resolved', (incident: Incident) => {
@@ -142,7 +143,7 @@ export default function IncidentsPage() {
     // whatever incident events happened to arrive during the outage.
     () => {
       fetchIncidents();
-      setToastMessage('🔄 Reconnected — refreshed incident data.');
+      setToastMessage('Reconnected — refreshed incident data.');
     }
   );
 
@@ -157,7 +158,7 @@ export default function IncidentsPage() {
       });
       if (data?.assignedVolunteer) {
         setToastMessage(
-          `✅ Deployed! ${data.assignedVolunteer.name} assigned. Est. resolution: ${data.estimatedResolution}`
+          `Deployed! ${data.assignedVolunteer.name} assigned. Est. resolution: ${data.estimatedResolution}`
         );
       }
     } catch (err) {
@@ -193,8 +194,12 @@ export default function IncidentsPage() {
             fontWeight: 600,
             boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
             maxWidth: '360px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
           }}
         >
+          <CheckCircleIcon size={18} />
           {toastMessage}
         </div>
       )}
@@ -286,9 +291,11 @@ export default function IncidentsPage() {
                       <Button
                         onClick={() => handleDeployVolunteers(incident.id)}
                         disabled={isDeploying}
+                        className="flex items-center justify-center gap-2"
                         style={{ whiteSpace: 'nowrap', minWidth: '140px' }}
                       >
-                        {isDeploying ? '⏳ Deploying...' : '🔥 Deploy'}
+                        {isDeploying ? <HourglassIcon size={16} /> : <FlameIcon size={16} />}
+                        {isDeploying ? 'Deploying...' : 'Deploy'}
                       </Button>
                     </Card>
                   );

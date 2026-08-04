@@ -6,6 +6,7 @@ import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge, { statusToBadge } from '@/components/ui/Badge';
+import { UserIcon, HomeIcon, AlertTriangleIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -124,8 +125,8 @@ export default function VolunteerProfile() {
         {/* Profile Card */}
         <Card padding="md" className="mb-4">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))' }}>
-              <span className="text-4xl">👤</span>
+            <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))', color: '#0D0500' }}>
+              <UserIcon size={36} />
             </div>
             <div>
               <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>{volunteer.name}</h1>
@@ -221,18 +222,18 @@ export default function VolunteerProfile() {
             onClick={() => router.push('/volunteer/home')}
             className="card p-6 text-center hover:shadow-xl transition-all"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--saffron-tint)' }}>
-              <span className="text-2xl">🏠</span>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--saffron-tint)', color: 'var(--accent-saffron)' }}>
+              <HomeIcon size={22} />
             </div>
             <p className="font-semibold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Home</p>
           </button>
-          
+
           <button
             onClick={() => router.push('/volunteer/report')}
             className="card p-6 text-center hover:shadow-xl transition-all"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--danger-tint)' }}>
-              <span className="text-2xl">⚠️</span>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--danger-tint)', color: 'var(--status-red)' }}>
+              <AlertTriangleIcon size={22} />
             </div>
             <p className="font-semibold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Report Incident</p>
           </button>

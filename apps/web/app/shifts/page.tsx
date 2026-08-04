@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import { useStaggerReveal } from '@/lib/scroll';
+import { AlertTriangleIcon, CheckCircleIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -425,8 +426,8 @@ export default function ShiftsPage() {
                         )}
                       </div>
                       {conflict && (
-                        <p role="alert" className="mt-2 text-xs" style={{ color: 'var(--status-red)' }}>
-                          ⚠ Already assigned to &quot;{conflict.conflicts[0].taskTitle}&quot; overlapping this time
+                        <p role="alert" className="mt-2 text-xs flex items-center gap-1" style={{ color: 'var(--status-red)' }}>
+                          <AlertTriangleIcon size={13} /> Already assigned to &quot;{conflict.conflicts[0].taskTitle}&quot; overlapping this time
                           ({formatShiftTime(conflict.conflicts[0].startTime)}–{formatShiftTime(conflict.conflicts[0].endTime)})
                         </p>
                       )}
@@ -462,8 +463,8 @@ export default function ShiftsPage() {
                 </div>
                 {conflictInfo && conflictInfo.volunteerId === manualVolunteerId && (
                   <div className="mt-2">
-                    <p role="alert" className="text-xs mb-2" style={{ color: 'var(--status-red)' }}>
-                      ⚠ Already assigned to &quot;{conflictInfo.conflicts[0].taskTitle}&quot; overlapping this time
+                    <p role="alert" className="text-xs mb-2 flex items-center gap-1" style={{ color: 'var(--status-red)' }}>
+                      <AlertTriangleIcon size={13} /> Already assigned to &quot;{conflictInfo.conflicts[0].taskTitle}&quot; overlapping this time
                       ({formatShiftTime(conflictInfo.conflicts[0].startTime)}–{formatShiftTime(conflictInfo.conflicts[0].endTime)})
                     </p>
                     <Button size="sm" variant="danger" onClick={() => handleAssign(manualVolunteerId as number, true)} disabled={assigning}>
@@ -476,7 +477,11 @@ export default function ShiftsPage() {
           )}
 
           {assignError && <p role="alert" style={{ color: 'var(--status-red)', fontSize: 'var(--text-sm)' }}>{assignError}</p>}
-          {assignSuccess && <p role="status" style={{ color: 'var(--status-green)', fontSize: 'var(--text-sm)' }}>✓ {assignSuccess}</p>}
+          {assignSuccess && (
+            <p role="status" className="flex items-center gap-1" style={{ color: 'var(--status-green)', fontSize: 'var(--text-sm)' }}>
+              <CheckCircleIcon size={14} /> {assignSuccess}
+            </p>
+          )}
         </div>
       </Modal>
     </div>

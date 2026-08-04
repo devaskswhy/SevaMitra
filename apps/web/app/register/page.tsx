@@ -6,6 +6,7 @@ import TopBanner from '@/components/TopBanner';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import { CheckCircleIcon, XCircleIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -49,7 +50,7 @@ export default function RegisterPage() {
     skills: [] as string[],
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -83,11 +84,11 @@ export default function RegisterPage() {
         aadhaarNumber: formData.aadhaarNumber,
       });
 
-      setMessage('✅ Registration successful! Thank you for volunteering.');
+      setMessage({ type: 'success', text: 'Registration successful! Thank you for volunteering.' });
       setFormData({ name: '', email: '', phone: '', age: '', gender: '', homeState: '', aadhaarNumber: '', skills: [] });
     } catch (error: unknown) {
       const axiosError = error as AxiosError;
-      setMessage(`❌ Registration failed: ${axiosError.response?.data?.error || 'Unknown error'}`);
+      setMessage({ type: 'error', text: `Registration failed: ${axiosError.response?.data?.error || 'Unknown error'}` });
     } finally {
       setLoading(false);
     }
@@ -253,12 +254,13 @@ export default function RegisterPage() {
 
               {/* Message */}
               {message && (
-                <div role="alert" className="p-4 rounded-lg" style={{
-                  background: message.includes('✅') ? 'rgba(46, 125, 50, 0.1)' : 'rgba(183, 28, 28, 0.1)',
-                  color: message.includes('✅') ? '#2E7D32' : '#B71C1C',
-                  border: `1px solid ${message.includes('✅') ? '#2E7D32' : '#B71C1C'}`
+                <div role="alert" className="p-4 rounded-lg flex items-center gap-2" style={{
+                  background: message.type === 'success' ? 'rgba(46, 125, 50, 0.1)' : 'rgba(183, 28, 28, 0.1)',
+                  color: message.type === 'success' ? '#2E7D32' : '#B71C1C',
+                  border: `1px solid ${message.type === 'success' ? '#2E7D32' : '#B71C1C'}`
                 }}>
-                  {message}
+                  {message.type === 'success' ? <CheckCircleIcon size={18} /> : <XCircleIcon size={18} />}
+                  {message.text}
                 </div>
               )}
 

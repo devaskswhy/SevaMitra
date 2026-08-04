@@ -8,6 +8,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WaterRipple from '@/components/WaterRipple';
 import Button from '@/components/ui/Button';
+import FloatingTileField from '@/components/FloatingTileField';
 
 // Registered at module scope (not inside a component effect) so it's
 // guaranteed to run before any component's effect creates a
@@ -371,6 +372,44 @@ export default function Home() {
       <HeroSection />
 
       {/* ═════════════════════════════════════════════════════════
+         FEATURE SHOWCASE — floating previews of every operational
+         page, scattered around the section heading on load and
+         converging into a settled row as the field is scrolled
+         through (same behavior as /hub, shared via
+         components/FloatingTileField). Signed-out visitors tapping a
+         tile go through Google sign-in straight to that destination.
+         ═════════════════════════════════════════════════════════ */}
+      <FloatingTileField
+        settledLabel="One platform, every function"
+        onTileClick={(href) => signIn('google', { callbackUrl: href })}
+        heroContent={
+          <>
+            <SectionLabel number="01" title="EXPLORE" />
+            <h2
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--text-2xl)',
+                color: '#FFF8EE',
+                marginBottom: 'var(--space-4)',
+                maxWidth: '640px',
+              }}
+            >
+              Every function, one platform
+            </h2>
+            <p
+              style={{
+                fontSize: 'var(--text-lg)',
+                color: 'rgba(255,248,238,0.6)',
+                maxWidth: '520px',
+              }}
+            >
+              Zones, incidents, volunteers, shifts and reports — sign in to reach the live operations hub.
+            </p>
+          </>
+        }
+      />
+
+      {/* ═════════════════════════════════════════════════════════
          ABOUT SECTION
          ═════════════════════════════════════════════════════════ */}
       <section
@@ -389,7 +428,7 @@ export default function Home() {
       >
         <div style={{ maxWidth: '760px', margin: '0 auto', textAlign: 'center' }}>
           <SectionWave />
-          <SectionLabel number="01" title="ABOUT" />
+          <SectionLabel number="02" title="ABOUT" />
           <h2
             style={{
               fontFamily: 'var(--font-heading)',

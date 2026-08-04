@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { CloseIcon, HandsPrayingIcon, VestIcon, SendIcon } from '@/components/icons';
 
 const QUICK_REPLIES = {
   pilgrim: [
@@ -38,9 +39,9 @@ export default function SevaSahayak({ isInline = false }: Props) {
     {
       id: '0',
       role: 'assistant',
-      content: isInline 
-        ? 'नमस्ते 🙏 I am SevaSahayak. Ask me anything about Mahakumbh 2025 — Shahi Snaan dates, ghat locations, crowd levels, or volunteer protocols.'
-        : 'नमस्ते 🙏 How can I help you today?',
+      content: isInline
+        ? 'नमस्ते, I am SevaSahayak. Ask me anything about Mahakumbh 2025 — Shahi Snaan dates, ghat locations, crowd levels, or volunteer protocols.'
+        : 'नमस्ते, how can I help you today?',
     }
   ]);
   const [input, setInput] = useState('');
@@ -81,7 +82,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
       const data = await response.json();
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: data.reply }]);
     } catch {
-      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: 'Kshama karein, kuch takniki samasya hai. Dobara koshish karein. 🙏' }]);
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: 'Kshama karein, kuch takniki samasya hai. Dobara koshish karein.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +109,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
               <div style={{ color: '#1DB954', fontSize: '11px' }}>● Online</div>
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,248,238,0.4)', fontSize: '20px', cursor: 'pointer', lineHeight: 1 }}>×</button>
+          <button onClick={() => setIsOpen(false)} aria-label="Close chat" style={{ background: 'none', border: 'none', color: 'rgba(255,248,238,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><CloseIcon size={18} /></button>
         </div>
       )}
 
@@ -122,8 +123,10 @@ export default function SevaSahayak({ isInline = false }: Props) {
             color: role === r ? '#FFF8EE' : 'rgba(255,248,238,0.5)',
             border: role === r ? 'none' : '1px solid rgba(232,101,10,0.2)',
             fontFamily: 'inherit',
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
           }}>
-            {r === 'pilgrim' ? '🙏 Pilgrim' : '🦺 Volunteer'}
+            {r === 'pilgrim' ? <HandsPrayingIcon size={14} /> : <VestIcon size={14} />}
+            {r === 'pilgrim' ? 'Pilgrim' : 'Volunteer'}
           </button>
         ))}
       </div>
@@ -153,7 +156,7 @@ export default function SevaSahayak({ isInline = false }: Props) {
               background: 'rgba(255,255,255,0.06)',
               color: '#FFF8EE', fontSize: '14px', lineHeight: '1.5',
             }}>
-              SevaSahayak soch raha hai... 🙏
+              SevaSahayak soch raha hai...
             </div>
           </div>
         )}
@@ -192,13 +195,13 @@ export default function SevaSahayak({ isInline = false }: Props) {
             color: '#FFF8EE', outline: 'none', fontFamily: 'inherit',
           }}
         />
-        <button onClick={() => sendMessage(input)} disabled={isLoading || !input.trim()} style={{
+        <button onClick={() => sendMessage(input)} disabled={isLoading || !input.trim()} aria-label="Send message" style={{
           width: '40px', height: '40px', borderRadius: '50%', border: 'none',
           background: input.trim() ? '#E8650A' : 'rgba(232,101,10,0.2)',
           color: '#FFF8EE', cursor: input.trim() ? 'pointer' : 'default',
-          fontSize: '16px', display: 'flex', alignItems: 'center', 
+          display: 'flex', alignItems: 'center',
           justifyContent: 'center', flexShrink: 0,
-        }}>➤</button>
+        }}><SendIcon size={16} /></button>
       </div>
     </div>
   );

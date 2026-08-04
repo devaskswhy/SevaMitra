@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import { HandsPrayingIcon, AlertTriangleIcon, XCircleIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -79,8 +80,8 @@ export default function VolunteerLogin() {
       
       <Card padding="lg" className="w-full max-w-md" style={{ maxWidth: '480px' }}>
         <div className="text-center mb-8">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))' }}>
-            <span className="text-5xl">🙏</span>
+          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, var(--saffron), var(--gold))', color: '#0D0500' }}>
+            <HandsPrayingIcon size={44} />
           </div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             SevaMitra Volunteer
@@ -92,8 +93,9 @@ export default function VolunteerLogin() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full mt-4"
             style={{ background: 'var(--gold-tint)', border: '1px solid var(--border-glow-hover)' }}
           >
+            <AlertTriangleIcon size={16} className="flex-shrink-0" style={{ color: 'var(--gold)' }} />
             <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--gold)' }}>
-              ⚠️ Demo Mode — OTP delivery is simulated, any 6-digit code will work
+              Demo Mode — OTP delivery is simulated, any 6-digit code will work
             </span>
           </div>
         </div>
@@ -128,7 +130,7 @@ export default function VolunteerLogin() {
 
             {error && (
               <div role="alert" className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
-                ❌ {error}
+                <XCircleIcon size={16} className="flex-shrink-0" /> {error}
               </div>
             )}
 
@@ -165,7 +167,7 @@ export default function VolunteerLogin() {
 
             {error && (
               <div role="alert" className="px-4 py-3 rounded-lg flex items-center gap-2" style={{ background: 'var(--danger-tint)', border: '1px solid var(--status-red)', color: 'var(--status-red)' }}>
-                ❌ {error}
+                <XCircleIcon size={16} className="flex-shrink-0" /> {error}
               </div>
             )}
 

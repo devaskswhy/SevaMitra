@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import { CheckCircleIcon, ClipboardIcon, CalendarIcon, AlertTriangleIcon, UserIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -167,7 +168,7 @@ export default function VolunteerHome() {
               className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 checkmark-pop"
               style={{ background: 'var(--success-tint)' }}
             >
-              <span className="text-3xl">✓</span>
+              <CheckCircleIcon size={30} style={{ color: 'var(--status-green)' }} />
             </div>
             <p className="font-bold" style={{ color: 'var(--status-green)', fontFamily: 'var(--font-body)' }}>
               {actionSuccess === 'checkin' ? 'Checked In' : 'Checked Out'}
@@ -208,8 +209,8 @@ export default function VolunteerHome() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--saffron-tint)' }}>
-                <span className="text-3xl">📋</span>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--saffron-tint)', color: 'var(--accent-saffron)' }}>
+                <ClipboardIcon size={30} />
               </div>
               <p style={{ color: 'var(--text-secondary)' }}>No active assignment</p>
             </div>
@@ -251,8 +252,8 @@ export default function VolunteerHome() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--gold-tint)' }}>
-                <span className="text-3xl">📅</span>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--gold-tint)', color: 'var(--gold)' }}>
+                <CalendarIcon size={30} />
               </div>
               <p style={{ color: 'var(--text-secondary)' }}>No upcoming shifts</p>
             </div>
@@ -289,18 +290,18 @@ export default function VolunteerHome() {
             onClick={() => router.push('/volunteer/report')}
             className="card p-6 text-center hover:shadow-xl transition-all"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--danger-tint)' }}>
-              <span className="text-2xl">⚠️</span>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--danger-tint)', color: 'var(--status-red)' }}>
+              <AlertTriangleIcon size={22} />
             </div>
             <p className="font-semibold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>Report Incident</p>
           </button>
-          
+
           <button
             onClick={() => router.push('/volunteer/profile')}
             className="card p-6 text-center hover:shadow-xl transition-all"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--gold-tint)' }}>
-              <span className="text-2xl">👤</span>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--gold-tint)', color: 'var(--gold)' }}>
+              <UserIcon size={22} />
             </div>
             <p className="font-semibold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>My Profile</p>
           </button>

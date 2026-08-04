@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import type { PathOptions } from 'leaflet';
+import { CloseIcon } from '@/components/icons';
 
 /* ═══════════════════════════════════════════════════════════════
    DYNAMIC IMPORTS — avoid SSR issues with Leaflet
@@ -315,11 +316,12 @@ export default function MapSection() {
               color: 'rgba(255,248,238,0.6)',
               background: 'none',
               border: 'none',
-              fontSize: '20px',
+              display: 'flex',
+              alignItems: 'center',
               cursor: 'pointer',
             }}
           >
-            ×
+            <CloseIcon size={18} />
           </button>
         </div>
 
