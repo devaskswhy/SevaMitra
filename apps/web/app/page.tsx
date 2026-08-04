@@ -7,7 +7,6 @@ import { initScroll } from '@/lib/scroll';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WaterRipple from '@/components/WaterRipple';
-import Button from '@/components/ui/Button';
 import FloatingTileField from '@/components/FloatingTileField';
 
 // Registered at module scope (not inside a component effect) so it's
@@ -17,40 +16,6 @@ import FloatingTileField from '@/components/FloatingTileField';
 // left a window where HeroSection's scroll-linked timeline could be
 // created before the plugin existed.
 gsap.registerPlugin(ScrollTrigger);
-
-/* ═══════════════════════════════════════════════════════════════
-   MAGNETIC BUTTON — the hero's signature interaction beyond the
-   crossfade: the primary CTA gently pulls toward the cursor within
-   its own bounds, then eases back on mouse-leave (gsap.quickTo, same
-   animation library as the rest of the app — no framer-motion).
-   ═══════════════════════════════════════════════════════════════ */
-
-function MagneticButton(props: React.ComponentProps<typeof Button>) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const quickX = useRef<gsap.QuickToFunc | null>(null);
-  const quickY = useRef<gsap.QuickToFunc | null>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    quickX.current = gsap.quickTo(ref.current, 'x', { duration: 0.4, ease: 'power3' });
-    quickY.current = gsap.quickTo(ref.current, 'y', { duration: 0.4, ease: 'power3' });
-  }, []);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const relX = e.clientX - rect.left - rect.width / 2;
-    const relY = e.clientY - rect.top - rect.height / 2;
-    quickX.current?.(relX * 0.3);
-    quickY.current?.(relY * 0.3);
-  };
-
-  const handleMouseLeave = () => {
-    quickX.current?.(0);
-    quickY.current?.(0);
-  };
-
-  return <Button ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} {...props} />;
-}
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION WAVE SVG
@@ -146,8 +111,7 @@ function HeroSection() {
       },
     });
     tl.to('.hero-title', { scale: 0.85, opacity: 0.3, y: -60 })
-      .to('.hero-subtitle', { opacity: 0, y: -40 }, '<0.1')
-      .to('.hero-cta', { opacity: 0, y: -20 }, '<0.1');
+      .to('.hero-subtitle', { opacity: 0, y: -40 }, '<0.1');
 
     const heroEl = heroRef.current;
     return () => {
@@ -260,22 +224,12 @@ function HeroSection() {
           style={{
             fontSize: 'var(--text-lg)',
             color: 'rgba(255,248,238,0.7)',
-            marginBottom: 'var(--space-10)',
             lineHeight: 1.5,
             fontWeight: 300,
           }}
         >
           SevaMitra — Mahakumbh 2025 Volunteer Intelligence Platform
         </p>
-        <MagneticButton
-          variant="primary"
-          size="lg"
-          shape="pill"
-          className="hero-cta"
-          onClick={() => signIn('google', { callbackUrl: '/hub' })}
-        >
-          Sign in with Google
-        </MagneticButton>
       </div>
 
       {/* ── Image dot indicators ── */}
@@ -444,23 +398,13 @@ export default function Home() {
               fontSize: 'var(--text-lg)',
               color: 'rgba(255,248,238,0.6)',
               lineHeight: 1.7,
-              marginBottom: 'var(--space-10)',
             }}
           >
             SevaMitra is a real-time volunteer coordination system built for
             Mahakumbh 2025 — managing zones, tracking incidents, and
             deploying sevadars across the world&apos;s largest spiritual
-            gathering. Sign in with your coordinator account to reach the
-            live operations hub.
+            gathering. Tap any function above to sign in and get started.
           </p>
-          <Button
-            variant="outline"
-            size="md"
-            shape="pill"
-            onClick={() => signIn('google', { callbackUrl: '/hub' })}
-          >
-            Sign in with Google
-          </Button>
         </div>
       </section>
     </>
