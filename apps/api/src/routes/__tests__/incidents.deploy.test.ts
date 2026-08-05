@@ -122,3 +122,118 @@ describe("POST /api/incidents/:id/deploy", () => {
     }
   });
 });
+
+describe("POST /api/incidents/:id/deploy-volunteers", () => {
+  // Exercises the dashboard's "Quick Volunteer Allocation" panel flow: the
+  // client already scores/picks its own candidate volunteerIds (via POST
+  // /api/allocation/recommendations) and just needs them assigned, unlike
+  // /:id/deploy above which picks one volunteer itself server-side.
+  let zoneId: number;
+  let volunteerAId: number;
+  let volunteerBId: number;
+
+  beforeAll(async () => {
+    const zone = await prisma.zone.create({
+      data: { name: `Test Zone DV ${runId}`, type: "CAMP", maxCapacity: 100 },
+    });
+    zoneId = zone.id;
+
+    const a = await prisma.volunteer.create({
+      data: {
+        name: "Deploy-Volunteers Candidate A",
+        phone: `+91${runId}2`,
+        email: `deploy-volunteers-a-${runId}@example.com`,
+        aadhaarHash: "test-hash",
+        age: 29,
+        gender: "OTHER",
+        skills: "first_aid",
+        homeState: "Uttar Pradesh",
+        status: "ACTIVE",
+        reliabilityScore: 70,
+      },
+    });
+    volunteerAId = a.id;
+
+    const b = await prisma.volunteer.create({
+      data: {
+        name: "Deploy-Volunteers Candidate B",
+        phone: `+91${runId}3`,
+        email: `deploy-volunteers-b-${runId}@example.com`,
+        aadhaarHash: "test-hash",
+        age: 31,
+        gender: "OTHER",
+        skills: "medical",
+        homeState: "Bihar",
+        status: "ACTIVE",
+        reliabilityScore: 65,
+      },
+    });
+    volunteerBId = b.id;
+  });
+
+  afterAll(async () => {
+    await prisma.assignment.deleteMany({ where: { task: { zoneId } } });
+    await prisma.incident.deleteMany({ where: { zoneId } });
+    await prisma.task.deleteMany({ where: { zoneId } });
+    await prisma.volunteer.delete({ where: { id: volunteerAId } });
+    await prisma.volunteer.delete({ where: { id: volunteerBId } });
+    await prisma.zone.delete({ where: { id: zoneId } });
+    await prisma.$disconnect();
+  });
+
+  it("returns 400 when volunteerIds is missing or empty", async () => {
+    const incident = await prisma.incident.create({
+      data: {
+        zoneId,
+        reportedBy: "Test",
+        severity: 2,
+        type: "Lost Person",
+        description: "Integration test incident (missing volunteerIds)",
+        status: "ACTIVE",
+      },
+    });
+
+    const res = await request(app).post(`/api/incidents/${incident.id}/deploy-volunteers`).send({});
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("returns 404 for an incident that doesn't exist", async () => {
+    const res = await request(app)
+      .post("/api/incidents/999999999/deploy-volunteers")
+      .send({ volunteerIds: [volunteerAId] });
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("deploys every given volunteer and marks the incident DEPLOYED", async () => {
+    const incident = await prisma.incident.create({
+      data: {
+        zoneId,
+        reportedBy: "Test",
+        severity: 2,
+        type: "Lost Person",
+        description: "Integration test incident (deploy-volunteers)",
+        status: "ACTIVE",
+      },
+    });
+
+    const res = await request(app)
+      .post(`/api/incidents/${incident.id}/deploy-volunteers`)
+      .send({ volunteerIds: [volunteerAId, volunteerBId] });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.assignedVolunteers).toHaveLength(2);
+    expect(res.body.data.incident.status).toBe("DEPLOYED");
+    expect(res.body.data.incident.resolvedAt).not.toBeNull();
+
+    const deployedIds = res.body.data.incident.volunteersDeployed.map((v: any) => v.id);
+    expect(deployedIds).toEqual(expect.arrayContaining([volunteerAId, volunteerBId]));
+
+    const assignments = await prisma.assignment.findMany({
+      where: { volunteerId: { in: [volunteerAId, volunteerBId] }, task: { zoneId } },
+    });
+    expect(assignments).toHaveLength(2);
+  });
+});

@@ -93,7 +93,7 @@ flowchart LR
         ChatRoute["/api/chat route"]
     end
 
-    subgraph Backend["Render/Railway — apps/api"]
+    subgraph Backend["Render — apps/api"]
         Express["Express REST API"]
         AllocEngine["Allocation Engine<br/>(weighted volunteer scoring)"]
         SocketIO["Socket.io server"]

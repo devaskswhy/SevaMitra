@@ -38,7 +38,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <motion.main
         key={pathname}
         variants={pageVariants}
         initial="initial"
@@ -47,7 +47,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
         style={{ minHeight: '100vh' }}
       >
         {children}
-      </motion.div>
+      </motion.main>
     </AnimatePresence>
   );
 }

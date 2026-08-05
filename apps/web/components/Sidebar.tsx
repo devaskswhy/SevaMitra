@@ -41,11 +41,15 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle Button */}
+      {/* Mobile Toggle Button — bottom-left, not bottom-right: the
+          SevaSahayak chat toggle (components/SevaSahayak.tsx) is fixed at
+          bottom:24px/right:24px with a higher z-index, which was exactly
+          covering this button at the same corner on mobile. */}
       <button
-        className="md:hidden fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
+        className="md:hidden fixed bottom-6 left-6 z-50 p-4 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
         style={{ background: 'var(--accent-saffron)', color: '#fff', width: '60px', height: '60px' }}
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
       >
         {isOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
       </button>

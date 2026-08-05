@@ -328,6 +328,121 @@ router.post("/:id/deploy", async (req: Request, res: Response) => {
   }
 });
 
+// POST deploy specific volunteers to an incident — used by the dashboard's
+// Quick Volunteer Allocation panel, which already scores and picks its own
+// candidates client-side via POST /api/allocation/recommendations and just
+// needs them assigned, unlike /:id/deploy above which picks one volunteer
+// itself server-side.
+router.post("/:id/deploy-volunteers", async (req: Request, res: Response) => {
+  try {
+    const incidentId = parseInt(req.params.id as string);
+    const { volunteerIds } = req.body as { volunteerIds?: number[] };
+
+    if (!Array.isArray(volunteerIds) || volunteerIds.length === 0) {
+      sendError(res, "volunteerIds (non-empty array) is required", 400);
+      return;
+    }
+
+    const incident = await prisma.incident.findUnique({
+      where: { id: incidentId },
+      include: { zone: true, volunteersDeployed: true },
+    });
+
+    if (!incident) {
+      sendError(res, "Incident not found", 404);
+      return;
+    }
+
+    const volunteers = await prisma.volunteer.findMany({
+      where: { id: { in: volunteerIds } },
+    });
+
+    if (!volunteers.length) {
+      sendError(res, "None of the given volunteerIds exist", 404);
+      return;
+    }
+
+    const requiredSkills = getIncidentSkillNeeds(incident.severity);
+    const [minMinutes, maxMinutes] = deploymentDurationsBySeverity[incident.severity] ?? [240, 480];
+    const estimatedMinutes = randomInt(minMinutes, maxMinutes);
+    const estimatedResolvedAt = new Date(Date.now() + estimatedMinutes * 60 * 1000);
+
+    let task = await prisma.task.findFirst({
+      where: { zoneId: incident.zoneId },
+      orderBy: [{ difficulty: "desc" }, { id: "asc" }],
+    });
+
+    if (!task) {
+      task = await prisma.task.create({
+        data: {
+          title: `Incident Response: ${incident.type}`,
+          zoneId: incident.zoneId,
+          skillsRequired: requiredSkills.join(","),
+          estimatedDuration: Math.max(1, Math.round(estimatedMinutes / 60)),
+          difficulty: Math.min(5, Math.max(1, incident.severity)),
+          minVolunteers: 1,
+          maxVolunteers: Math.max(3, volunteers.length),
+        },
+      });
+    }
+
+    const now = new Date();
+    let shift =
+      (await prisma.shift.findFirst({
+        where: { startTime: { lte: now }, endTime: { gte: now } },
+        orderBy: { startTime: "asc" },
+      })) ??
+      (await prisma.shift.findFirst({
+        where: { startTime: { gte: now } },
+        orderBy: { startTime: "asc" },
+      }));
+
+    if (!shift) {
+      shift = await prisma.shift.create({
+        data: {
+          startTime: now,
+          endTime: new Date(now.getTime() + 6 * 60 * 60 * 1000),
+        },
+      });
+    }
+
+    for (const volunteer of volunteers) {
+      try {
+        await prisma.assignment.create({
+          data: { volunteerId: volunteer.id, taskId: task.id, shiftId: shift.id },
+        });
+      } catch (error: any) {
+        if (error.code !== "P2002") throw error; // ignore duplicate assignment, still deploy
+      }
+    }
+
+    const updatedIncident = await prisma.incident.update({
+      where: { id: incidentId },
+      data: {
+        status: "DEPLOYED",
+        resolvedAt: estimatedResolvedAt,
+        volunteersDeployed: {
+          connect: volunteers.map((v) => ({ id: v.id })),
+        },
+      },
+      include: {
+        zone: true,
+        volunteersDeployed: true,
+      },
+    });
+
+    getSocketServer()?.emit("incident:deployed", updatedIncident);
+
+    sendSuccess(res, {
+      assignedVolunteers: volunteers.map((v) => ({ name: v.name, phone: v.phone, skills: v.skills })),
+      estimatedResolution: `${estimatedMinutes} minutes`,
+      incident: updatedIncident,
+    });
+  } catch (error) {
+    sendPrismaError(res, error);
+  }
+});
+
 // POST resolve incident
 router.post("/:id/resolve", async (req: Request, res: Response) => {
   try {

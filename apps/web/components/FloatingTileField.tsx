@@ -151,6 +151,7 @@ export default function FloatingTileField({
   background = 'radial-gradient(ellipse 120% 70% at 50% 60%, #E8650A 0%, #3D1A00 45%, #0D0500 80%)',
 }: FloatingTileFieldProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 900);
@@ -159,11 +160,29 @@ export default function FloatingTileField({
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  // The scatter-on-load and scroll-linked-convergence effects below are
+  // this component's only sustained, non-decorative-adjacent motion — skip
+  // both entirely under reduced motion and render tiles motionlessly at
+  // their settled position instead, same pattern as the hub idle bob's
+  // existing prefers-reduced-motion handling in globals.css.
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mq.matches);
+    const onChange = () => setPrefersReducedMotion(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   // Tiles float/settle into their scattered resting position+rotation on
   // first mount, staggered per tile — instead of just appearing already
   // in place. Mobile skips this (stacked grid, no scatter to settle into).
   useEffect(() => {
-    if (isMobile) return;
+    // Queried directly (not via the prefersReducedMotion state) because on
+    // the very first effect flush after mount, that state hasn't yet been
+    // set by its own effect — using the stale `false` closure here would
+    // let this tween start, then get killed mid-flight a render later,
+    // leaving tiles stuck half-scaled instead of cleanly skipped.
+    if (isMobile || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const els = gsap.utils.toArray<HTMLElement>('.floating-tile');
     if (els.length === 0) return;
 
@@ -189,7 +208,7 @@ export default function FloatingTileField({
     return () => {
       tween.kill();
     };
-  }, [isMobile]);
+  }, [isMobile, prefersReducedMotion]);
 
   // Scroll-linked convergence: tiles scatter loosely around the hero
   // content on load, then gather into a settled, aligned row as the
@@ -197,7 +216,10 @@ export default function FloatingTileField({
   // coordinates in vh/vw), not transforms, so it composes cleanly with
   // the mount entrance animation above and the idle bob.
   useEffect(() => {
-    if (isMobile) return;
+    // Same direct matchMedia check as the entrance effect above, and for
+    // the same reason — avoids starting a scrub tween on stale state just
+    // to have it killed a render later.
+    if (isMobile || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     gsap.registerPlugin(ScrollTrigger);
     const els = gsap.utils.toArray<HTMLElement>('.floating-tile');
     if (els.length === 0) return;
@@ -227,7 +249,7 @@ export default function FloatingTileField({
       tl.scrollTrigger?.kill();
       tl.kill();
     };
-  }, [isMobile]);
+  }, [isMobile, prefersReducedMotion]);
 
   return (
     <div
@@ -244,35 +266,40 @@ export default function FloatingTileField({
         background,
       }}
     >
-      {/* ── Floating preview tiles (desktop: scatter -> scroll-settle) ── */}
+      {/* ── Floating preview tiles (desktop: scatter -> scroll-settle,
+           reduced motion: render motionlessly at the settled position) ── */}
       {!isMobile &&
-        TILES.map((tile) => (
-          <div
-            key={tile.href}
-            className="floating-tile hub-tile"
-            role="link"
-            tabIndex={0}
-            onClick={() => onTileClick(tile.href)}
-            onKeyDown={(e) => { if (e.key === 'Enter') onTileClick(tile.href); }}
-            style={{
-              position: 'absolute',
-              zIndex: 3,
-              width: '160px',
-              top: `${tile.scatterPos.top}vh`,
-              left: `${tile.scatterPos.left}vw`,
-              transform: `rotate(${tile.rotation}deg)`,
-            }}
-          >
-            <div className="hub-tile-bob" style={{ animationDelay: `${tile.delay}s` }}>
-              <Card padding="sm">
-                <tile.Preview />
-                <p style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {tile.label}
-                </p>
-              </Card>
+        TILES.map((tile) => {
+          const pos = prefersReducedMotion ? tile.settledPos : tile.scatterPos;
+          const rotation = prefersReducedMotion ? 0 : tile.rotation;
+          return (
+            <div
+              key={tile.href}
+              className="floating-tile hub-tile"
+              role="link"
+              tabIndex={0}
+              onClick={() => onTileClick(tile.href)}
+              onKeyDown={(e) => { if (e.key === 'Enter') onTileClick(tile.href); }}
+              style={{
+                position: 'absolute',
+                zIndex: 3,
+                width: '160px',
+                top: `${pos.top}vh`,
+                left: `${pos.left}vw`,
+                transform: `rotate(${rotation}deg)`,
+              }}
+            >
+              <div className={prefersReducedMotion ? undefined : 'hub-tile-bob'} style={{ animationDelay: `${tile.delay}s` }}>
+                <Card padding="sm">
+                  <tile.Preview />
+                  <p style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {tile.label}
+                  </p>
+                </Card>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
       {/* ── Settled-zone label — sits where the tiles converge, only
            relevant once scrolled to (desktop only, matches the tile
