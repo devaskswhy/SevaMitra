@@ -40,8 +40,8 @@ change); the TopBanner fix is commit `a568d4b`.
 | 7 | New feature depth (shift scheduling admin UI) | ✅ Done — `45ac8ed` |
 | 8 | Performance & real-time robustness | ✅ Done — `66bdbf8` |
 | 9 | Accessibility hardening (full audit) | ✅ Done — `66bdbf8` |
-| 10 | **Resume-readiness (README, tests, CI, case study)** | ⬅ Do this next |
-| 11 | Final QA + deploy | Pending |
+| 10 | Resume-readiness (README, tests, CI, case study) | ✅ Done — `87b96b4` |
+| 11 | **Final QA + deploy** | ⬅ Do this next |
 
 Also worth knowing going in: an external PR (`copilot/update-incident-
 deployment-system`, merged as `736dfef` before I could push Phase 1) added
@@ -397,7 +397,7 @@ ACCEPTANCE CRITERIA:
 
 ---
 
-## Phase 10 — Resume-Readiness Pass
+## Phase 10 (done) — Resume-Readiness Pass
 
 **Goal:** make the project legible and credible to a recruiter skimming
 it for 90 seconds, and durable enough a stranger can run it without your
