@@ -21,6 +21,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ reply: 'Kshama karein, message khaali hai.' })
   }
 
+  // Demo-mode fallback: no live infra requires a Groq key to run, so a
+  // stranger cloning the repo without one should still get a working
+  // (if canned) chat widget instead of a network call that's guaranteed
+  // to fail against an undefined Authorization header.
+  if (!process.env.GROQ_API_KEY) {
+    return NextResponse.json({
+      reply:
+        'Namaste! SevaSahayak abhi demo mode mein hai — is deployment ke liye GROQ_API_KEY set nahi hai, isliye main live jawab nahi de sakta. Emergency helpline: 1920.',
+    })
+  }
+
   const systemPrompt = `You are SevaSahayak, a friendly and knowledgeable AI assistant for Mahakumbh 2025 built into SevaMitra volunteer management system. You were created by the SevaMitra team for Mahakumbh 2025. You run on an advanced AI model. Answer ALL questions naturally and conversationally — greetings, casual chat, opinions, anything.
 
 Key knowledge:

@@ -100,7 +100,7 @@ router.post("/", async (req: Request, res: Response) => {
         res.status(409).json({
           success: false,
           error: "Volunteer has a conflicting assignment in an overlapping shift",
-          conflicts: conflicts.map((c) => ({
+          conflicts: conflicts.map((c: (typeof conflicts)[number]) => ({
             shiftId: c.shiftId,
             startTime: c.shift.startTime,
             endTime: c.shift.endTime,

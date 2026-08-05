@@ -220,14 +220,14 @@ router.post("/:id/deploy", async (req: Request, res: Response) => {
     }
 
     const requiredSkills = getIncidentSkillNeeds(incident.severity);
-    const skilledVolunteers = activeVolunteers.filter((volunteer) => {
+    const skilledVolunteers = activeVolunteers.filter((volunteer: (typeof activeVolunteers)[number]) => {
       const volunteerSkills = volunteer.skills.toLowerCase();
       return requiredSkills.some((skill) => volunteerSkills.includes(skill));
     });
     const volunteerPool = skilledVolunteers.length ? skilledVolunteers : activeVolunteers;
 
     const volunteerWithAssignmentCounts = await Promise.all(
-      volunteerPool.map(async (volunteer) => {
+      volunteerPool.map(async (volunteer: (typeof volunteerPool)[number]) => {
         const currentAssignments = await prisma.assignment.count({
           where: { volunteerId: volunteer.id, checkOutTime: null },
         });

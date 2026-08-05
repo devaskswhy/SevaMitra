@@ -2,6 +2,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// apps/api has its own independent node_modules (no npm workspaces in this
+// repo), and Prisma's default output always resolves relative to *this*
+// schema file's directory (repo root) regardless of where `generate` is
+// invoked from — so apps/api's local install never picks up a real client
+// without a second generator block explicitly targeting it. Without this,
+// apps/api/node_modules/@prisma/client stays the pre-generate stub that
+// throws "did not initialize yet" the moment the API tries to connect.
+generator apiClient {
+  provider = "prisma-client-js"
+  output   = "../apps/api/node_modules/.prisma/client"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")

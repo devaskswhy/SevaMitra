@@ -1,55 +1,9 @@
-import express, { Express, Request, Response, NextFunction } from "express";
 import { Server } from "socket.io";
-import cors from "cors";
-import helmet from "helmet";
 import { prisma } from "./lib/prisma";
 import { setSocketServer } from "./lib/socket";
-import volunteerRoutes from "./routes/volunteers";
-import zoneRoutes from "./routes/zones";
-import taskRoutes from "./routes/tasks";
-import assignmentRoutes from "./routes/assignments";
-import incidentRoutes from "./routes/incidents";
-import allocationRoutes from "./routes/allocation";
-import shiftRoutes from "./routes/shifts";
-import demoRoutes from "./routes/demo";
+import app from "./app";
 
-const app: Express = express();
 const PORT = process.env.PORT || 4000;
-
-// Middleware
-app.use(helmet());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || "*",
-    credentials: true,
-  })
-);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Health check
-app.get("/health", (_req: Request, res: Response) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
-// API Routes
-app.use("/api/volunteers", volunteerRoutes);
-app.use("/api/zones", zoneRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/assignments", assignmentRoutes);
-app.use("/api/incidents", incidentRoutes);
-app.use("/api/allocation", allocationRoutes);
-app.use("/api/shifts", shiftRoutes);
-app.use("/api/demo", demoRoutes);
-
-// Error handling middleware
-app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
-  console.error("Error:", err);
-  res.status(500).json({
-    error: "Internal server error",
-    message: process.env.NODE_ENV === "development" ? err.message : undefined,
-  });
-});
 
 // Start server
 const server = app.listen(PORT, () => {
