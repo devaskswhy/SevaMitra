@@ -41,7 +41,7 @@ change); the TopBanner fix is commit `a568d4b`.
 | 8 | Performance & real-time robustness | ✅ Done — `66bdbf8` |
 | 9 | Accessibility hardening (full audit) | ✅ Done — `66bdbf8` |
 | 10 | Resume-readiness (README, tests, CI, case study) | ✅ Done — `87b96b4` |
-| 11 | **Final QA + deploy** | ⬅ Do this next |
+| 11 | Final QA + deploy | ✅ Done — `33bb44c` |
 
 Also worth knowing going in: an external PR (`copilot/update-incident-
 deployment-system`, merged as `736dfef` before I could push Phase 1) added
@@ -457,7 +457,7 @@ touch the design system.
 
 ---
 
-## Phase 11 — Final QA + Deploy Pass
+## Phase 11 (done) — Final QA + Deploy Pass
 
 **Goal:** close the loop — verify every prior phase actually shipped
 correctly together, then deploy.
