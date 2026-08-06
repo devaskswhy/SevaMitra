@@ -38,12 +38,13 @@ const DOCK_ITEMS: DockItem[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════
-   GLOW DOCK — the sidebar's replacement. A compact row of glowing
+   GLOW DOCK — the sidebar's replacement. A compact row of flat,
    icon-only buttons, fixed bottom-left (mirrors the reference site's
    minimal-chrome navigation instead of a boxed sidebar list). Bottom-
    *left* specifically because SevaSahayak's own toggle already owns
    bottom-right (see the exact same collision Sidebar's old mobile
-   button had, fixed in the Phase 11 QA pass).
+   button had, fixed in the Phase 11 QA pass). Deliberately no drop-
+   shadow glow — just a flat saffron fill on the active page.
    ═══════════════════════════════════════════════════════════════ */
 export default function GlowDock() {
   const router = useRouter();
@@ -74,11 +75,10 @@ export default function GlowDock() {
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            background: isActive ? 'linear-gradient(135deg, var(--saffron), var(--gold))' : 'rgba(255,255,255,0.06)',
-            border: isActive ? '1px solid rgba(232,101,10,0.6)' : '1px solid rgba(232,101,10,0.18)',
+            background: isActive ? 'var(--saffron)' : 'transparent',
+            border: isActive ? '1px solid var(--saffron)' : '1px solid transparent',
             color: isActive ? '#0D0500' : 'rgba(255,248,238,0.75)',
-            boxShadow: isActive ? '0 0 20px rgba(232,101,10,0.5)' : 'none',
-            transition: 'transform var(--duration-base) var(--ease-sacred), box-shadow var(--duration-base) var(--ease-sacred)',
+            transition: 'background var(--duration-base) var(--ease-sacred), color var(--duration-base) var(--ease-sacred), transform var(--duration-base) var(--ease-sacred)',
           }}
         >
           <item.icon size={Math.round(size * 0.44)} />
@@ -100,10 +100,9 @@ export default function GlowDock() {
           gap: 'var(--space-2)',
           padding: 'var(--space-2)',
           borderRadius: '999px',
-          background: 'rgba(13,5,0,0.55)',
+          background: 'rgba(13,5,0,0.6)',
           backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(232,101,10,0.15)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          border: '1px solid rgba(255,255,255,0.08)',
         }}
       >
         {dockButtons(44)}
@@ -130,8 +129,7 @@ export default function GlowDock() {
             className="fixed bottom-24 left-6 right-6 flex flex-wrap gap-3 p-4 rounded-2xl"
             style={{
               background: 'rgba(13,5,0,0.9)',
-              border: '1px solid rgba(232,101,10,0.25)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >

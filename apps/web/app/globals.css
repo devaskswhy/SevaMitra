@@ -371,14 +371,12 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-sacred-primary {
-  background: linear-gradient(135deg, var(--saffron), var(--marigold));
+  background: var(--saffron);
   color: white;
-  box-shadow: 0 4px 20px rgba(232, 101, 10, 0.35);
 }
 
 .btn-sacred-primary:hover {
-  box-shadow: 0 8px 32px rgba(232, 101, 10, 0.5);
-  transform: translateY(-2px);
+  background: #D4590A;
 }
 
 .btn-sacred-outline {
@@ -392,14 +390,12 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-sacred-danger {
-  background: linear-gradient(135deg, var(--sacred-red), #A52020);
+  background: var(--sacred-red);
   color: white;
-  box-shadow: 0 4px 16px rgba(139, 26, 26, 0.35);
 }
 
 .btn-sacred-danger:hover {
-  box-shadow: 0 8px 28px rgba(139, 26, 26, 0.5);
-  transform: translateY(-2px);
+  background: #7A1717;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -542,8 +538,8 @@ input:focus, select:focus, textarea:focus {
 /* GlowDock (components/GlowDock.tsx) — the sidebar's replacement on
    every function page. */
 .glow-dock-item:hover {
-  transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 0 16px rgba(232, 101, 10, 0.35);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 @media (prefers-reduced-motion: reduce) {

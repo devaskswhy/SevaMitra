@@ -16,13 +16,11 @@ interface FunctionPageShellProps {
 /* ═══════════════════════════════════════════════════════════════
    FUNCTION PAGE SHELL — the sidebar+TopBanner replacement shared by
    every admin/coordinator page (dashboard, zones, incidents,
-   volunteers, reports, register, shifts, map). Same glow-hero
-   language as the hub/landing floating showcase (om watermark, warm
-   radial glow, serif heading) anchored to the TOP of the page only —
-   unlike hub's full-bleed gradient, it fades out to the flat
-   `--bg-primary` by ~70% down so dense table/card content underneath
-   stays readable. GlowDock (bottom-left) replaces the old fixed
-   sidebar entirely; SevaSahayak (bottom-right, global) is the only
+   volunteers, reports, register, shifts, map). Deliberately minimal:
+   a faint warm tint anchored at the top (not a full glow wash), a
+   plain saffron icon + serif heading for the page title — no gradient
+   badge box, no drop-shadow glow. GlowDock (bottom-left) replaces the
+   old fixed sidebar; SevaSahayak (bottom-right, global) is the only
    other persistent chrome.
    ═══════════════════════════════════════════════════════════════ */
 export default function FunctionPageShell({
@@ -38,11 +36,9 @@ export default function FunctionPageShell({
         position: 'relative',
         minHeight: '100vh',
         background:
-          'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(232,101,10,0.22) 0%, rgba(61,26,0,0.12) 35%, var(--bg-primary) 70%)',
+          'radial-gradient(ellipse 80% 40% at 50% 0%, rgba(232,101,10,0.08) 0%, var(--bg-primary) 60%)',
       }}
     >
-      <div className="om-watermark" aria-hidden="true">ॐ</div>
-
       <div
         style={{
           maxWidth: '1200px',
@@ -50,7 +46,7 @@ export default function FunctionPageShell({
           padding: 'var(--space-10) var(--space-6) var(--space-24)',
         }}
       >
-        {/* ── Hero header ── */}
+        {/* ── Header ── */}
         <div
           style={{
             display: 'flex',
@@ -61,23 +57,8 @@ export default function FunctionPageShell({
             marginBottom: 'var(--space-10)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-            <div
-              style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                background: 'linear-gradient(135deg, var(--saffron), var(--gold))',
-                color: '#0D0500',
-                boxShadow: '0 0 24px rgba(232,101,10,0.35)',
-              }}
-            >
-              <Icon size={28} />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <Icon size={26} style={{ color: 'var(--saffron)', flexShrink: 0 }} />
             <div>
               <h1
                 style={{

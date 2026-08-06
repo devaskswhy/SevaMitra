@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import FunctionPageShell from '@/components/FunctionPageShell';
-import { MapPinIcon } from '@/components/icons';
+import { MapPinIcon, CheckCircleIcon } from '@/components/icons';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { priorityToBadge } from '@/components/ui/Badge';
+import Modal from '@/components/ui/Modal';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
 
@@ -26,6 +27,40 @@ export default function ZonesPage() {
   const [zones, setZones] = useState<Zone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  const [managingZone, setManagingZone] = useState<Zone | null>(null);
+  const [formPriority, setFormPriority] = useState('LOW');
+  const [formLoad, setFormLoad] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [savedMessage, setSavedMessage] = useState('');
+
+  const openManageZone = (zone: Zone) => {
+    setManagingZone(zone);
+    setFormPriority(zone.priority);
+    setFormLoad(zone.currentLoad);
+    setSavedMessage('');
+  };
+
+  const handleSaveZone = async () => {
+    if (!managingZone) return;
+    setSaving(true);
+    try {
+      await axios.put(`${API}/zones/${managingZone.id}`, {
+        priority: formPriority,
+        currentLoad: formLoad,
+      });
+      setZones((prev) =>
+        prev.map((z) => (z.id === managingZone.id ? { ...z, priority: formPriority, currentLoad: formLoad } : z))
+      );
+      setSavedMessage(`${managingZone.name} updated.`);
+      setTimeout(() => setManagingZone(null), 900);
+    } catch (err) {
+      console.error('Failed to update zone:', err);
+      setSavedMessage('Update failed — please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const fetchZones = async () => {
     setLoading(true);
@@ -98,12 +133,60 @@ export default function ZonesPage() {
                   </div>
                 </div>
 
-                <Button className="w-full mt-4">
+                <Button className="w-full mt-4" onClick={() => openManageZone(zone)}>
                   Manage Zone
                 </Button>
               </Card>
             ))}
           </div>
+
+          <Modal open={!!managingZone} onClose={() => setManagingZone(null)} title={managingZone ? `Manage ${managingZone.name}` : undefined}>
+            {managingZone && (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="zone-priority" className="block mb-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    Priority
+                  </label>
+                  <select
+                    id="zone-priority"
+                    value={formPriority}
+                    onChange={(e) => setFormPriority(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg"
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="zone-load" className="block mb-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    Current Load (of {managingZone.maxCapacity})
+                  </label>
+                  <input
+                    id="zone-load"
+                    type="number"
+                    min={0}
+                    max={managingZone.maxCapacity}
+                    value={formLoad}
+                    onChange={(e) => setFormLoad(Number(e.target.value))}
+                    className="w-full px-4 py-2 rounded-lg"
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  />
+                </div>
+
+                {savedMessage && (
+                  <p role="status" className="text-sm flex items-center gap-2" style={{ color: 'var(--status-green)' }}>
+                    <CheckCircleIcon size={14} /> {savedMessage}
+                  </p>
+                )}
+
+                <Button className="w-full" onClick={handleSaveZone} disabled={saving}>
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            )}
+          </Modal>
     </FunctionPageShell>
   );
 }
