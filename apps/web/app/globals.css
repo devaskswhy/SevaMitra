@@ -535,8 +535,9 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 16px 48px rgba(232, 101, 10, 0.4), 0 0 0 1px rgba(232, 101, 10, 0.3);
 }
 
-/* GlowDock (components/GlowDock.tsx) — the sidebar's replacement on
-   every function page. */
+/* ScrollDock (components/ScrollDock.tsx) — bottom-left dock nav on
+   /hub's single-scroll page (class name kept from its GlowDock
+   predecessor). */
 .glow-dock-item:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.08);
