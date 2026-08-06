@@ -220,3 +220,6 @@ export const CloseIcon = (props: IconProps) => base(
 
 export const MenuIcon = (props: IconProps) => base(
   <path d="M3 12h18M3 6h18M3 18h18" />, props);
+
+export const ChevronDownIcon = (props: IconProps) => base(
+  <path d="m6 9 6 6 6-6" />, props);

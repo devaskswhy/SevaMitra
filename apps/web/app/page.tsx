@@ -8,6 +8,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WaterRipple from '@/components/WaterRipple';
 import FloatingTileField from '@/components/FloatingTileField';
+import { HandsPrayingIcon, ChevronDownIcon } from '@/components/icons';
 
 // Registered at module scope (not inside a component effect) so it's
 // guaranteed to run before any component's effect creates a
@@ -338,27 +339,54 @@ export default function Home() {
         onTileClick={(href) => signIn('google', { callbackUrl: href })}
         heroContent={
           <>
-            <SectionLabel number="01" title="EXPLORE" />
-            <h2
+            <h1
               style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'var(--text-2xl)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 800,
+                fontSize: 'var(--text-display)',
                 color: '#FFF8EE',
-                marginBottom: 'var(--space-4)',
-                maxWidth: '640px',
+                lineHeight: 1.1,
+                marginBottom: 'var(--space-3)',
+                textShadow: '0 4px 40px rgba(0,0,0,0.4)',
               }}
             >
-              Every function, one platform
-            </h2>
+              Namaste
+            </h1>
             <p
               style={{
-                fontSize: 'var(--text-lg)',
-                color: 'rgba(255,248,238,0.6)',
-                maxWidth: '520px',
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--text-xl)',
+                color: 'rgba(255,248,238,0.85)',
+                marginBottom: 'var(--space-10)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
               }}
             >
-              Zones, incidents, volunteers, shifts and reports — sign in to reach the live operations hub.
+              <HandsPrayingIcon size={22} /> सेवा के लिए तैयार
             </p>
+
+            {/* ── Scroll-down cue — signals there's more below before
+                 the scattered tiles are even visible ── */}
+            <button
+              onClick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}
+              aria-label="Scroll down to explore"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'rgba(255,248,238,0.6)',
+                cursor: 'pointer',
+                padding: 'var(--space-2)',
+                minWidth: 'var(--tap-target)',
+                minHeight: 'var(--tap-target)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ChevronDownIcon size={28} className="scroll-cue-bob" />
+            </button>
           </>
         }
       />

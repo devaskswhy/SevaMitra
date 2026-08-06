@@ -551,6 +551,24 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
+/* Landing hero's scroll-down cue (apps/web/app/page.tsx) — a smaller,
+   faster bob than the hub tiles' since it's a small inline glyph, not
+   a floating card. */
+@keyframes scroll-cue-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.scroll-cue-bob {
+  animation: scroll-cue-bob 1.8s var(--ease-sacred) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-bob {
+    animation: none;
+  }
+}
+
 @keyframes dot-bounce {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
   30% { transform: translateY(-4px); opacity: 1; }
