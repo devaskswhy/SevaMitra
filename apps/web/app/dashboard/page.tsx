@@ -5,14 +5,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 
-import TopBanner from '@/components/TopBanner';
-import Sidebar from '@/components/Sidebar';
+import FunctionPageShell from '@/components/FunctionPageShell';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { severityToBadge, priorityToBadge } from '@/components/ui/Badge';
 import { useStaggerReveal } from '@/lib/scroll';
 import { useSocket, SocketStatus } from '@/lib/socket';
 import {
+  GridIcon,
   UsersIcon,
   MapPinIcon,
   AlertTriangleIcon,
@@ -347,26 +347,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen lotus-pattern" style={{ background: 'var(--bg-primary)' }}>
-      <div className="loading-bar"></div>
-      <TopBanner />
-      <Sidebar />
-      
-      {/* OM Watermark */}
-      <div className="om-watermark">ॐ</div>
-
-      {/* Main Content */}
-      <div className="p-8" style={{ marginLeft: '280px', paddingTop: '56px' }}>
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Operations Center
-          </h1>
-          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-            Real-time Volunteer Management System
-          </p>
-        </div>
-
+    <FunctionPageShell icon={GridIcon} title="Operations Center" description="Real-time Volunteer Management System">
         {/* Top Metrics Bar */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <MetricCard title="Total Active Volunteers" value={stats.totalActiveVolunteers} color="var(--accent-saffron)" icon={UsersIcon} />
@@ -618,8 +599,7 @@ export default function Dashboard() {
             <ZoneCapacityChart zones={zones} />
           </div>
         </div>
-      </div>
-    </div>
+    </FunctionPageShell>
   );
 }
 

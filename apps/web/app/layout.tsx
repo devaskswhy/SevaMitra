@@ -74,8 +74,8 @@ export default function RootLayout({
           fontFamily: "var(--font-inter), -apple-system, sans-serif",
         }}
       >
-        <Loader />
         <AuthProvider>
+          <Loader />
           <PageTransition>{children}</PageTransition>
           <GlobalChatWidget />
         </AuthProvider>

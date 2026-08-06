@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
-import TopBanner from '@/components/TopBanner';
+import FunctionPageShell from '@/components/FunctionPageShell';
+import { UsersIcon } from '@/components/icons';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -56,13 +56,7 @@ export default function VolunteersPage() {
   useStaggerReveal('.volunteer-row', !loading && !error && filtered.length > 0);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      <TopBanner />
-      <Sidebar />
-      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
-        <div className="p-8">
-          <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Volunteers</h1>
-
+    <FunctionPageShell icon={UsersIcon} title="Volunteers" description="Searchable roster with skills and reliability scores.">
           {/* Search */}
           <div className="mb-6">
             <input
@@ -134,8 +128,6 @@ export default function VolunteersPage() {
           {!error && !loading && filtered.length === 0 && (
             <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No volunteers found.</div>
           )}
-        </div>
-      </div>
-    </div>
+    </FunctionPageShell>
   );
 }

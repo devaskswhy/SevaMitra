@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Sidebar from '@/components/Sidebar';
-import TopBanner from '@/components/TopBanner';
+import FunctionPageShell from '@/components/FunctionPageShell';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { CheckCircleIcon, XCircleIcon } from '@/components/icons';
+import { CheckCircleIcon, XCircleIcon, FileTextIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -95,14 +94,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      <TopBanner />
-      <Sidebar />
-      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
-        <div className="p-8 max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Volunteer Registration</h1>
-          <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Join us in serving at the Mahakumbh 2025</p>
-
+    <FunctionPageShell icon={FileTextIcon} title="Volunteer Registration" description="Join us in serving at the Mahakumbh 2025.">
+        <div className="max-w-2xl mx-auto">
           <Card padding="lg">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
@@ -271,7 +264,6 @@ export default function RegisterPage() {
             </form>
           </Card>
         </div>
-      </div>
-    </div>
+    </FunctionPageShell>
   );
 }

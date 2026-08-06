@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from '@/components/Sidebar';
-import TopBanner from '@/components/TopBanner';
+import FunctionPageShell from '@/components/FunctionPageShell';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import { useStaggerReveal } from '@/lib/scroll';
-import { AlertTriangleIcon, CheckCircleIcon } from '@/components/icons';
+import { AlertTriangleIcon, CheckCircleIcon, CalendarIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -239,16 +238,12 @@ export default function ShiftsPage() {
   const selectedTask = tasks.find((t) => t.id === assignTaskId);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      <TopBanner />
-      <Sidebar />
-      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
-        <div className="p-8">
-          <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Shifts</h1>
-            <Button onClick={openCreateModal}>+ New Shift</Button>
-          </div>
-
+    <FunctionPageShell
+      icon={CalendarIcon}
+      title="Shifts"
+      description="Schedule shifts and assign volunteers with skill-matched recommendations."
+      headerExtra={<Button onClick={openCreateModal}>+ New Shift</Button>}
+    >
           {error && (
             <Card padding="md" className="text-center mb-6">
               <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load shift data.</p>
@@ -312,8 +307,6 @@ export default function ShiftsPage() {
               </Card>
             );
           })}
-        </div>
-      </div>
 
       {/* ── Create Shift Modal ── */}
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="New Shift">
@@ -484,6 +477,6 @@ export default function ShiftsPage() {
           )}
         </div>
       </Modal>
-    </div>
+    </FunctionPageShell>
   );
 }

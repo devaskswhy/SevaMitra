@@ -539,6 +539,22 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 16px 48px rgba(232, 101, 10, 0.4), 0 0 0 1px rgba(232, 101, 10, 0.3);
 }
 
+/* GlowDock (components/GlowDock.tsx) — the sidebar's replacement on
+   every function page. */
+.glow-dock-item:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 0 16px rgba(232, 101, 10, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-dock-item {
+    transition: none !important;
+  }
+  .glow-dock-item:hover {
+    transform: none;
+  }
+}
+
 @keyframes dot-bounce {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
   30% { transform: translateY(-4px); opacity: 1; }

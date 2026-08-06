@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import gsap from "gsap";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -45,6 +46,13 @@ function startCounter() {
 }
 
 export default function Loader() {
+  const { data: session } = useSession();
+  // First name from the signed-in Google account when there is one (admin/
+  // coordinator flow); everyone else (signed-out visitors, the volunteer
+  // phone+OTP persona, which never populates this NextAuth session) gets
+  // the same generic greeting as before.
+  const firstName = session?.user?.name?.split(' ')[0];
+  const greeting = firstName ? `Namaste, ${firstName}` : 'Namaste';
 
   useEffect(() => {
     // Always show full loader on every visit
@@ -55,6 +63,7 @@ export default function Loader() {
 
     // Reset state so animation always starts fresh
     gsap.set('.loader-om', { scale: 0, opacity: 0 });
+    gsap.set('.loader-greeting', { opacity: 0, y: 8 });
     gsap.set('.loader-counter', { opacity: 0 });
     gsap.set('.loader-overlay', { yPercent: 0, display: 'flex' });
 
@@ -65,7 +74,8 @@ export default function Loader() {
       duration: 0.8,
       ease: 'back.out(1.7)',
       onComplete: () => {
-        // Start counter after OM appears
+        // Greeting + counter fade in after OM appears
+        gsap.to('.loader-greeting', { opacity: 1, y: 0, duration: 0.4 });
         gsap.to('.loader-counter', { opacity: 1, duration: 0.3 });
         startCounter();
       }
@@ -116,6 +126,21 @@ export default function Loader() {
       >
         ॐ
       </span>
+
+      {/* ── Personalized greeting ─────────────────────────────── */}
+      <p
+        className="loader-greeting"
+        style={{
+          marginTop: "16px",
+          fontFamily: "var(--font-heading)",
+          fontSize: "var(--text-lg)",
+          color: "#FFF8EE",
+          opacity: 0,
+          userSelect: "none",
+        }}
+      >
+        {greeting}
+      </p>
 
       {/* ── Progress Counter ─────────────────────────────────── */}
       <span

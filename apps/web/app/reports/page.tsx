@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
-import TopBanner from '@/components/TopBanner';
+import FunctionPageShell from '@/components/FunctionPageShell';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge, { statusToBadge } from '@/components/ui/Badge';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
-import { DownloadIcon, UsersIcon, CheckCircleIcon, ShieldIcon, StarIcon, MedalIcon, type IconProps } from '@/components/icons';
+import { DownloadIcon, UsersIcon, CheckCircleIcon, ShieldIcon, StarIcon, MedalIcon, ChartIcon, type IconProps } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -191,26 +190,16 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      <TopBanner />
-      <Sidebar />
-      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
-        <div className="p-8">
-          {/* Page Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-                Reports & Analytics
-              </h1>
-              <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-                Event performance overview and volunteer insights
-              </p>
-            </div>
-            <Button onClick={handleExport} className="flex items-center gap-2">
-              <DownloadIcon size={18} /> Export Report
-            </Button>
-          </div>
-
+    <FunctionPageShell
+      icon={ChartIcon}
+      title="Reports & Analytics"
+      description="Event performance overview and volunteer insights."
+      headerExtra={
+        <Button onClick={handleExport} className="flex items-center gap-2">
+          <DownloadIcon size={18} /> Export Report
+        </Button>
+      }
+    >
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <SummaryCard title="Total Volunteers" value={totalVolunteers} icon={UsersIcon} color="var(--accent-saffron)" />
@@ -323,9 +312,7 @@ export default function ReportsPage() {
               <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No volunteer data available.</div>
             )}
           </Card>
-        </div>
-      </div>
-    </div>
+    </FunctionPageShell>
   );
 }
 

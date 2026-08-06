@@ -1,15 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Sidebar from '@/components/Sidebar';
-import TopBanner from '@/components/TopBanner';
+import FunctionPageShell from '@/components/FunctionPageShell';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { severityToBadge, toneToColorVar } from '@/components/ui/Badge';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
 import { useSocket, SocketStatus } from '@/lib/socket';
-import { CheckCircleIcon, HourglassIcon, FlameIcon } from '@/components/icons';
+import { CheckCircleIcon, HourglassIcon, FlameIcon, AlertTriangleIcon } from '@/components/icons';
 
 const SOCKET_STATUS_META: Record<SocketStatus, { color: string; label: string }> = {
   connected: { color: 'var(--status-green)', label: 'LIVE' },
@@ -175,14 +174,27 @@ export default function IncidentsPage() {
   useStaggerReveal('.incident-card', !loading && !error && unresolved.length > 0);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      <TopBanner />
-      <Sidebar />
+    <FunctionPageShell
+      icon={AlertTriangleIcon}
+      title="Incident Management"
+      description="Live incident tracking with skill-matched volunteer deployment."
+      headerExtra={
+        <div className="flex items-center gap-2">
+          <span
+            className={`w-2 h-2 rounded-full ${socketStatus !== 'disconnected' ? 'animate-pulse' : ''}`}
+            style={{ background: SOCKET_STATUS_META[socketStatus].color }}
+          />
+          <span className="text-xs font-bold" style={{ color: SOCKET_STATUS_META[socketStatus].color }}>
+            {SOCKET_STATUS_META[socketStatus].label}
+          </span>
+        </div>
+      }
+    >
       {toastMessage && (
         <div
           style={{
             position: 'fixed',
-            top: '72px',
+            top: '24px',
             right: '20px',
             zIndex: 1200,
             background: 'rgba(17, 34, 17, 0.95)',
@@ -203,21 +215,6 @@ export default function IncidentsPage() {
           {toastMessage}
         </div>
       )}
-      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
-        <div className="p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Incident Management</h1>
-            <div className="flex items-center gap-2">
-              <span
-                className={`w-2 h-2 rounded-full ${socketStatus !== 'disconnected' ? 'animate-pulse' : ''}`}
-                style={{ background: SOCKET_STATUS_META[socketStatus].color }}
-              />
-              <span className="text-xs font-bold" style={{ color: SOCKET_STATUS_META[socketStatus].color }}>
-                {SOCKET_STATUS_META[socketStatus].label}
-              </span>
-            </div>
-          </div>
-
           {error && (
             <Card padding="md" className="text-center mb-6">
               <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load incidents.</p>
@@ -332,8 +329,6 @@ export default function IncidentsPage() {
           </div>
           </>
           )}
-        </div>
-      </div>
-    </div>
+    </FunctionPageShell>
   );
 }

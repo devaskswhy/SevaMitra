@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
-import TopBanner from '@/components/TopBanner';
+import FunctionPageShell from '@/components/FunctionPageShell';
+import { MapPinIcon } from '@/components/icons';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { priorityToBadge } from '@/components/ui/Badge';
@@ -48,13 +48,7 @@ export default function ZonesPage() {
   useStaggerReveal('.zone-card', !loading && !error && zones.length > 0);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      <TopBanner />
-      <Sidebar />
-      <div className="md:ml-[280px] pt-[56px] transition-all duration-300 min-h-screen">
-        <div className="p-8">
-          <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Zones</h1>
-
+    <FunctionPageShell icon={MapPinIcon} title="Zones" description="Capacity and priority across every Mahakumbh zone.">
           {error && (
             <Card padding="md" className="text-center mb-6">
               <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load zones.</p>
@@ -110,8 +104,6 @@ export default function ZonesPage() {
               </Card>
             ))}
           </div>
-        </div>
-      </div>
-    </div>
+    </FunctionPageShell>
   );
 }
