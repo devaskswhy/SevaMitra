@@ -8,7 +8,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import { useStaggerReveal } from '@/lib/scroll';
-import { AlertTriangleIcon, CheckCircleIcon, CalendarIcon } from '@/components/icons';
+import { AlertTriangleIcon, CheckCircleIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -240,7 +240,6 @@ export default function ShiftsSection() {
   return (
     <>
       <SectionHeading
-        icon={CalendarIcon}
         title="Shifts"
         description="Schedule shifts and assign volunteers with skill-matched recommendations."
         extra={<Button onClick={openCreateModal}>+ New Shift</Button>}
@@ -249,7 +248,7 @@ export default function ShiftsSection() {
       {error && (
         <Card padding="md" className="text-center mb-6">
           <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load shift data.</p>
-          <Button onClick={fetchAll} size="sm">Retry</Button>
+          <Button variant="outline" onClick={fetchAll} size="sm">Retry</Button>
         </Card>
       )}
 
@@ -283,7 +282,7 @@ export default function ShiftsSection() {
                 <Badge tone={totalAssigned > 0 ? 'saffron' : 'neutral'}>
                   {totalAssigned} volunteer{totalAssigned === 1 ? '' : 's'} assigned
                 </Badge>
-                <Button size="sm" onClick={() => openAssignModal(shift)}>Assign Volunteer</Button>
+                <Button variant="outline" size="sm" onClick={() => openAssignModal(shift)}>Assign Volunteer</Button>
               </div>
             </div>
 
@@ -298,7 +297,6 @@ export default function ShiftsSection() {
                     <span style={{ color: 'var(--text-secondary)' }}>{task.title} — {task.zone.name}</span>
                     <Badge
                       tone={assignedCount < task.minVolunteers ? 'danger' : assignedCount > task.maxVolunteers ? 'warning' : 'success'}
-                      variant="solid"
                     >
                       {assignedCount}/{task.minVolunteers}-{task.maxVolunteers}
                     </Badge>
@@ -411,7 +409,7 @@ export default function ShiftsSection() {
                           </p>
                         </div>
                         {!conflict ? (
-                          <Button size="sm" onClick={() => handleAssign(rec.volunteerId)} disabled={assigning}>
+                          <Button variant="outline" size="sm" onClick={() => handleAssign(rec.volunteerId)} disabled={assigning}>
                             Assign
                           </Button>
                         ) : (
@@ -449,6 +447,7 @@ export default function ShiftsSection() {
                     ))}
                   </select>
                   <Button
+                    variant="outline"
                     size="sm"
                     disabled={!manualVolunteerId || assigning}
                     onClick={() => manualVolunteerId && handleAssign(manualVolunteerId)}

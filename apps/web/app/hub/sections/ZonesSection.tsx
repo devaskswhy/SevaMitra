@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SectionHeading from './SectionHeading';
-import { MapPinIcon, CheckCircleIcon } from '@/components/icons';
+import { CheckCircleIcon } from '@/components/icons';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge, { priorityToBadge } from '@/components/ui/Badge';
@@ -84,12 +84,12 @@ export default function ZonesSection() {
 
   return (
     <>
-      <SectionHeading icon={MapPinIcon} title="Zones" description="Capacity and priority across every Mahakumbh zone." />
+      <SectionHeading title="Zones" description="Capacity and priority across every Mahakumbh zone." />
 
       {error && (
         <Card padding="md" className="text-center mb-6">
           <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load zones.</p>
-          <Button onClick={fetchZones} size="sm">
+          <Button variant="outline" onClick={fetchZones} size="sm">
             Retry
           </Button>
         </Card>
@@ -115,7 +115,7 @@ export default function ZonesSection() {
                 <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{zone.name}</h3>
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{zone.type}</p>
               </div>
-              <Badge tone={priorityToBadge(zone.priority).tone} variant="solid">
+              <Badge tone={priorityToBadge(zone.priority).tone}>
                 {zone.priority}
               </Badge>
             </div>
@@ -135,7 +135,7 @@ export default function ZonesSection() {
               </div>
             </div>
 
-            <Button size="sm" className="w-full mt-4" onClick={() => openManageZone(zone)}>
+            <Button variant="outline" size="sm" className="w-full mt-4" onClick={() => openManageZone(zone)}>
               Manage Zone
             </Button>
           </Card>

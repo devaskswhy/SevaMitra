@@ -7,7 +7,6 @@ import Button from '@/components/ui/Button';
 import Badge, { statusToBadge } from '@/components/ui/Badge';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
-import { DownloadIcon, UsersIcon, CheckCircleIcon, ShieldIcon, StarIcon, MedalIcon, ChartIcon, type IconProps } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -128,10 +127,10 @@ export default function ReportsSection() {
     .slice(0, 10);
 
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return { isMedal: true, color: '#D4A017', bg: 'rgba(212, 160, 23, 0.1)' };
-    if (rank === 2) return { isMedal: true, color: '#78909C', bg: 'rgba(120, 144, 156, 0.1)' };
-    if (rank === 3) return { isMedal: true, color: '#8B5E3C', bg: 'rgba(139, 94, 60, 0.1)' };
-    return { isMedal: false, label: `#${rank}`, color: 'var(--text-muted)', bg: 'rgba(160, 120, 90, 0.05)' };
+    if (rank === 1) return { color: '#D4A017', bg: 'rgba(212, 160, 23, 0.1)' };
+    if (rank === 2) return { color: '#78909C', bg: 'rgba(120, 144, 156, 0.1)' };
+    if (rank === 3) return { color: '#8B5E3C', bg: 'rgba(139, 94, 60, 0.1)' };
+    return { color: 'var(--text-muted)', bg: 'rgba(160, 120, 90, 0.05)' };
   };
 
   const toCsvValue = (value: string | number) => {
@@ -172,7 +171,7 @@ export default function ReportsSection() {
   if (loading) {
     return (
       <>
-        <SectionHeading icon={ChartIcon} title="Reports & Analytics" description="Event performance overview and volunteer insights." />
+        <SectionHeading title="Reports & Analytics" description="Event performance overview and volunteer insights." />
         <div className="card rounded-lg p-8 text-center" style={{ color: 'var(--text-muted)' }}>
           Loading report data...
         </div>
@@ -183,10 +182,10 @@ export default function ReportsSection() {
   if (error) {
     return (
       <>
-        <SectionHeading icon={ChartIcon} title="Reports & Analytics" description="Event performance overview and volunteer insights." />
+        <SectionHeading title="Reports & Analytics" description="Event performance overview and volunteer insights." />
         <Card padding="lg" className="text-center">
           <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load report data.</p>
-          <Button onClick={fetchAll}>Retry</Button>
+          <Button variant="outline" onClick={fetchAll}>Retry</Button>
         </Card>
       </>
     );
@@ -195,30 +194,25 @@ export default function ReportsSection() {
   return (
     <>
       <SectionHeading
-        icon={ChartIcon}
         title="Reports & Analytics"
         description="Event performance overview and volunteer insights."
-        extra={
-          <Button onClick={handleExport} className="flex items-center gap-2">
-            <DownloadIcon size={18} /> Export Report
-          </Button>
-        }
+        extra={<Button variant="outline" onClick={handleExport}>Export Report</Button>}
       />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <SummaryCard title="Total Volunteers" value={totalVolunteers} icon={UsersIcon} color="var(--accent-saffron)" />
-        <SummaryCard title="Shifts Completed" value={totalShiftsCompleted} icon={CheckCircleIcon} color="var(--success)" />
-        <SummaryCard title="Incidents Resolved" value={totalIncidentsResolved} icon={ShieldIcon} color="var(--accent-gold)" />
-        <SummaryCard title="Avg Reliability Score" value={`${avgReliability}%`} icon={StarIcon} color="var(--accent-deep)" />
+        <SummaryCard title="Total Volunteers" value={totalVolunteers} />
+        <SummaryCard title="Shifts Completed" value={totalShiftsCompleted} />
+        <SummaryCard title="Incidents Resolved" value={totalIncidentsResolved} />
+        <SummaryCard title="Avg Reliability Score" value={`${avgReliability}%`} />
       </div>
 
       <hr className="rangoli-divider" />
 
       {/* Zone Performance Table */}
       <Card padding="md" className="mb-8">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
-          <span style={{ color: 'var(--accent-gold)' }}>●</span> Zone Performance
+        <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+          Zone Performance
         </h3>
         <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
           <table className="w-full">
@@ -239,7 +233,7 @@ export default function ReportsSection() {
                   <td className="px-6 py-4 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{zone.name}</td>
                   <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{zone.assignedVolunteers}</td>
                   <td className="px-6 py-4 text-sm">
-                    <Badge tone={zone.incidents > 3 ? 'danger' : 'success'} variant="solid">
+                    <Badge tone={zone.incidents > 3 ? 'danger' : 'success'}>
                       {zone.incidents}
                     </Badge>
                   </td>
@@ -256,8 +250,8 @@ export default function ReportsSection() {
 
       {/* Volunteer Leaderboard */}
       <Card padding="md">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
-          <span style={{ color: 'var(--accent-saffron)' }}>●</span> Volunteer Leaderboard — Top 10
+        <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+          Volunteer Leaderboard — Top 10
         </h3>
         <div className="space-y-3">
           {leaderboard.map((volunteer, index) => {
@@ -276,16 +270,16 @@ export default function ReportsSection() {
                 <div
                   className="flex items-center justify-center rounded-full font-bold"
                   style={{
-                    width: '36px',
-                    height: '36px',
+                    width: '32px',
+                    height: '32px',
                     flexShrink: 0,
                     background: rank <= 3 ? `${badge.color}15` : 'var(--bg-secondary)',
-                    border: `2px solid ${badge.color}`,
+                    border: `1px solid ${badge.color}`,
                     color: badge.color,
-                    fontSize: rank <= 3 ? 'var(--text-base)' : 'var(--text-sm)',
+                    fontSize: 'var(--text-sm)',
                   }}
                 >
-                  {badge.isMedal ? <MedalIcon size={18} /> : badge.label}
+                  #{rank}
                 </div>
 
                 {/* Volunteer Info */}
@@ -299,13 +293,13 @@ export default function ReportsSection() {
                 </div>
 
                 {/* Status */}
-                <Badge tone={statusToBadge(volunteer.status).tone} variant="solid">
+                <Badge tone={statusToBadge(volunteer.status).tone}>
                   {volunteer.status}
                 </Badge>
 
                 {/* Score */}
                 <div className="text-right">
-                  <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--accent-gold)' }}>
+                  <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--text-primary)' }}>
                     {volunteer.reliabilityScore}%
                   </p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>reliability</p>
@@ -322,14 +316,11 @@ export default function ReportsSection() {
   );
 }
 
-function SummaryCard({ title, value, icon: Icon, color }: { title: string; value: string | number; icon: (props: IconProps) => React.JSX.Element; color: string }) {
+function SummaryCard({ title, value }: { title: string; value: string | number }) {
   return (
-    <Card padding="md" className="hover:shadow-xl transition-all summary-card">
-      <div className="flex items-center justify-between mb-3">
-        <span style={{ color }}><Icon size={22} /></span>
-        <span style={{ fontSize: 'var(--text-xl)', fontWeight: 800, color }}>{value}</span>
-      </div>
-      <h4 style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>{title}</h4>
+    <Card padding="md" className="summary-card">
+      <span style={{ fontSize: 'var(--text-xl)', fontWeight: 800, color: 'var(--text-primary)' }}>{value}</span>
+      <h4 style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', fontWeight: 500, marginTop: 'var(--space-1)' }}>{title}</h4>
     </Card>
   );
 }

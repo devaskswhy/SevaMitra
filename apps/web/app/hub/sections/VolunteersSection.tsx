@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import SectionHeading from './SectionHeading';
-import { UsersIcon } from '@/components/icons';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -57,7 +56,7 @@ export default function VolunteersSection() {
 
   return (
     <>
-      <SectionHeading icon={UsersIcon} title="Volunteers" description="Searchable roster with skills and reliability scores." />
+      <SectionHeading title="Volunteers" description="Searchable roster with skills and reliability scores." />
 
       {/* Search */}
       <div className="mb-6">
@@ -79,7 +78,7 @@ export default function VolunteersSection() {
       {error && (
         <Card padding="md" className="mb-6 text-center">
           <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load volunteers.</p>
-          <Button onClick={fetchVolunteers}>Retry</Button>
+          <Button variant="outline" onClick={fetchVolunteers}>Retry</Button>
         </Card>
       )}
 
@@ -116,7 +115,7 @@ export default function VolunteersSection() {
                   </td>
                   <td className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--accent-gold)' }}>{v.reliabilityScore}%</td>
                   <td className="px-6 py-4 text-sm">
-                    <Badge tone={statusToBadge(v.status).tone} variant="solid">
+                    <Badge tone={statusToBadge(v.status).tone}>
                       {v.status}
                     </Badge>
                   </td>

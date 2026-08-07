@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic';
 import SectionHeading from './SectionHeading';
-import { MapIcon } from '@/components/icons';
 import { useStaggerReveal } from '@/lib/scroll';
 
 // components/MapSection uses react-leaflet, which touches window at
@@ -16,7 +15,7 @@ export default function ZoneMapSection() {
 
   return (
     <>
-      <SectionHeading icon={MapIcon} title="Zone Map" description="Live density monitoring across all 12 sectors." />
+      <SectionHeading title="Zone Map" description="Live density monitoring across all 12 sectors." />
       <div className="map-reveal">
         <LeafletMap />
       </div>

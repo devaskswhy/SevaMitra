@@ -5,7 +5,7 @@ import SectionHeading from './SectionHeading';
 import axios from 'axios';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { CheckCircleIcon, XCircleIcon, FileTextIcon } from '@/components/icons';
+import { CheckCircleIcon, XCircleIcon } from '@/components/icons';
 
 const API = process.env.NEXT_PUBLIC_API_URL
   ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : `${process.env.NEXT_PUBLIC_API_URL}/api`)
@@ -95,7 +95,7 @@ export default function RegisterSection() {
 
   return (
     <>
-      <SectionHeading icon={FileTextIcon} title="Volunteer Registration" description="Join us in serving at the Mahakumbh 2025." />
+      <SectionHeading title="Volunteer Registration" description="Join us in serving at the Mahakumbh 2025." />
       <div className="max-w-2xl mx-auto">
         <Card padding="lg">
           <form onSubmit={handleSubmit} className="space-y-6">

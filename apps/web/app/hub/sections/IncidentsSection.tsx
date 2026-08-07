@@ -8,7 +8,7 @@ import Badge, { severityToBadge, toneToColorVar } from '@/components/ui/Badge';
 import axios from 'axios';
 import { useStaggerReveal } from '@/lib/scroll';
 import { useSocket, SocketStatus } from '@/lib/socket';
-import { CheckCircleIcon, HourglassIcon, FlameIcon, AlertTriangleIcon } from '@/components/icons';
+import { CheckCircleIcon } from '@/components/icons';
 
 const SOCKET_STATUS_META: Record<SocketStatus, { color: string; label: string }> = {
   connected: { color: 'var(--status-green)', label: 'LIVE' },
@@ -176,7 +176,6 @@ export default function IncidentsSection() {
   return (
     <>
       <SectionHeading
-        icon={AlertTriangleIcon}
         title="Incidents"
         description="Live incident tracking with skill-matched volunteer deployment."
         extra={
@@ -220,7 +219,7 @@ export default function IncidentsSection() {
       {error && (
         <Card padding="md" className="text-center mb-6">
           <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>Couldn&apos;t load incidents.</p>
-          <Button onClick={fetchIncidents} size="sm">
+          <Button variant="outline" onClick={fetchIncidents} size="sm">
             Retry
           </Button>
         </Card>
@@ -265,7 +264,7 @@ export default function IncidentsSection() {
                     >
                       <div style={{ flex: '1 1 300px' }}>
                         <div className="flex items-center gap-3 mb-2">
-                          <Badge tone={sev.tone} variant="solid">
+                          <Badge tone={sev.tone}>
                             {sev.label}
                           </Badge>
                           {incident.severity >= 5 && (
@@ -288,13 +287,12 @@ export default function IncidentsSection() {
                         )}
                       </div>
                       <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => handleDeployVolunteers(incident.id)}
                         disabled={isDeploying}
-                        className="flex items-center justify-center gap-2"
-                        style={{ whiteSpace: 'nowrap', minWidth: '120px' }}
+                        style={{ whiteSpace: 'nowrap', minWidth: '110px' }}
                       >
-                        {isDeploying ? <HourglassIcon size={14} /> : <FlameIcon size={14} />}
                         {isDeploying ? 'Deploying...' : 'Deploy'}
                       </Button>
                     </Card>
@@ -321,7 +319,7 @@ export default function IncidentsSection() {
                         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Resolved by: {resolverName}</p>
                         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Resolved in: {resolvedIn}</p>
                       </div>
-                      <Badge tone="success" variant="solid">
+                      <Badge tone="success">
                         Resolved
                       </Badge>
                     </div>
