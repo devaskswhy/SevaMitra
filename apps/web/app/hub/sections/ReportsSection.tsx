@@ -276,15 +276,16 @@ export default function ReportsSection() {
                 <div
                   className="flex items-center justify-center rounded-full font-bold"
                   style={{
-                    width: '44px',
-                    height: '44px',
+                    width: '36px',
+                    height: '36px',
+                    flexShrink: 0,
                     background: rank <= 3 ? `${badge.color}15` : 'var(--bg-secondary)',
                     border: `2px solid ${badge.color}`,
                     color: badge.color,
-                    fontSize: rank <= 3 ? '20px' : '14px'
+                    fontSize: rank <= 3 ? 'var(--text-base)' : 'var(--text-sm)',
                   }}
                 >
-                  {badge.isMedal ? <MedalIcon size={22} /> : badge.label}
+                  {badge.isMedal ? <MedalIcon size={18} /> : badge.label}
                 </div>
 
                 {/* Volunteer Info */}
@@ -304,7 +305,7 @@ export default function ReportsSection() {
 
                 {/* Score */}
                 <div className="text-right">
-                  <p className="text-2xl font-bold" style={{ color: 'var(--accent-gold)' }}>
+                  <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--accent-gold)' }}>
                     {volunteer.reliabilityScore}%
                   </p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>reliability</p>
@@ -324,13 +325,11 @@ export default function ReportsSection() {
 function SummaryCard({ title, value, icon: Icon, color }: { title: string; value: string | number; icon: (props: IconProps) => React.JSX.Element; color: string }) {
   return (
     <Card padding="md" className="hover:shadow-xl transition-all summary-card">
-      <div className="flex items-center justify-between mb-4">
-        <span style={{ color }}><Icon size={32} /></span>
-        <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
-          <span className="text-3xl font-bold" style={{ color }}>{value}</span>
-        </div>
+      <div className="flex items-center justify-between mb-3">
+        <span style={{ color }}><Icon size={22} /></span>
+        <span style={{ fontSize: 'var(--text-xl)', fontWeight: 800, color }}>{value}</span>
       </div>
-      <h4 className="font-medium" style={{ color: 'var(--text-secondary)', fontSize: '18px' }}>{title}</h4>
+      <h4 style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>{title}</h4>
     </Card>
   );
 }

@@ -288,12 +288,13 @@ export default function IncidentsSection() {
                         )}
                       </div>
                       <Button
+                        size="sm"
                         onClick={() => handleDeployVolunteers(incident.id)}
                         disabled={isDeploying}
                         className="flex items-center justify-center gap-2"
-                        style={{ whiteSpace: 'nowrap', minWidth: '140px' }}
+                        style={{ whiteSpace: 'nowrap', minWidth: '120px' }}
                       >
-                        {isDeploying ? <HourglassIcon size={16} /> : <FlameIcon size={16} />}
+                        {isDeploying ? <HourglassIcon size={14} /> : <FlameIcon size={14} />}
                         {isDeploying ? 'Deploying...' : 'Deploy'}
                       </Button>
                     </Card>

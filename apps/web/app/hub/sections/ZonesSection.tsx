@@ -135,7 +135,7 @@ export default function ZonesSection() {
               </div>
             </div>
 
-            <Button className="w-full mt-4" onClick={() => openManageZone(zone)}>
+            <Button size="sm" className="w-full mt-4" onClick={() => openManageZone(zone)}>
               Manage Zone
             </Button>
           </Card>

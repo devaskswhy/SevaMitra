@@ -21,7 +21,7 @@ const TINT_A = 'radial-gradient(ellipse 80% 40% at 50% 0%, rgba(232,101,10,0.08)
 const TINT_B = 'radial-gradient(ellipse 80% 40% at 50% 0%, rgba(232,101,10,0.08) 0%, #100600 60%)';
 
 const CONTAINER_STYLE: React.CSSProperties = { maxWidth: '1200px', margin: '0 auto' };
-const SECTION_STYLE: React.CSSProperties = { width: '100%', padding: 'var(--space-20) var(--space-6)' };
+const SECTION_STYLE: React.CSSProperties = { width: '100%', padding: 'var(--space-14) var(--space-6)' };
 
 /* ═══════════════════════════════════════════════════════════════
    HUB PAGE — single continuous scroll containing every function,
@@ -176,7 +176,7 @@ export default function HubPage() {
         <div style={CONTAINER_STYLE}><ShiftsSection /></div>
       </section>
 
-      <section id="register" style={{ ...SECTION_STYLE, background: TINT_A, position: 'relative', zIndex: 2, paddingBottom: 'var(--space-32)' }}>
+      <section id="register" style={{ ...SECTION_STYLE, background: TINT_A, position: 'relative', zIndex: 2, paddingBottom: 'var(--space-24)' }}>
         <div style={CONTAINER_STYLE}><RegisterSection /></div>
       </section>
 
